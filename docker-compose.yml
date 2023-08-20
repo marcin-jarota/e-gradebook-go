@@ -1,0 +1,25 @@
+version: "3.1"
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./tmp/postgres:/var/lib/postgresql/data"
+  local-web:
+    build:
+      dockerfile: local.dockerfile
+      context: ./
+    volumes:
+      - ./:/app
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - postgres
+

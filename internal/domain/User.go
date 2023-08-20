@@ -1,0 +1,34 @@
+package domain
+
+import (
+	"fmt"
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+)
+
+type User struct {
+	ID        uint           `json:"id" gorm:"primaryKey" `
+	Name      string         `json:"name"`
+	Surname   string         `json:"surname"`
+	Email     string         `json:"email"`
+	Password  string         `json:"-"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
+	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+}
+
+func (u *User) GetFullName() string {
+	return fmt.Sprintf("%s %s", u.Name, u.Surname)
+}
+
+func (u *User) GeneratePassword(plainText string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(plainText), 14)
+	return string(bytes), err
+}
+
+func (u *User) PaswordMatches(plainText string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plainText))
+	return err
+}
