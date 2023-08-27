@@ -15,8 +15,8 @@ POST http://localhost:8080/student HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Damian",
-    "surname": "Hirsz",
+    "name": "Jaonna",
+    "surname": "Testowa",
     "email": "jo@com.pl",
     "password": "zaq1@WSX",
     "role": "student"
@@ -37,3 +37,12 @@ content-type: application/json
 ### List subjects
 GET http://localhost:8080/subjects HTTP/1.1
 content-type: application/json
+
+
+### Add mark
+POST http://localhost:8080/mark HTTP/1.1
+content-type: application/json
+
+{
+    "value": "4.5"
+}

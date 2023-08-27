@@ -24,6 +24,6 @@ type SubjectRepository interface {
 	GetAll() ([]*domain.Subject, error)
 }
 
-type ClassGroupRepository interface {
-	AddClassGroup(classGroup *domain.ClassGroup) error
-}
+// type ClassGroupRepository interface {
+// 	AddClassGroup(classGroup *domain.ClassGroup) error
+// }

@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
@@ -29,6 +30,8 @@ func main() {
 	port := flag.String("port", os.Getenv("PORT"), "Port to listen on")
 	flag.Parse()
 
+	fmt.Println(*dsn)
+	time.Sleep(time.Second * 2)
 	conn, err := gorm.Open(postgres.Open(*dsn), nil)
 
 	if err != nil {
@@ -41,6 +44,7 @@ func main() {
 
 	studentRepo := repository.NewStudentRepository(conn)
 	subjectRepo := repository.NewSubjectRepository(conn)
+	markRepo := repository.NewMarkRepository(conn)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		type response struct {
@@ -181,6 +185,49 @@ func main() {
 		w.Write(response)
 
 	})
+
+	r.Post("/mark", func(w http.ResponseWriter, r *http.Request) {
+		var mark domain.Mark
+
+		err := json.NewDecoder(r.Body).Decode(&mark)
+
+		w.Header().Add("Content-Type", "application/json")
+
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		students, err := studentRepo.GetAll()
+		if err != nil {
+			handleErr(err, w)
+			return
+		}
+		subjects, err := subjectRepo.GetAll()
+		if err != nil {
+			handleErr(err, w)
+			return
+		}
+
+		mark.StudentID = students[0].ID
+		mark.SubjectID = subjects[0].ID
+
+		err = markRepo.AddMark(&mark)
+
+		if err != nil {
+			handleErr(err, w)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+
+		response, _ := json.Marshal(struct {
+			Ok bool `json:"ok"`
+		}{Ok: true})
+
+		w.Write(response)
+
+	})
 	r.Post("/user", func(w http.ResponseWriter, r *http.Request) {
 		var p domain.User
 
@@ -263,4 +310,13 @@ func main() {
 
 	http.ListenAndServe(fmt.Sprintf(":%s", *port), r)
 
+}
+
+func handleErr(err error, w http.ResponseWriter) {
+	w.WriteHeader(http.StatusBadRequest)
+	response, _ := json.Marshal(struct {
+		Error string `json:"error"`
+	}{Error: err.Error()})
+
+	w.Write(response)
 }

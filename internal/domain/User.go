@@ -2,8 +2,10 @@ package domain
 
 import (
 	"fmt"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type userRole string
@@ -14,13 +16,16 @@ const (
 )
 
 type User struct {
-	baseModel
-	Name     string   `json:"name"`
-	Surname  string   `json:"surname"`
-	Email    string   `json:"email"`
-	Role     userRole `json:"role" gorm:"type:user_role"`
-	Password string   `json:"-"`
-	Active   bool     `json:"active"`
+	ID        uint           `json:"id" gorm:"primaryKey"`
+	Name      string         `json:"name"`
+	Surname   string         `json:"surname"`
+	Email     string         `json:"email"`
+	Role      userRole       `json:"role" gorm:"type:user_role"`
+	Password  string         `json:"-"`
+	Active    bool           `json:"active"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
+	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
 func (u *User) GetFullName() string {
