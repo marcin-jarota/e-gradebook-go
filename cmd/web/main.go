@@ -31,7 +31,7 @@ func main() {
 	flag.Parse()
 
 	fmt.Println(*dsn)
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 5)
 	conn, err := gorm.Open(postgres.Open(*dsn), nil)
 
 	if err != nil {
@@ -41,10 +41,10 @@ func main() {
 	r := chi.NewRouter()
 
 	userRepo := repository.NewUserRepository(conn)
-
+	markRepo := repository.NewMarkRepository(conn)
 	studentRepo := repository.NewStudentRepository(conn)
 	subjectRepo := repository.NewSubjectRepository(conn)
-	markRepo := repository.NewMarkRepository(conn)
+
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		type response struct {
