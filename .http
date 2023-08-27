@@ -1,9 +1,39 @@
+### Add user
 POST http://localhost:8080/user HTTP/1.1
 content-type: application/json
 
 {
     "name": "Marcin",
-    "surname": "Testoy",
+    "surname": "User",
     "email": "jo@com.pl",
-    "password": "zaq1@WSX"
+    "password": "zaq1@WSX",
+    "role": "user"
 }
+
+### Add student
+POST http://localhost:8080/student HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Damian",
+    "surname": "Hirsz",
+    "email": "jo@com.pl",
+    "password": "zaq1@WSX",
+    "role": "student"
+}
+
+### List students
+GET http://localhost:8080/students HTTP/1.1
+content-type: application/json
+
+### Add subject
+POST http://localhost:8080/subject HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Matematyka"
+}
+
+### List subjects
+GET http://localhost:8080/subjects HTTP/1.1
+content-type: application/json

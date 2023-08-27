@@ -2,21 +2,25 @@ package domain
 
 import (
 	"fmt"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
+)
+
+type userRole string
+
+const (
+	admin   userRole = "admin"
+	student userRole = "student"
 )
 
 type User struct {
-	ID        uint           `json:"id" gorm:"primaryKey" `
-	Name      string         `json:"name"`
-	Surname   string         `json:"surname"`
-	Email     string         `json:"email"`
-	Password  string         `json:"-"`
-	CreatedAt time.Time      `json:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt"`
-	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+	baseModel
+	Name     string   `json:"name"`
+	Surname  string   `json:"surname"`
+	Email    string   `json:"email"`
+	Role     userRole `json:"role" gorm:"type:user_role"`
+	Password string   `json:"-"`
+	Active   bool     `json:"active"`
 }
 
 func (u *User) GetFullName() string {
@@ -31,4 +35,8 @@ func (u *User) GeneratePassword(plainText string) (string, error) {
 func (u *User) PaswordMatches(plainText string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plainText))
 	return err
+}
+
+func (u *User) IsAdmin() bool {
+	return u.Role == admin
 }

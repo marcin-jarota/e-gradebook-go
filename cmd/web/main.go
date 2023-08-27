@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -30,8 +31,6 @@ func main() {
 
 	conn, err := gorm.Open(postgres.Open(*dsn), nil)
 
-	conn.AutoMigrate(&domain.User{})
-
 	if err != nil {
 		panic(err)
 	}
@@ -40,12 +39,15 @@ func main() {
 
 	userRepo := repository.NewUserRepository(conn)
 
+	studentRepo := repository.NewStudentRepository(conn)
+	subjectRepo := repository.NewSubjectRepository(conn)
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		type response struct {
 			Data any `json:"data"`
 		}
 
-		user, err := userRepo.GetOne(1)
+		user, err := userRepo.GetOne(12)
 
 		if err != nil {
 			w.WriteHeader(500)
@@ -69,6 +71,116 @@ func main() {
 		w.Write(parsed)
 	})
 
+	r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
+		tpl, err := template.ParseFiles("./cmd/web/index.html")
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = tpl.Execute(w, nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+	})
+
+	r.Get("/test1", func(w http.ResponseWriter, r *http.Request) {
+		tpl, err := template.ParseFiles("./cmd/web/tst.html")
+
+		user, err := userRepo.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		students, err := studentRepo.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = tpl.Execute(w, map[string]any{
+			"User":     user,
+			"Students": students,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+	})
+
+	r.Get("/students", func(w http.ResponseWriter, r *http.Request) {
+		type response struct {
+			Error bool              `json:"error"`
+			Data  []*domain.Student `json:"data"`
+		}
+		responseError := false
+
+		students, err := studentRepo.GetAll()
+		w.Header().Add("Content-Type", "application/json")
+
+		if err != nil {
+			responseError = true
+		}
+
+		jsonResponse, _ := json.Marshal(response{
+			Data:  students,
+			Error: responseError,
+		})
+
+		w.Write(jsonResponse)
+	})
+
+	r.Get("/subjects", func(w http.ResponseWriter, r *http.Request) {
+		type response struct {
+			Error bool              `json:"error"`
+			Data  []*domain.Subject `json:"data"`
+		}
+		responseError := false
+
+		subjects, err := subjectRepo.GetAll()
+		w.Header().Add("Content-Type", "application/json")
+
+		if err != nil {
+			responseError = true
+		}
+
+		jsonResponse, _ := json.Marshal(response{
+			Data:  subjects,
+			Error: responseError,
+		})
+
+		w.Write(jsonResponse)
+	})
+
+	r.Post("/subject", func(w http.ResponseWriter, r *http.Request) {
+		var subject domain.Subject
+		err := json.NewDecoder(r.Body).Decode(&subject)
+		w.Header().Add("Content-Type", "application/json")
+
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		err = subjectRepo.AddSubject(&subject)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			response, _ := json.Marshal(struct {
+				Error string `json:"error"`
+			}{Error: err.Error()})
+
+			w.Write(response)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+
+		response, _ := json.Marshal(struct {
+			Ok bool `json:"ok"`
+		}{Ok: true})
+
+		w.Write(response)
+
+	})
 	r.Post("/user", func(w http.ResponseWriter, r *http.Request) {
 		var p domain.User
 
@@ -105,6 +217,46 @@ func main() {
 
 		w.Write(response)
 
+	})
+
+	r.Post("/student", func(w http.ResponseWriter, r *http.Request) {
+		var user domain.User
+		var student domain.Student
+
+		err := json.NewDecoder(r.Body).Decode(&user)
+		w.Header().Add("Content-Type", "application/json")
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			response, _ := json.Marshal(struct {
+				Error string `json:"error"`
+			}{Error: err.Error()})
+
+			w.Write(response)
+			return
+		}
+
+		student.User = user
+
+		err = studentRepo.AddStudent(&student)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			response, _ := json.Marshal(struct {
+				Error string `json:"error"`
+			}{Error: err.Error()})
+
+			w.Write(response)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+
+		response, _ := json.Marshal(struct {
+			Ok bool `json:"ok"`
+		}{Ok: true})
+
+		w.Write(response)
 	})
 
 	log.Printf("Listening on port http://localhost:%s", *port)
