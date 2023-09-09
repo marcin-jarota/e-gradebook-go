@@ -45,6 +45,7 @@ func main() {
 	studentRepo := repository.NewStudentRepository(conn)
 	subjectRepo := repository.NewSubjectRepository(conn)
 
+	tpls := template.Must(template.ParseFiles("./web/templates/layout/base.layout.html", "./web/templates/pages/login.html"))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		type response struct {
@@ -76,13 +77,18 @@ func main() {
 	})
 
 	r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
-		tpl, err := template.ParseFiles("./cmd/web/index.html")
+		// tpl, err := template.ParseFiles("./cmd/web/index.html")
 
-		if err != nil {
-			log.Fatal(err)
-		}
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
 
-		err = tpl.Execute(w, nil)
+		// err = tpl.Execute(w, nil)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		err := tpls.ExecuteTemplate(w, "login.html", nil)
+
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -194,7 +200,7 @@ func main() {
 		w.Header().Add("Content-Type", "application/json")
 
 		if err != nil {
-			log.Fatal(err)
+			handleErr(err, w)
 			return
 		}
 
@@ -203,6 +209,7 @@ func main() {
 			handleErr(err, w)
 			return
 		}
+
 		subjects, err := subjectRepo.GetAll()
 		if err != nil {
 			handleErr(err, w)
@@ -308,12 +315,17 @@ func main() {
 
 	log.Printf("Listening on port http://localhost:%s", *port)
 
+	fs := http.FileServer(http.Dir("./web/dist"))
+
+	r.Handle("/static/*", http.StripPrefix("/static/", fs))
+
 	http.ListenAndServe(fmt.Sprintf(":%s", *port), r)
 
 }
 
 func handleErr(err error, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusBadRequest)
+	log.Panic(err)
 	response, _ := json.Marshal(struct {
 		Error string `json:"error"`
 	}{Error: err.Error()})

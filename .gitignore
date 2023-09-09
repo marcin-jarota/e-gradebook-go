@@ -1,2 +1,4 @@
 .env
 tmp
+/web/dist
+node_modules

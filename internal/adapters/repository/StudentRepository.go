@@ -24,7 +24,7 @@ func NewStudentRepository(db *gorm.DB) *StudentRepository {
 func (r *StudentRepository) GetAll() ([]*domain.Student, error) {
 	var students []*domain.Student
 
-	res := r.db.Preload("User").Find(&students)
+	res := r.db.Preload("User").Preload("Marks").Find(&students)
 	if res.Error != nil {
 		return students, res.Error
 	}
