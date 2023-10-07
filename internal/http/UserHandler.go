@@ -1,6 +1,7 @@
 package http
 
 import (
+	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
 	"fmt"
 
@@ -11,10 +12,19 @@ type UserHandler struct {
 	auth ports.AuthService
 }
 
-func NewUserHandler(userUscase ports.AuthService) *UserHandler {
+func NewUserHandler(auth ports.AuthService) *UserHandler {
 	return &UserHandler{
-		auth: userUscase,
+		auth: auth,
 	}
+}
+
+func (u *UserHandler) BindRouting(app *fiber.App) *UserHandler {
+	app.Get("/login", u.GetLogin)
+	app.Post("/login", u.PostLogin)
+	app.Get("/logout", u.AuthMiddleware(), u.Logout)
+	app.Get("/start", u.AuthMiddleware(), u.Start)
+
+	return u
 }
 
 func (u *UserHandler) AuthMiddleware() fiber.Handler {
@@ -24,15 +34,21 @@ func (u *UserHandler) AuthMiddleware() fiber.Handler {
 		if isLoggedIn {
 			fmt.Println(user.Name)
 
-			c.Locals("User", user)
+			c.Locals("user", user)
 			return c.Next()
 		}
 
-		return c.Redirect("/")
+		return c.Redirect("/login")
 	}
 }
 
 func (u *UserHandler) GetLogin(c *fiber.Ctx) error {
+	isLoggedIn, _ := u.auth.IsLoggedIn(c.Cookies("token"))
+
+	if isLoggedIn {
+		return c.Redirect("/start")
+	}
+
 	return c.Render("pages/login", nil, "layouts/main")
 }
 
@@ -47,5 +63,24 @@ func (u *UserHandler) PostLogin(c *fiber.Ctx) error {
 
 	c.Cookie(&fiber.Cookie{Name: "token", Value: token})
 
-	return c.Redirect("/app/home", fiber.StatusFound)
+	return c.Redirect("/start", fiber.StatusFound)
+}
+
+func (u *UserHandler) Logout(c *fiber.Ctx) error {
+	user := c.Locals("user").(*domain.SessionUser)
+	err := u.auth.Logout(int(user.ID))
+	if err != nil {
+		panic(err)
+	}
+
+	return c.Render("pages/login", fiber.Map{"Error": "Logged out!"}, "layouts/main")
+
+}
+
+func (u *UserHandler) Start(c *fiber.Ctx) error {
+	user := c.Locals("user").(*domain.SessionUser)
+
+	return c.Render("pages/start", fiber.Map{
+		"User": user,
+	}, "layouts/main")
 }

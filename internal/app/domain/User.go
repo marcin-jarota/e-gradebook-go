@@ -28,6 +28,16 @@ type User struct {
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
+type SessionUser struct {
+	ID       uint     `json:"id"`
+	Name     string   `json:"name"`
+	Surname  string   `json:"surname"`
+	FullName string   `json:"fullName"`
+	Email    string   `json:"email"`
+	Role     userRole `json:"role"`
+	Active   bool     `json:"active"`
+}
+
 func (u *User) GetFullName() string {
 	return fmt.Sprintf("%s %s", u.Name, u.Surname)
 }

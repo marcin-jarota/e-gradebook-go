@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"e-student/internal/adapters/repository"
 	"e-student/internal/adapters/service"
 	"e-student/internal/adapters/storage"
@@ -9,14 +10,15 @@ import (
 	transport "e-student/internal/http"
 	"encoding/json"
 	"fmt"
-	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"html/template"
 	"log"
 	"net/http"
 
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/redis/go-redis/v9"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/template/html/v2"
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
@@ -34,6 +36,12 @@ func main() {
 
 	r := chi.NewRouter()
 
+	client := redis.NewClient(&redis.Options{
+		Addr:     cfg.RedisAddr,
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+
 	userRepo := repository.NewGormUserRepository(conn)
 	markRepo := repository.NewGormMarkRepository(conn)
 	studentRepo := repository.NewGormStudentRepository(conn)
@@ -43,38 +51,44 @@ func main() {
 
 	engine := html.New("./web/templates", ".html")
 
-	app := fiber.New(fiber.Config{Views: engine})
+	app := fiber.New(fiber.Config{Views: engine, ViewsLayout: "layouts/main"})
 
-	app.Use(csrf.New())
-	storage := storage.NewMemoryStorage()
-	authService := service.NewAuthService(userRepo, storage, cfg)
-	studentSrvc := service.NewStudentService(studentRepo)
-	studentHandler := transport.NewStudentHandler(studentSrvc)
-	userHandler := transport.NewUserHandler(authService)
+	// app.Use(csrf.New())
+	// app.Use(cors.New(cors.Config{
+	// 	AllowCredentials: true,
+	// 	AllowOrigins:     "http://localhost:3001,http://localhost:3002",
+	// }))
 
-	app.Use(cors.New(cors.Config{
-		AllowCredentials: true,
-		AllowOrigins:     "http://localhost:3001,http://localhost:3002",
+	app.Use(logger.New(logger.Config{
+		Format:     "${pid} ${status} - ${method} ${path}\n",
+		TimeFormat: "02-Jan-2006",
+		TimeZone:   "Poland/Warsaw",
 	}))
 
-	app.Get("/", userHandler.GetLogin)
+	storage := storage.NewRedisStorage("session", client, context.Background())
+	authService := service.NewAuthService(userRepo, storage, cfg)
+	// studentSrvc := service.NewStudentService(studentRepo)
+	// studentHandler := transport.NewStudentHandler(studentSrvc)
 
-	app.Post("/", userHandler.PostLogin)
+	transport.NewUserHandler(authService).BindRouting(app)
 
-	app.Get("/delete", func(c *fiber.Ctx) error {
-		storage.Delete(c.Query("id"))
-		return c.JSON(fiber.Map{"message": fmt.Sprintf("Deleted session for user %s", c.Query("id"))})
-	})
+	// app.Get("/login", userHandler.GetLogin)
+	// app.Post("/login", userHandler.PostLogin)
+	// app.Get("/start", userHandler.Start)
+	// app.Get("/delete", func(c *fiber.Ctx) error {
+	// 	storage.Delete(c.Query("id"))
+	// 	return c.JSON(fiber.Map{"message": fmt.Sprintf("Deleted session for user %s", c.Query("id"))})
+	// })
 
 	// app.Get("/students2", userHandler.AuthMiddleware(), studentHandler.GetAllStudents)
 
-	appGroup := app.Group("/app", userHandler.AuthMiddleware())
+	// appGroup := app.Group("/app", userHandler.AuthMiddleware())
 
-	appGroup.Get("/home", func(c *fiber.Ctx) error {
-		return c.Render("pages/home", nil, "layouts/main")
-	})
+	// appGroup.Get("/home", func(c *fiber.Ctx) error {
+	// 	return c.Render("pages/home", nil, "layouts/main")
+	// })
 
-	appGroup.Get("/students", studentHandler.GetAllStudents)
+	// appGroup.Get("/students", studentHandler.GetAllStudents)
 
 	// r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 	// 	type response struct {
@@ -319,7 +333,6 @@ func main() {
 			return
 		}
 
-		fmt.Println("USER PASWOD ", user.Password, user.Name)
 		student.User = user
 
 		err = studentRepo.AddStudent(&student)

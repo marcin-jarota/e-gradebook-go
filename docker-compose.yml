@@ -22,4 +22,13 @@ services:
       - ${PORT}:${PORT}
     depends_on:
       - postgres
+      - redis
+  redis:
+    image: 'bitnami/redis:latest'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./tmp/redis-data:/data
+    ports:
+      - 6379:6379
 

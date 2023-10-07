@@ -30,7 +30,7 @@ func NewAuthService(userRepo ports.UserRepository, sessionStorage ports.SessionS
 	}
 }
 
-func (s *AuthService) IsLoggedIn(token string) (bool, *domain.User) {
+func (s *AuthService) IsLoggedIn(token string) (bool, *domain.SessionUser) {
 	var userClaims claims
 
 	parsed, err := jwt.ParseWithClaims(token, &userClaims, func(t *jwt.Token) (interface{}, error) {
@@ -67,8 +67,19 @@ func (s *AuthService) IsLoggedIn(token string) (bool, *domain.User) {
 		return false, nil
 	}
 
-	return true, user
+	return true, &domain.SessionUser{
+		ID:       user.ID,
+		Name:     user.Name,
+		Surname:  user.Surname,
+		FullName: user.GetFullName(),
+		Email:    user.Email,
+		Active:   user.Active,
+	}
 
+}
+
+func (s *AuthService) Logout(userId int) error {
+	return s.sessionStorage.Delete(strconv.Itoa(userId))
 }
 
 func (s *AuthService) Login(email string, password string) (string, error) {
@@ -101,7 +112,7 @@ func (s *AuthService) Login(email string, password string) (string, error) {
 	err = s.sessionStorage.Set(strconv.Itoa(int(user.ID)), signedToken)
 
 	if err != nil {
-		return "", errors.New("could not login")
+		return "", errors.Join(err, errors.New("could not login"))
 	}
 
 	return signedToken, nil
