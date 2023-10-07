@@ -12,21 +12,21 @@ var (
 	ErrCouldNotCreateStudent = errors.New("could not create student")
 )
 
-type StudentRepository struct {
+type GormStudentRepository struct {
 	db *gorm.DB
 }
 
-func NewStudentRepository(db *gorm.DB) *StudentRepository {
+func NewGormStudentRepository(db *gorm.DB) *GormStudentRepository {
 	if err := db.AutoMigrate(&domain.Student{}); err != nil {
 		log.Panic(err)
 	}
 
-	return &StudentRepository{
+	return &GormStudentRepository{
 		db: db,
 	}
 }
 
-func (r *StudentRepository) GetAll() ([]*domain.Student, error) {
+func (r *GormStudentRepository) GetAll() ([]*domain.Student, error) {
 	var students []*domain.Student
 
 	res := r.db.Preload("User").Preload("Marks").Find(&students)
@@ -37,7 +37,7 @@ func (r *StudentRepository) GetAll() ([]*domain.Student, error) {
 	return students, nil
 }
 
-func (r *StudentRepository) AddStudent(student *domain.Student) error {
+func (r *GormStudentRepository) AddStudent(student *domain.Student) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		hash, err := student.User.GeneratePassword(student.User.Password)
 		if err != nil {

@@ -33,10 +33,10 @@ func main() {
 
 	r := chi.NewRouter()
 
-	userRepo := repository.NewUserRepository(conn)
-	markRepo := repository.NewMarkRepository(conn)
-	studentRepo := repository.NewStudentRepository(conn)
-	subjectRepo := repository.NewSubjectRepository(conn)
+	userRepo := repository.NewGormUserRepository(conn)
+	markRepo := repository.NewGormMarkRepository(conn)
+	studentRepo := repository.NewGormStudentRepository(conn)
+	subjectRepo := repository.NewGormSubjectRepository(conn)
 
 	tpls := template.Must(template.ParseFiles("./web/templates/pages/login.html"))
 

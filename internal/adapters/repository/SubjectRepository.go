@@ -6,23 +6,23 @@ import (
 	"gorm.io/gorm"
 )
 
-type SubjectRepository struct {
+type GormSubjectRepository struct {
 	db *gorm.DB
 }
 
-func NewSubjectRepository(db *gorm.DB) *SubjectRepository {
+func NewGormSubjectRepository(db *gorm.DB) *GormSubjectRepository {
 	db.AutoMigrate(&domain.Subject{})
 
-	return &SubjectRepository{
+	return &GormSubjectRepository{
 		db: db,
 	}
 }
 
-func (r *SubjectRepository) AddSubject(subject *domain.Subject) error {
+func (r *GormSubjectRepository) AddSubject(subject *domain.Subject) error {
 	return r.db.Create(subject).Error
 }
 
-func (r *SubjectRepository) GetAll() ([]*domain.Subject, error) {
+func (r *GormSubjectRepository) GetAll() ([]*domain.Subject, error) {
 	var subjects []*domain.Subject
 
 	res := r.db.Find(&subjects)

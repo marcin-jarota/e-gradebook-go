@@ -7,21 +7,21 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository struct {
+type GormUserRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
+func NewGormUserRepository(db *gorm.DB) *GormUserRepository {
 	if err := db.AutoMigrate(&domain.User{}); err != nil {
 		log.Panic(err)
 	}
 
-	return &UserRepository{
+	return &GormUserRepository{
 		db: db,
 	}
 }
 
-func (u *UserRepository) GetOneByEmail(email string) (*domain.User, error) {
+func (u *GormUserRepository) GetOneByEmail(email string) (*domain.User, error) {
 	var user domain.User
 	res := u.db.First(&user, "email = ?", email)
 
@@ -31,7 +31,7 @@ func (u *UserRepository) GetOneByEmail(email string) (*domain.User, error) {
 
 	return &user, nil
 }
-func (u *UserRepository) GetOne(id int) (*domain.User, error) {
+func (u *GormUserRepository) GetOne(id int) (*domain.User, error) {
 	var user domain.User
 
 	res := u.db.First(&user, id)
@@ -43,7 +43,7 @@ func (u *UserRepository) GetOne(id int) (*domain.User, error) {
 	return &user, nil
 }
 
-func (u *UserRepository) GetAll() ([]*domain.User, error) {
+func (u *GormUserRepository) GetAll() ([]*domain.User, error) {
 	var users []*domain.User
 
 	res := u.db.Find(&users)
@@ -55,7 +55,7 @@ func (u *UserRepository) GetAll() ([]*domain.User, error) {
 	return users, nil
 }
 
-func (u *UserRepository) AddUser(user *domain.User) error {
+func (u *GormUserRepository) AddUser(user *domain.User) error {
 	hash, err := user.GeneratePassword(user.Password)
 
 	user.Password = hash

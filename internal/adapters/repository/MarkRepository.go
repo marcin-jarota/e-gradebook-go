@@ -7,22 +7,22 @@ import (
 	"gorm.io/gorm"
 )
 
-type MarkRepository struct {
+type GormMarkRepository struct {
 	db *gorm.DB
 }
 
-func NewMarkRepository(db *gorm.DB) *MarkRepository {
+func NewGormMarkRepository(db *gorm.DB) *GormMarkRepository {
 	err := db.AutoMigrate(&domain.Mark{})
 
 	if err != nil {
 		log.Panic(err)
 	}
 
-	return &MarkRepository{
+	return &GormMarkRepository{
 		db: db,
 	}
 }
 
-func (r *MarkRepository) AddMark(mark *domain.Mark) error {
+func (r *GormMarkRepository) AddMark(mark *domain.Mark) error {
 	return r.db.Create(mark).Error
 }
