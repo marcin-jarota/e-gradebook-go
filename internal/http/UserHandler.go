@@ -41,9 +41,8 @@ func (u *UserHandler) PostLogin(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Render("pages/login", fiber.Map{
-			"Title": "E-gradebook login",
 			"Error": err.Error(),
-		})
+		}, "layouts/main")
 	}
 
 	c.Cookie(&fiber.Cookie{Name: "token", Value: token})

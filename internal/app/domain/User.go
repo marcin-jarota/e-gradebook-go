@@ -38,7 +38,6 @@ func (u *User) GeneratePassword(plainText string) (string, error) {
 }
 
 func (u *User) PaswordMatches(plainText string) error {
-	fmt.Println("asdasdsadsd passs ", u.Password, plainText)
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plainText))
 	return err
 }

@@ -1,8 +1,18 @@
-<form action="/" method="POST">
-	{{ if .Error }}
-	{{ .Error }}
-	{{end}}
-	<input type="email" name="email" value="">
-	<input type="password" name="password" value="">
-	<button type="submit" class="btn btn-primary">Login</button>
-</form>
+<div class="container d-flex align-items-center justify-content-center">
+	<form action="/" class="container-sm" method="POST">
+		{{ if .Error }}
+		<div class="alert alert-danger" role="alert">
+			{{ .Error }}
+		</div>
+		{{end}}
+		<div class="form-group mb-3">
+			<label for="email" class="form-label">Email</label>
+			<input class="form-control" type="email" name="email">
+		</div>
+		<div class="form-group mb-3">
+			<label for="password" class="form-label">Password</label>
+			<input class="form-control" type="password" name="password">
+		</div>
+		<button type="submit" class="btn btn-primary">Zaloguj</button>
+	</form>
+</div>

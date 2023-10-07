@@ -9,6 +9,7 @@ import (
 	transport "e-student/internal/http"
 	"encoding/json"
 	"fmt"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"html/template"
 	"log"
 	"net/http"
@@ -44,6 +45,7 @@ func main() {
 
 	app := fiber.New(fiber.Config{Views: engine})
 
+	app.Use(csrf.New())
 	storage := storage.NewMemoryStorage()
 	authService := service.NewAuthService(userRepo, storage, cfg)
 	studentSrvc := service.NewStudentService(studentRepo)
