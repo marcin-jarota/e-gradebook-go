@@ -8,12 +8,18 @@ import (
 )
 
 type RedisStorage struct {
-	client *redis.Client
 	ctx    context.Context
 	prefix string
+	client *redis.Client
 }
 
-func NewRedisStorage(prefix string, client *redis.Client, ctx context.Context) *RedisStorage {
+func NewRedisStorage(prefix string, addr string, ctx context.Context) *RedisStorage {
+	client := redis.NewClient(&redis.Options{
+		Addr:     addr,
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+
 	return &RedisStorage{
 		client: client,
 		ctx:    ctx,
