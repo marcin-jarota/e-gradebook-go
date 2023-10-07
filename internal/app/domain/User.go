@@ -21,7 +21,7 @@ type User struct {
 	Surname   string         `json:"surname"`
 	Email     string         `json:"email"`
 	Role      userRole       `json:"role" gorm:"type:user_role"`
-	Password  string         `json:"-"`
+	Password  string         `json:"password"`
 	Active    bool           `json:"active"`
 	CreatedAt time.Time      `json:"createdAt"`
 	UpdatedAt time.Time      `json:"updatedAt"`
@@ -33,11 +33,12 @@ func (u *User) GetFullName() string {
 }
 
 func (u *User) GeneratePassword(plainText string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(plainText), 14)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(plainText), bcrypt.DefaultCost)
 	return string(bytes), err
 }
 
 func (u *User) PaswordMatches(plainText string) error {
+	fmt.Println("asdasdsadsd passs ", u.Password, plainText)
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plainText))
 	return err
 }

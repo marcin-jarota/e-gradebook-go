@@ -1,5 +1,8 @@
-{{template "base-layout" .}}
-
-{{define "body"}}
-<h1>ok</h1>
-{{end}}
+<form action="/" method="POST">
+	{{ if .Error }}
+	{{ .Error }}
+	{{end}}
+	<input type="email" name="email" value="">
+	<input type="password" name="password" value="">
+	<button type="submit" class="btn btn-primary">Login</button>
+</form>

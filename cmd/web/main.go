@@ -2,37 +2,30 @@ package main
 
 import (
 	"e-student/internal/adapters/repository"
-	"e-student/internal/domain"
+	"e-student/internal/adapters/service"
+	"e-student/internal/adapters/storage"
+	"e-student/internal/app/domain"
+	"e-student/internal/common"
+	transport "e-student/internal/http"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"os"
-	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/joho/godotenv"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/template/html/v2"
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func main() {
-	err := godotenv.Load()
+	cfg := common.NewConfig()
 
-	if err != nil {
-		panic(err)
-	}
-
-	dsn := flag.String("dsn", os.Getenv("DSN"), "Connection DSN")
-	port := flag.String("port", os.Getenv("PORT"), "Port to listen on")
-	flag.Parse()
-
-	fmt.Println(*dsn)
-	time.Sleep(time.Second * 5)
-	conn, err := gorm.Open(postgres.Open(*dsn), nil)
+	conn, err := gorm.Open(postgres.Open(cfg.Dsn), nil)
 
 	if err != nil {
 		panic(err)
@@ -45,36 +38,70 @@ func main() {
 	studentRepo := repository.NewStudentRepository(conn)
 	subjectRepo := repository.NewSubjectRepository(conn)
 
-	tpls := template.Must(template.ParseFiles("./web/templates/layout/base.layout.html", "./web/templates/pages/login.html"))
+	tpls := template.Must(template.ParseFiles("./web/templates/pages/login.html"))
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		type response struct {
-			Data any `json:"data"`
-		}
+	engine := html.New("./web/templates", ".html")
 
-		user, err := userRepo.GetOne(12)
+	app := fiber.New(fiber.Config{Views: engine})
 
-		if err != nil {
-			w.WriteHeader(500)
-			parsed, _ := json.Marshal(response{
-				Data: err.Error(),
-			})
+	storage := storage.NewMemoryStorage()
+	authService := service.NewAuthService(userRepo, storage, cfg)
+	studentSrvc := service.NewStudentService(studentRepo)
+	studentHandler := transport.NewStudentHandler(studentSrvc)
+	userHandler := transport.NewUserHandler(authService)
 
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(parsed)
-			return
-		}
+	app.Use(cors.New(cors.Config{
+		AllowCredentials: true,
+		AllowOrigins:     "http://localhost:3001,http://localhost:3002",
+	}))
 
-		parsed, _ := json.Marshal(response{
-			Data: user,
-		})
+	app.Get("/", userHandler.GetLogin)
 
-		fmt.Println(parsed)
-		w.WriteHeader(200)
+	app.Post("/", userHandler.PostLogin)
 
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(parsed)
+	app.Get("/delete", func(c *fiber.Ctx) error {
+		storage.Delete(c.Query("id"))
+		return c.JSON(fiber.Map{"message": fmt.Sprintf("Deleted session for user %s", c.Query("id"))})
 	})
+
+	// app.Get("/students2", userHandler.AuthMiddleware(), studentHandler.GetAllStudents)
+
+	appGroup := app.Group("/app", userHandler.AuthMiddleware())
+
+	appGroup.Get("/home", func(c *fiber.Ctx) error {
+		return c.Render("pages/home", nil, "layouts/main")
+	})
+
+	appGroup.Get("/students", studentHandler.GetAllStudents)
+
+	// r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	// 	type response struct {
+	// 		Data any `json:"data"`
+	// 	}
+	//
+	// 	user, err := userRepo.GetOne(12)
+	//
+	// 	if err != nil {
+	// 		w.WriteHeader(500)
+	// 		parsed, _ := json.Marshal(response{
+	// 			Data: err.Error(),
+	// 		})
+	//
+	// 		w.Header().Set("Content-Type", "application/json")
+	// 		w.Write(parsed)
+	// 		return
+	// 	}
+	//
+	// 	parsed, _ := json.Marshal(response{
+	// 		Data: user,
+	// 	})
+	//
+	// 	fmt.Println(parsed)
+	// 	w.WriteHeader(200)
+	//
+	// 	w.Header().Set("Content-Type", "application/json")
+	// 	w.Write(parsed)
+	// })
 
 	r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
 		// tpl, err := template.ParseFiles("./cmd/web/index.html")
@@ -116,7 +143,7 @@ func main() {
 		}
 	})
 
-	r.Get("/students", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/students12", func(w http.ResponseWriter, r *http.Request) {
 		type response struct {
 			Error bool              `json:"error"`
 			Data  []*domain.Student `json:"data"`
@@ -124,7 +151,7 @@ func main() {
 		responseError := false
 
 		students, err := studentRepo.GetAll()
-		w.Header().Add("Content-Type", "application/json")
+		// w.Header().Add("Content-Type", "application/json")
 
 		if err != nil {
 			responseError = true
@@ -290,6 +317,7 @@ func main() {
 			return
 		}
 
+		fmt.Println("USER PASWOD ", user.Password, user.Name)
 		student.User = user
 
 		err = studentRepo.AddStudent(&student)
@@ -313,13 +341,15 @@ func main() {
 		w.Write(response)
 	})
 
-	log.Printf("Listening on port http://localhost:%s", *port)
+	log.Printf("Listening on port http://localhost:%s", cfg.Port)
 
 	fs := http.FileServer(http.Dir("./web/dist"))
 
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
 
-	http.ListenAndServe(fmt.Sprintf(":%s", *port), r)
+	app.Static("/static", "./web/dist")
+	app.Listen(fmt.Sprintf(":%s", cfg.Port))
+	// http.ListenAndServe(fmt.Sprintf(":%s", cfg.Port), r)
 
 }
 

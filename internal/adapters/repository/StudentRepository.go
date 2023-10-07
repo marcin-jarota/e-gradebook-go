@@ -1,10 +1,15 @@
 package repository
 
 import (
-	"e-student/internal/domain"
+	"e-student/internal/app/domain"
+	"errors"
 	"log"
 
 	"gorm.io/gorm"
+)
+
+var (
+	ErrCouldNotCreateStudent = errors.New("could not create student")
 )
 
 type StudentRepository struct {
@@ -36,7 +41,7 @@ func (r *StudentRepository) AddStudent(student *domain.Student) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		hash, err := student.User.GeneratePassword(student.User.Password)
 		if err != nil {
-			return err
+			return errors.Join(err, ErrCouldNotCreateStudent)
 		}
 
 		student.User.Password = hash

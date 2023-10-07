@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"e-student/internal/domain"
+	"e-student/internal/app/domain"
 	"log"
 
 	"gorm.io/gorm"
