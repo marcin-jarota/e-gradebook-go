@@ -9,6 +9,7 @@ import (
 )
 
 type UserHandler struct {
+	Handler
 	auth ports.AuthService
 }
 
@@ -20,7 +21,8 @@ func NewUserHandler(auth ports.AuthService) *UserHandler {
 
 func (u *UserHandler) BindRouting(app *fiber.App) *UserHandler {
 	app.Get("/login", u.GetLogin)
-	app.Post("/login", u.PostLogin)
+	app.Post("/login", u.PostLoginVue)
+	// app.Post("/login", u.PostLogin)
 	app.Get("/logout", u.AuthMiddleware(), u.Logout)
 	app.Get("/start", u.AuthMiddleware(), u.Start)
 
@@ -49,7 +51,7 @@ func (u *UserHandler) GetLogin(c *fiber.Ctx) error {
 		return c.Redirect("/start")
 	}
 
-	return c.Render("pages/login", nil, "layouts/main")
+	return c.Render("pages/login", nil, "layouts/login")
 }
 
 func (u *UserHandler) PostLogin(c *fiber.Ctx) error {
@@ -66,8 +68,33 @@ func (u *UserHandler) PostLogin(c *fiber.Ctx) error {
 	return c.Redirect("/start", fiber.StatusFound)
 }
 
+func (u *UserHandler) PostLoginVue(c *fiber.Ctx) error {
+	payload := struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}{}
+
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"Error": "Could not parse message",
+		})
+	}
+
+	token, err := u.auth.Login(payload.Email, payload.Password)
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"Error": err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"token": token,
+	})
+}
+
 func (u *UserHandler) Logout(c *fiber.Ctx) error {
-	user := c.Locals("user").(*domain.SessionUser)
+	user := c.Locals("user").(*domain.User)
 	err := u.auth.Logout(int(user.ID))
 	if err != nil {
 		panic(err)
@@ -78,9 +105,5 @@ func (u *UserHandler) Logout(c *fiber.Ctx) error {
 }
 
 func (u *UserHandler) Start(c *fiber.Ctx) error {
-	user := c.Locals("user").(*domain.SessionUser)
-
-	return c.Render("pages/start", fiber.Map{
-		"User": user,
-	}, "layouts/main")
+	return u.RenderWithGlobals(c, "pages/start", nil)
 }

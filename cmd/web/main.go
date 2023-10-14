@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 
@@ -40,13 +41,13 @@ func main() {
 
 	app.Use(recover.New(recover.Config{
 		EnableStackTrace: true,
+		Next:             nil,
 	}))
 
-	// app.Use(csrf.New())
-	// app.Use(cors.New(cors.Config{
-	// 	AllowCredentials: true,
-	// 	AllowOrigins:     "http://localhost:3001,http://localhost:3002",
-	// }))
+	app.Use(cors.New(cors.Config{
+		AllowCredentials: true,
+		AllowOrigins:     "http://localhost:3001,http://localhost:5173",
+	}))
 
 	app.Use(logger.New(logger.Config{
 		Format: "[${time}] ${status} - ${latency} ${method} ${path}\n",

@@ -16,12 +16,16 @@ func NewStudentHandler(srv ports.StudentService) *StudentHandler {
 	}
 }
 
-func (s *StudentHandler) GetAllStudents(c *fiber.Ctx) error {
-	studentsList, err := s.service.GetAll()
+func (h *StudentHandler) GetAllStudents(c *fiber.Ctx) error {
+	studentsList, err := h.service.GetAll()
 
 	if err != nil {
 		return err
 	}
 
 	return c.Render("pages/students", fiber.Map{"Students": studentsList}, "layouts/main")
+}
+
+func (h *StudentHandler) GetMarks(c *fiber.Ctx) error {
+	return c.Render("student/marks", nil)
 }

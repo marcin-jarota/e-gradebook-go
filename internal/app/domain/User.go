@@ -35,7 +35,6 @@ type SessionUser struct {
 	FullName string   `json:"fullName"`
 	Email    string   `json:"email"`
 	Role     userRole `json:"role"`
-	Active   bool     `json:"active"`
 }
 
 func (u *User) GetFullName() string {
@@ -54,4 +53,8 @@ func (u *User) PaswordMatches(plainText string) error {
 
 func (u *User) IsAdmin() bool {
 	return u.Role == admin
+}
+
+func (u *User) IsStudent() bool {
+	return u.Role == student
 }
