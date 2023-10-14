@@ -5,4 +5,4 @@ start:
 build:
 	go build -o ./tmp/main ./cmd/web/.
 fe-dev:
-	npm run dev
+	cd ./web && npm run dev
