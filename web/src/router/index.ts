@@ -4,6 +4,31 @@ import { Role } from '@/types'
 import type { SessionUser } from '@/types'
 import { useSessionStore } from '@/stores/session'
 
+type Route = 'login' | 'student' | 'start' | 'profile' | 'studentMarks'
+
+export const routes: Record<Route, { path: string; name: string }> = Object.freeze({
+  login: {
+    path: '/login',
+    name: 'login'
+  },
+  student: {
+    path: '/student',
+    name: 'student'
+  },
+  studentMarks: {
+    path: '/student/marks',
+    name: 'student-marks'
+  },
+  start: {
+    path: '/start',
+    name: 'start'
+  },
+  profile: {
+    path: '/profile',
+    name: 'profile'
+  }
+})
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -15,23 +40,26 @@ const router = createRouter({
       }
     },
     {
-      path: '/login',
-      name: 'login',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
+      path: routes.login.path,
+      name: routes.login.name,
       component: () => import('@/views/LoginView.vue')
     },
     {
       path: '/student',
       name: 'student',
       component: () => import('@/views/StudentView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Student] }
+      meta: { requiresAuth: true, roles: [Role.Student], title: 'Student' }
     },
     {
       path: '/denied',
       name: 'denied',
       component: () => import('@/views/DeniedView.vue')
+    },
+    {
+      path: routes.start.path,
+      name: routes.start.name,
+      component: () => import('@/views/StartView.vue'),
+      meta: { requiresAuth: true, roles: [Role.Student, Role.Admin], title: 'Start' }
     },
     {
       path: '/:pathMatch(.*)*',
@@ -41,12 +69,12 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _, next) => {
-  const meta = to.meta as { requiresAuth?: boolean; requiresRole?: Role[] }
+  const meta = to.meta as { requiresAuth?: boolean; requiresRole?: Role[]; title?: string }
   const token = localStorage.getItem('token')
 
   if (!meta.requiresAuth) return next()
 
-  if (meta.requiresAuth && token === 'undefined') {
+  if (meta.requiresAuth && (token === 'undefined' || !token)) {
     next('/login')
     return
   }
@@ -55,6 +83,10 @@ router.beforeEach((to, _, next) => {
   const user = session?.sessionUser
 
   const { updateUser } = useSessionStore()
+
+  if (meta.title) {
+    document.title = meta.title
+  }
 
   if (meta?.requiresRole?.length && (!user || !meta?.requiresRole?.includes(user.role))) {
     next('/denied')
