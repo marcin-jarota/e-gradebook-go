@@ -30,3 +30,8 @@ type StudentResponse struct {
 	UpdatedAt time.Time      `json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
+
+type StudentMarkResponse struct {
+	ID      uint    `json:"id"`
+	Subject Subject `json:"subject"`
+}

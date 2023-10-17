@@ -10,4 +10,5 @@ type AuthService interface {
 
 type StudentService interface {
 	GetAll() ([]*domain.StudentResponse, error)
+	GetMarks(studentId int) ([]*domain.Mark, error)
 }

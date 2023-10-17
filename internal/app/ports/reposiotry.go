@@ -17,6 +17,7 @@ type StudentRepository interface {
 
 type MarkRepository interface {
 	AddMark(mark *domain.Mark) error
+	GetMarksByStudent(studentId int) ([]*domain.Mark, error)
 }
 
 type SubjectRepository interface {

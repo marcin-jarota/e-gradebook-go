@@ -31,8 +31,8 @@ func main() {
 	}
 
 	userRepo := repository.NewGormUserRepository(conn)
-	// markRepo := repository.NewGormMarkRepository(conn)
-	// studentRepo := repository.NewGormStudentRepository(conn)
+	markRepo := repository.NewGormMarkRepository(conn)
+	studentRepo := repository.NewGormStudentRepository(conn)
 	// subjectRepo := repository.NewGormSubjectRepository(conn)
 
 	engine := html.New("./web/templates", ".html")
@@ -55,9 +55,9 @@ func main() {
 
 	storage := storage.NewRedisStorage("session", cfg.RedisAddr, context.Background())
 	authService := service.NewAuthService(userRepo, storage, cfg)
-	// studentSrvc := service.NewStudentService(studentRepo)
-	// studentHandler := transport.NewStudentHandler(studentSrvc)
+	studentSrvc := service.NewStudentService(studentRepo, markRepo)
 
+	transport.NewStudentHandler(studentSrvc).BindRouting(app)
 	transport.NewUserHandler(authService).BindRouting(app)
 
 	log.Printf("Listening on port http://localhost:%s", cfg.Port)
