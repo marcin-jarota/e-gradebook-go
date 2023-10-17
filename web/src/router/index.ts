@@ -62,6 +62,12 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: [Role.Student, Role.Admin], title: 'Start' }
     },
     {
+      path: routes.studentMarks.path,
+      name: routes.studentMarks.name,
+      component: () => import('@/views/student/MarksView.vue'),
+      meta: { requiresAuth: true, roles: [Role.Student], title: 'Oceny' }
+    },
+    {
       path: '/:pathMatch(.*)*',
       component: () => import('@/views/PageNotFound.vue')
     }

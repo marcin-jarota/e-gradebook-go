@@ -7,7 +7,7 @@ import MainSidebar from '../components/MainSidebar.vue'
     <aside>
       <MainSidebar />
     </aside>
-    <main class="px-4">
+    <main class="p-4">
       <slot />
     </main>
   </div>

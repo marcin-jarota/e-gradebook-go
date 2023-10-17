@@ -1,9 +1,8 @@
 <template>
-  <div class="container">
-    denited
-  </div>
+  <div class="container">Access Denided</div>
 </template>
 
+<script setup lang="ts"></script>
 <style lang="scss">
 @media (min-width: 1024px) {
   .about {
