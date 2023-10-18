@@ -6,8 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type Handler struct {
-}
+type Handler struct{}
 
 func (h *Handler) JSONError(c *fiber.Ctx, err error, status int) error {
 	return c.Status(status).JSON(fiber.Map{

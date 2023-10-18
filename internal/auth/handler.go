@@ -4,54 +4,32 @@ import (
 	"e-student/internal/adapters/transport"
 	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
+	"e-student/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type AuthHandler struct {
 	transport.Handler
-	service ports.AuthService
+	service    ports.AuthService
+	middleware *middleware.AuthMiddleware
 }
 
-func NewAuthHandler(service ports.AuthService) *AuthHandler {
+func NewAuthHandler(service ports.AuthService, middleware *middleware.AuthMiddleware) *AuthHandler {
 	return &AuthHandler{
-		service: service,
+		service:    service,
+		middleware: middleware,
 	}
 }
 
 func (h *AuthHandler) BindRouting(app *fiber.App) *AuthHandler {
-	app.Get("/login", h.GetLogin)
-	app.Post("/login", h.PostLoginVue)
-	app.Get("/logout", h.Logout)
+	app.Post("/login", h.Login)
+	app.Get("/logout", h.middleware.IsAuthenticatedByHeader(), h.Logout)
 
 	return h
 }
 
-func (h *AuthHandler) GetLogin(c *fiber.Ctx) error {
-	isLoggedIn, _ := h.service.IsLoggedIn(c.Cookies("token"))
-
-	if isLoggedIn {
-		return c.Redirect("/start")
-	}
-
-	return c.Render("pages/login", nil, "layouts/login")
-}
-
-func (h *AuthHandler) PostLogin(c *fiber.Ctx) error {
-	token, err := h.service.Login(c.FormValue("email"), c.FormValue("password"))
-
-	if err != nil {
-		return c.Render("pages/login", fiber.Map{
-			"Error": err.Error(),
-		}, "layouts/main")
-	}
-
-	c.Cookie(&fiber.Cookie{Name: "token", Value: token})
-
-	return c.Redirect("/start", fiber.StatusFound)
-}
-
-func (h *AuthHandler) PostLoginVue(c *fiber.Ctx) error {
+func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	payload := struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -80,9 +58,9 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 	user := c.Locals("user").(*domain.User)
 	err := h.service.Logout(int(user.ID))
 	if err != nil {
-		panic(err)
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
 	}
 
-	return c.Render("pages/login", fiber.Map{"Error": "Logged out!"}, "layouts/main")
+	return c.SendStatus(200)
 
 }

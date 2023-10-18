@@ -73,7 +73,7 @@ func main() {
 
 	// bind routing
 	student.NewStudentHandler(studentService, authMiddleware).BindRouting(app)
-	auth.NewAuthHandler(authService).BindRouting(app)
+	auth.NewAuthHandler(authService, authMiddleware).BindRouting(app)
 
 	log.Printf("Listening on port http://localhost:%s", cfg.Port)
 
