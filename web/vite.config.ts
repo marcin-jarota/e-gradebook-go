@@ -2,12 +2,10 @@ import { fileURLToPath, URL } from 'node:url'
 import path from 'path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-// import htmlPurge from 'vite-plugin-html-purgecss'
-import htmlPurge from 'vite-plugin-purgecss'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [htmlPurge(), vue()],
+  plugins: [vue()],
   css: {
     preprocessorOptions: {
       scss: {
