@@ -1,7 +1,9 @@
 package student
 
 import (
+	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
+	"errors"
 )
 
 type StudentService struct {
@@ -56,4 +58,27 @@ func (s *StudentService) GetMarks(studentId int) ([]*ports.StudentMarkOutput, er
 	}
 
 	return studentMarks, nil
+}
+
+func (s *StudentService) AddStudent(student *ports.StudentCreatePayload) error {
+	// TODO: validate
+	exists, err := s.studentRepo.ExistsByEmail(student.Email)
+
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return errors.New("student with this email exists")
+	}
+
+	return s.studentRepo.AddStudent(&domain.Student{
+		User: domain.User{
+			Name:     student.Name,
+			Surname:  student.Surname,
+			Email:    student.Email,
+			Password: student.Password,
+			Role:     domain.StudentRole,
+		},
+	})
 }

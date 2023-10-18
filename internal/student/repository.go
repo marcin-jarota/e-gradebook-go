@@ -66,3 +66,18 @@ func (r *GormStudentRepository) GetMarks(studentID int) ([]domain.Mark, error) {
 	err := r.db.Preload("Marks").Preload("Marks.Subject").First(&student, studentID).Error
 	return student.Marks, err
 }
+
+func (r *GormStudentRepository) ExistsByEmail(email string) (bool, error) {
+	var user domain.User
+	err := r.db.First(&user, "email = ?", email).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
+}

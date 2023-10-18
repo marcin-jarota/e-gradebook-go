@@ -19,7 +19,6 @@ func NewAuthMiddleware(auth ports.AuthService) *AuthMiddleware {
 	return &AuthMiddleware{
 		auth: auth,
 	}
-
 }
 
 func (m *AuthMiddleware) IsAuthenticatedByHeader() fiber.Handler {

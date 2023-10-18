@@ -10,6 +10,7 @@ type (
 		GetAll() ([]*domain.Student, error)
 		AddStudent(student *domain.Student) error
 		GetMarks(studentID int) ([]domain.Mark, error)
+		ExistsByEmail(email string) (bool, error)
 	}
 
 	StudentOutput struct {
@@ -30,8 +31,16 @@ type (
 		Subject domain.Subject `json:"subject"`
 	}
 
+	StudentCreatePayload struct {
+		Name     string `json:"name"`
+		Surname  string `json:"surname"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
 	StudentService interface {
 		GetAll() ([]*StudentOutput, error)
 		GetMarks(studentID int) ([]*StudentMarkOutput, error)
+		AddStudent(student *StudentCreatePayload) error
 	}
 )

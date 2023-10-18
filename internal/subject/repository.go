@@ -32,3 +32,23 @@ func (r *GormSubjectRepository) GetAll() ([]*domain.Subject, error) {
 
 	return subjects, nil
 }
+
+func (r *GormSubjectRepository) GetOneByName(name string) (*domain.Subject, error) {
+	var subject domain.Subject
+	err := r.db.First(&subject, "name = ?", name).Error
+	return &subject, err
+}
+
+func (r *GormSubjectRepository) Exists(name string) (bool, error) {
+	_, err := r.GetOneByName(name)
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
+}

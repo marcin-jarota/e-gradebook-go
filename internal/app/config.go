@@ -3,7 +3,6 @@ package app
 import (
 	"flag"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -29,7 +28,7 @@ func NewConfig() *Config {
 
 	flag.Parse()
 
-	time.Sleep(time.Second * 5)
+	// time.Sleep(time.Second * 5)
 
 	return &Config{
 		Dsn:       *dsn,
