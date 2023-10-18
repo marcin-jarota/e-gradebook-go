@@ -11,21 +11,18 @@ import (
 
 type StudentHandler struct {
 	transport.Handler
-	service    ports.StudentService
-	middleware *middleware.AuthMiddleware
+	service ports.StudentService
 }
 
-func NewStudentHandler(service ports.StudentService, middleware *middleware.AuthMiddleware) *StudentHandler {
+func NewStudentHandler(service ports.StudentService) *StudentHandler {
 	return &StudentHandler{
-		service:    service,
-		middleware: middleware,
+		service: service,
 	}
 }
 
-func (h *StudentHandler) BindRouting(app fiber.Router) {
-	r := app.Group("/", h.middleware.IsAuthenticatedByHeader())
-
-	r.Get("/:studentId/marks", h.middleware.IsStudent(), h.GetMarks)
+func (h *StudentHandler) BindRouting(app fiber.Router, auth *middleware.AuthMiddleware) {
+	r := app.Group("/student", auth.IsAuthenticatedByHeader())
+	r.Get("/:studentId/marks", auth.IsStudent(), h.GetMarks)
 }
 
 func (h *StudentHandler) GetMarks(c *fiber.Ctx) error {

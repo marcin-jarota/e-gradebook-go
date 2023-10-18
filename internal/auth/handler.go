@@ -11,20 +11,18 @@ import (
 
 type AuthHandler struct {
 	transport.Handler
-	service    ports.AuthService
-	middleware *middleware.AuthMiddleware
+	service ports.AuthService
 }
 
-func NewAuthHandler(service ports.AuthService, middleware *middleware.AuthMiddleware) *AuthHandler {
+func NewAuthHandler(service ports.AuthService) *AuthHandler {
 	return &AuthHandler{
-		service:    service,
-		middleware: middleware,
+		service: service,
 	}
 }
 
-func (h *AuthHandler) BindRouting(app *fiber.App) *AuthHandler {
+func (h *AuthHandler) BindRouting(app *fiber.App, auth *middleware.AuthMiddleware) *AuthHandler {
 	app.Post("/login", h.Login)
-	app.Get("/logout", h.middleware.IsAuthenticatedByHeader(), h.Logout)
+	app.Get("/logout", auth.IsAuthenticatedByHeader(), h.Logout)
 
 	return h
 }
