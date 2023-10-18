@@ -9,6 +9,7 @@ import (
 	"e-student/internal/auth"
 	"e-student/internal/middleware"
 	"e-student/internal/student"
+	"e-student/internal/subject"
 	"e-student/internal/user"
 )
 
@@ -22,10 +23,12 @@ func main() {
 	// repositories
 	userRepo := user.NewGormUserRepository(conn)
 	studentRepo := student.NewGormStudentRepository(conn)
+	subjectRepo := subject.NewGormSubjectRepository(conn)
 
 	// services
 	authService := auth.NewAuthService(userRepo, storage, cfg)
 	studentService := student.NewStudentService(studentRepo)
+	subjectService := subject.NewSubjectService(subjectRepo)
 
 	// middlewares
 	authMiddleware := middleware.NewAuthMiddleware(authService)
@@ -33,10 +36,12 @@ func main() {
 	// handlers
 	studentHandler := student.NewStudentHandler(studentService)
 	authHandler := auth.NewAuthHandler(authService)
+	subhectHandler := subject.NewSubjectHandler(subjectService)
 
 	// bind routing
 	studentHandler.BindRouting(server.App, authMiddleware)
 	authHandler.BindRouting(server.App, authMiddleware)
+	subhectHandler.BindRouting(server.App, authMiddleware)
 
 	server.Listen()
 }
