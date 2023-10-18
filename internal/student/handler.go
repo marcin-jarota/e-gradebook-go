@@ -1,9 +1,9 @@
 package student
 
 import (
+	"e-student/internal/adapters/transport"
 	"e-student/internal/app/ports"
 	"e-student/internal/middleware"
-	"e-student/internal/transport"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"

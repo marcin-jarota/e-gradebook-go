@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"e-student/internal/adapters/storage"
+	core "e-student/internal/app"
 	"e-student/internal/auth"
-	"e-student/internal/common"
 	"e-student/internal/middleware"
 	"e-student/internal/student"
 	"e-student/internal/user"
@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-	cfg := common.NewConfig()
+	cfg := core.NewConfig()
 
 	// newLogger := gormLogger.New(
 	// 	log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
@@ -73,7 +73,7 @@ func main() {
 
 	// bind routing
 	student.NewStudentHandler(studentService, authMiddleware).BindRouting(app)
-	user.NewUserHandler(authService).BindRouting(app)
+	auth.NewAuthHandler(authService).BindRouting(app)
 
 	log.Printf("Listening on port http://localhost:%s", cfg.Port)
 

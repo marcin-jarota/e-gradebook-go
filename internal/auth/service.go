@@ -1,9 +1,9 @@
 package auth
 
 import (
+	"e-student/internal/app"
 	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
-	"e-student/internal/common"
 	"errors"
 	"log"
 	"strconv"
@@ -14,7 +14,7 @@ import (
 type AuthService struct {
 	userRepo       ports.UserRepository
 	sessionStorage ports.SessionStorage
-	cfg            *common.Config
+	cfg            *app.Config
 }
 
 type claims struct {
@@ -22,7 +22,7 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
-func NewAuthService(userRepo ports.UserRepository, sessionStorage ports.SessionStorage, cfg *common.Config) *AuthService {
+func NewAuthService(userRepo ports.UserRepository, sessionStorage ports.SessionStorage, cfg *app.Config) *AuthService {
 	return &AuthService{
 		sessionStorage: sessionStorage,
 		userRepo:       userRepo,
