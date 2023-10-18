@@ -11,31 +11,31 @@ content-type: application/json
 }
 
 ### Add student
-POST http://localhost:8080/student HTTP/1.1
+POST http://localhost:8080/student/create HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Jaonna",
-    "surname": "Testowa",
+    "name": "Marcin",
+    "surname": "Jarota",
     "email": "jo10@com.pl",
-    "password": "zaq1@WSX",
-    "role": "student"
+    "password": "zaq1@WSX"
 }
 
 ### List students
 GET http://localhost:8080/students HTTP/1.1
 content-type: application/json
+Authorization: Bearer asdasdas
 
 ### Add subject
-POST http://localhost:8080/subject HTTP/1.1
+POST http://localhost:8080/subject/create HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Matematyka"
+    "name": "Polski"
 }
 
 ### List subjects
-GET http://localhost:8080/subjects HTTP/1.1
+GET http://localhost:8080/subject/all HTTP/1.1
 content-type: application/json
 
 
