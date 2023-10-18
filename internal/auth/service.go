@@ -1,4 +1,4 @@
-package service
+package auth
 
 import (
 	"e-student/internal/app/domain"
@@ -18,7 +18,7 @@ type AuthService struct {
 }
 
 type claims struct {
-	SessionUser domain.SessionUser `json:"sessionUser"`
+	SessionUser ports.SessionUser `json:"sessionUser"`
 	jwt.RegisteredClaims
 }
 
@@ -51,7 +51,7 @@ func (s *AuthService) IsLoggedIn(token string) (bool, *domain.User) {
 	exists, err := s.sessionStorage.Get(strconv.Itoa(int(userClaims.SessionUser.ID)))
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Storage errpr:", err)
 		return false, nil
 	}
 
@@ -64,6 +64,7 @@ func (s *AuthService) IsLoggedIn(token string) (bool, *domain.User) {
 	user, err := s.userRepo.GetOne(int(userClaims.SessionUser.ID))
 
 	if err != nil {
+		log.Println("Could not get user from storage", err)
 		return false, nil
 	}
 
@@ -94,7 +95,7 @@ func (s *AuthService) Login(email string, password string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims{
 		RegisteredClaims: jwt.RegisteredClaims{},
-		SessionUser: domain.SessionUser{
+		SessionUser: ports.SessionUser{
 			ID:      user.ID,
 			Name:    user.Name,
 			Surname: user.Surname,

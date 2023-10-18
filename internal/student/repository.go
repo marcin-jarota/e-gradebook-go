@@ -1,4 +1,4 @@
-package repository
+package student
 
 import (
 	"e-student/internal/app/domain"
@@ -22,7 +22,7 @@ func NewGormStudentRepository(db *gorm.DB) *GormStudentRepository {
 	}
 
 	return &GormStudentRepository{
-		db: db,
+		db,
 	}
 }
 
@@ -59,4 +59,10 @@ func (r *GormStudentRepository) AddStudent(student *domain.Student) error {
 		return nil
 
 	})
+}
+
+func (r *GormStudentRepository) GetMarks(studentID int) ([]domain.Mark, error) {
+	var student domain.Student
+	err := r.db.Preload("Marks").Preload("Marks.Subject").First(&student, studentID).Error
+	return student.Marks, err
 }

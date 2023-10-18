@@ -2,30 +2,26 @@ package domain
 
 import (
 	"fmt"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
-type userRole string
+type UserRole string
 
 const (
-	admin   userRole = "admin"
-	student userRole = "student"
+	AdminRole   UserRole = "admin"
+	StudentRole UserRole = "student"
 )
 
 type User struct {
-	ID        uint           `json:"id" gorm:"primaryKey"`
-	Name      string         `json:"name"`
-	Surname   string         `json:"surname"`
-	Email     string         `json:"email"`
-	Role      userRole       `json:"role" gorm:"type:user_role"`
-	Password  string         `json:"password"`
-	Active    bool           `json:"active"`
-	CreatedAt time.Time      `json:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt"`
-	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+	gorm.Model
+	Name     string
+	Surname  string
+	Email    string
+	Role     UserRole `gorm:"type:user_role"`
+	Password string
+	Active   bool
 }
 
 type SessionUser struct {
@@ -34,7 +30,7 @@ type SessionUser struct {
 	Surname  string   `json:"surname"`
 	FullName string   `json:"fullName"`
 	Email    string   `json:"email"`
-	Role     userRole `json:"role"`
+	Role     UserRole `json:"role"`
 }
 
 func (u *User) GetFullName() string {
@@ -52,9 +48,9 @@ func (u *User) PaswordMatches(plainText string) error {
 }
 
 func (u *User) IsAdmin() bool {
-	return u.Role == admin
+	return u.Role == AdminRole
 }
 
 func (u *User) IsStudent() bool {
-	return u.Role == student
+	return u.Role == StudentRole
 }

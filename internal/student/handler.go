@@ -1,26 +1,31 @@
-package http
+package student
 
 import (
 	"e-student/internal/app/ports"
+	"e-student/internal/middleware"
+	"e-student/internal/transport"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type StudentHandler struct {
-	Handler
-	service ports.StudentService
+	transport.Handler
+	service    ports.StudentService
+	middleware *middleware.AuthMiddleware
 }
 
-func NewStudentHandler(srv ports.StudentService) *StudentHandler {
+func NewStudentHandler(service ports.StudentService, middleware *middleware.AuthMiddleware) *StudentHandler {
 	return &StudentHandler{
-		service: srv,
+		service:    service,
+		middleware: middleware,
 	}
 }
 
 func (h *StudentHandler) BindRouting(app fiber.Router) {
-	app.Get("/student/marks/:studentId", h.GetMarks)
-	app.Get("/students", h.GetAllStudents)
+	r := app.Group("/", h.middleware.IsAuthenticatedByHeader())
+
+	r.Get("/:studentId/marks", h.middleware.IsStudent(), h.GetMarks)
 }
 
 func (h *StudentHandler) GetMarks(c *fiber.Ctx) error {

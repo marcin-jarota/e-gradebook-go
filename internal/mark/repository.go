@@ -1,4 +1,4 @@
-package repository
+package mark
 
 import (
 	"e-student/internal/app/domain"

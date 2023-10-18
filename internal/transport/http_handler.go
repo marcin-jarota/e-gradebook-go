@@ -1,4 +1,4 @@
-package http
+package transport
 
 import (
 	"e-student/internal/app/domain"

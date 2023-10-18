@@ -2,42 +2,60 @@ package main
 
 import (
 	"context"
-	"e-student/internal/adapters/repository"
-	"e-student/internal/adapters/service"
 	"e-student/internal/adapters/storage"
+	"e-student/internal/auth"
 	"e-student/internal/common"
-	transport "e-student/internal/http"
+	"e-student/internal/middleware"
+	"e-student/internal/student"
+	"e-student/internal/user"
 	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	fiberLogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/template/html/v2"
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	// gormLogger "gorm.io/gorm/logger"
 )
 
 func main() {
 	cfg := common.NewConfig()
 
-	conn, err := gorm.Open(postgres.Open(cfg.Dsn), nil)
+	// newLogger := gormLogger.New(
+	// 	log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+	// 	gormLogger.Config{
+	// 		SlowThreshold:             time.Second,     // Slow SQL threshold
+	// 		LogLevel:                  gormLogger.Info, // Log level
+	// 		IgnoreRecordNotFoundError: true,            // Ignore ErrRecordNotFound error for logger
+	// 		ParameterizedQueries:      false,           // Don't include params in the SQL log
+	// 		Colorful:                  true,            // Disable color
+	// 	},
+	// )
+
+	conn, err := gorm.Open(postgres.Open(cfg.Dsn)) // &gorm.Config{Logger: newLogger})
 
 	if err != nil {
 		panic(err)
 	}
 
-	userRepo := repository.NewGormUserRepository(conn)
-	markRepo := repository.NewGormMarkRepository(conn)
-	studentRepo := repository.NewGormStudentRepository(conn)
-	// subjectRepo := repository.NewGormSubjectRepository(conn)
+	storage := storage.NewRedisStorage("session", cfg.RedisAddr, context.Background())
 
-	engine := html.New("./web/templates", ".html")
+	// repositories
+	userRepo := user.NewGormUserRepository(conn)
+	studentRepo := student.NewGormStudentRepository(conn)
 
-	app := fiber.New(fiber.Config{Views: engine, ViewsLayout: "layouts/main"})
+	// services
+	authService := auth.NewAuthService(userRepo, storage, cfg)
+	studentService := student.NewStudentService(studentRepo)
+
+	// middlewares
+	authMiddleware := middleware.NewAuthMiddleware(authService)
+
+	app := fiber.New()
 
 	app.Use(recover.New(recover.Config{
 		EnableStackTrace: true,
@@ -49,21 +67,16 @@ func main() {
 		AllowOrigins:     "http://localhost:3001,http://localhost:5173",
 	}))
 
-	app.Use(logger.New(logger.Config{
+	app.Use(fiberLogger.New(fiberLogger.Config{
 		Format: "[${time}] ${status} - ${latency} ${method} ${path}\n",
 	}))
 
-	storage := storage.NewRedisStorage("session", cfg.RedisAddr, context.Background())
-	authService := service.NewAuthService(userRepo, storage, cfg)
-	studentSrvc := service.NewStudentService(studentRepo, markRepo)
-
-	transport.NewStudentHandler(studentSrvc).BindRouting(app)
-	transport.NewUserHandler(authService).BindRouting(app)
+	// bind routing
+	student.NewStudentHandler(studentService, authMiddleware).BindRouting(app)
+	user.NewUserHandler(authService).BindRouting(app)
 
 	log.Printf("Listening on port http://localhost:%s", cfg.Port)
 
 	app.Static("/static", "./web/dist")
 	app.Listen(fmt.Sprintf(":%s", cfg.Port))
-	// http.ListenAndServe(fmt.Sprintf(":%s", cfg.Port), r)
-
 }

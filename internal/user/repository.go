@@ -1,4 +1,4 @@
-package repository
+package user
 
 import (
 	"e-student/internal/app/domain"

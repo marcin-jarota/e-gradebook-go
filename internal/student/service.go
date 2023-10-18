@@ -1,24 +1,21 @@
-package service
+package student
 
 import (
-	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
 )
 
 type StudentService struct {
 	studentRepo ports.StudentRepository
-	marksRepo   ports.MarkRepository
 }
 
-func NewStudentService(repo ports.StudentRepository, marksRepo ports.MarkRepository) *StudentService {
+func NewStudentService(repo ports.StudentRepository) *StudentService {
 	return &StudentService{
 		studentRepo: repo,
-		marksRepo:   marksRepo,
 	}
 }
 
-func (s *StudentService) GetAll() ([]*domain.StudentResponse, error) {
-	var studentsResponse []*domain.StudentResponse
+func (s *StudentService) GetAll() ([]*ports.StudentOutput, error) {
+	var studentsResponse []*ports.StudentOutput
 	students, err := s.studentRepo.GetAll()
 
 	if err != nil {
@@ -26,7 +23,7 @@ func (s *StudentService) GetAll() ([]*domain.StudentResponse, error) {
 	}
 
 	for _, student := range students {
-		studentsResponse = append(studentsResponse, &domain.StudentResponse{
+		studentsResponse = append(studentsResponse, &ports.StudentOutput{
 			ID:        student.ID,
 			Name:      student.User.Name,
 			Surname:   student.User.Surname,
@@ -36,27 +33,27 @@ func (s *StudentService) GetAll() ([]*domain.StudentResponse, error) {
 			Marks:     student.Marks,
 			CreatedAt: student.CreatedAt,
 			UpdatedAt: student.UpdatedAt,
-			DeletedAt: student.DeletedAt,
 		})
 	}
 
 	return studentsResponse, nil
 }
 
-func (s *StudentService) GetMarks(studentId int) ([]*domain.Mark, error) {
-	var studentMarks []*domain.StudentMarkResponse
-	marks, err := s.marksRepo.GetMarksByStudent(studentId)
+func (s *StudentService) GetMarks(studentId int) ([]*ports.StudentMarkOutput, error) {
+	var studentMarks []*ports.StudentMarkOutput
+	marks, err := s.studentRepo.GetMarks(studentId)
 
 	if err != nil {
-		return marks, err
+		return nil, err
 	}
 
 	for _, mark := range marks {
-		studentMarks = append(studentMarks, &domain.StudentMarkResponse{
+		studentMarks = append(studentMarks, &ports.StudentMarkOutput{
 			ID:      mark.ID,
+			Value:   mark.Value,
 			Subject: mark.Subject,
 		})
 	}
 
-	return marks, nil
+	return studentMarks, nil
 }

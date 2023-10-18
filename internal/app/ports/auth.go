@@ -7,8 +7,3 @@ type AuthService interface {
 	Logout(userId int) error
 	IsLoggedIn(token string) (bool, *domain.User)
 }
-
-type StudentService interface {
-	GetAll() ([]*domain.StudentResponse, error)
-	GetMarks(studentId int) ([]*domain.Mark, error)
-}

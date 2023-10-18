@@ -1,15 +1,16 @@
-package http
+package user
 
 import (
 	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
+	"e-student/internal/transport"
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type UserHandler struct {
-	Handler
+	transport.Handler
 	auth ports.AuthService
 }
 
@@ -22,7 +23,6 @@ func NewUserHandler(auth ports.AuthService) *UserHandler {
 func (u *UserHandler) BindRouting(app *fiber.App) *UserHandler {
 	app.Get("/login", u.GetLogin)
 	app.Post("/login", u.PostLoginVue)
-	// app.Post("/login", u.PostLogin)
 	app.Get("/logout", u.AuthMiddleware(), u.Logout)
 	app.Get("/start", u.AuthMiddleware(), u.Start)
 

@@ -1,19 +1,15 @@
 package domain
 
 import (
-	"time"
+	// "time"
 
 	"gorm.io/gorm"
 )
 
 type Mark struct {
-	ID        uint    `json:"id" gorm:"primaryKey"`
-	Value     float32 `json:"value"`
-	Subject   Subject `json:"subject" gorm:"foreignKey:SubjectID;references:ID"`
-	Student   Student `json:"student" gorm:"foreignKey:StudentID;references:ID"`
-	StudentID uint
+	gorm.Model
+	Value     float32
+	Subject   Subject `gorm:"foreignKey:subject_id;references:id"`
+	StudentID uint    `gorm:"foreignKey:student_id;references:id"`
 	SubjectID uint
-	CreatedAt time.Time      `json:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt"`
-	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
