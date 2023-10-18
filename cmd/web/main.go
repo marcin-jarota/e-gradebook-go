@@ -10,8 +10,6 @@ import (
 	"e-student/internal/middleware"
 	"e-student/internal/student"
 	"e-student/internal/user"
-
-	_ "github.com/lib/pq"
 )
 
 func main() {
