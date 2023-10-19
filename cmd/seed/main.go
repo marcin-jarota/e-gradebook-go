@@ -9,7 +9,9 @@ import (
 
 func main() {
 	cfg := app.NewConfig()
-	conn := db.NewGormDB(cfg)
+	conn, closeConn := db.NewGormDB(cfg)
+
+	defer closeConn()
 
 	if err := conn.AutoMigrate(&domain.User{}); err != nil {
 		log.Panic("Could not boot User table: ", err)

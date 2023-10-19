@@ -13,7 +13,7 @@ type RedisStorage struct {
 	client *redis.Client
 }
 
-func NewRedisStorage(prefix string, addr string, ctx context.Context) *RedisStorage {
+func NewRedisStorage(prefix string, addr string, ctx context.Context) (*RedisStorage, func() error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: "", // no password set
@@ -24,7 +24,7 @@ func NewRedisStorage(prefix string, addr string, ctx context.Context) *RedisStor
 		client: client,
 		ctx:    ctx,
 		prefix: prefix,
-	}
+	}, client.Close
 }
 
 func (s *RedisStorage) Get(key string) (any, error) {

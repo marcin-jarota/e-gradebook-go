@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func NewGormDB(cfg *app.Config) *gorm.DB {
+func NewGormDB(cfg *app.Config) (*gorm.DB, func() error) {
 	queryLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
@@ -30,5 +30,11 @@ func NewGormDB(cfg *app.Config) *gorm.DB {
 		panic(err)
 	}
 
-	return conn
+	sqlDB, err := conn.DB()
+
+	if err != nil {
+		panic(err)
+	}
+
+	return conn, sqlDB.Close
 }

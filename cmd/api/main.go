@@ -16,9 +16,13 @@ import (
 func main() {
 	cfg := core.NewConfig()
 
-	conn := db.NewGormDB(cfg)
+	conn, closeDbConn := db.NewGormDB(cfg)
 	server := transport.NewFiberHttpServer(cfg)
-	storage := storage.NewRedisStorage("session", cfg.RedisAddr, context.Background())
+	storage, closeRedis := storage.NewRedisStorage("session", cfg.RedisAddr, context.Background())
+
+	defer closeRedis()
+	defer closeDbConn()
+	defer server.App.Shutdown()
 
 	// repositories
 	userRepo := user.NewGormUserRepository(conn)
