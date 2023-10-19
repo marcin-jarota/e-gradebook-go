@@ -7,7 +7,8 @@ import (
 // Model
 type Student struct {
 	gorm.Model
-	UserID uint
-	User   User
-	Marks  []Mark
+	UserID       uint
+	User         User
+	Marks        []Mark
+	ClassGroupID uint
 }

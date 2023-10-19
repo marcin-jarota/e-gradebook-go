@@ -11,8 +11,6 @@ type GormSubjectRepository struct {
 }
 
 func NewGormSubjectRepository(db *gorm.DB) *GormSubjectRepository {
-	db.AutoMigrate(&domain.Subject{})
-
 	return &GormSubjectRepository{
 		db: db,
 	}

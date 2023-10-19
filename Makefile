@@ -6,3 +6,5 @@ build:
 	go build -o ./tmp/main ./cmd/api/.
 fe-dev:
 	cd ./web && npm run dev
+seed:
+	go run ./cmd/seed/. -dsn ${SEED_DSN}

@@ -12,4 +12,5 @@ type Mark struct {
 	Subject   Subject `gorm:"foreignKey:subject_id;references:id"`
 	StudentID uint    `gorm:"foreignKey:student_id;references:id"`
 	SubjectID uint
+	TeacherID uint
 }

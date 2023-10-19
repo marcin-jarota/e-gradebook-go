@@ -6,6 +6,7 @@ import (
 
 type Teacher struct {
 	gorm.Model
-	User  User   `json:"user"`
-	Marks []Mark `json:"marks"`
+	User   User
+	UserID uint
+	Marks  []Mark
 }

@@ -2,7 +2,6 @@ package mark
 
 import (
 	"e-student/internal/app/domain"
-	"log"
 
 	"gorm.io/gorm"
 )
@@ -12,11 +11,6 @@ type GormMarkRepository struct {
 }
 
 func NewGormMarkRepository(db *gorm.DB) *GormMarkRepository {
-	err := db.AutoMigrate(&domain.Mark{})
-
-	if err != nil {
-		log.Panic(err)
-	}
 
 	return &GormMarkRepository{
 		db: db,

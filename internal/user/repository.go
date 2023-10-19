@@ -2,7 +2,6 @@ package user
 
 import (
 	"e-student/internal/app/domain"
-	"log"
 
 	"gorm.io/gorm"
 )
@@ -12,10 +11,6 @@ type GormUserRepository struct {
 }
 
 func NewGormUserRepository(db *gorm.DB) *GormUserRepository {
-	if err := db.AutoMigrate(&domain.User{}); err != nil {
-		log.Panic(err)
-	}
-
 	return &GormUserRepository{
 		db: db,
 	}

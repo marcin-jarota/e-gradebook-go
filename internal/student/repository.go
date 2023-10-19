@@ -3,7 +3,6 @@ package student
 import (
 	"e-student/internal/app/domain"
 	"errors"
-	"log"
 
 	"gorm.io/gorm"
 )
@@ -17,10 +16,6 @@ type GormStudentRepository struct {
 }
 
 func NewGormStudentRepository(db *gorm.DB) *GormStudentRepository {
-	if err := db.AutoMigrate(&domain.Student{}); err != nil {
-		log.Panic(err)
-	}
-
 	return &GormStudentRepository{
 		db,
 	}
