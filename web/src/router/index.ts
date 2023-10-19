@@ -4,7 +4,14 @@ import { Role } from '@/types'
 import type { SessionUser } from '@/types'
 import { useSessionStore } from '@/stores/session'
 
-type Route = 'login' | 'student' | 'start' | 'profile' | 'studentMarks'
+type Route =
+  | 'login'
+  | 'student'
+  | 'start'
+  | 'profile'
+  | 'studentMarks'
+  | 'subjectList'
+  | 'studentList'
 
 export const routes: Record<Route, { path: string; name: string }> = Object.freeze({
   login: {
@@ -26,6 +33,14 @@ export const routes: Record<Route, { path: string; name: string }> = Object.free
   profile: {
     path: '/profile',
     name: 'profile'
+  },
+  subjectList: {
+    path: '/subject/list',
+    name: 'subject-list'
+  },
+  studentList: {
+    path: '/student/list',
+    name: 'student-list'
   }
 })
 
@@ -68,6 +83,18 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: [Role.Student], title: 'Oceny' }
     },
     {
+      path: routes.subjectList.path,
+      name: routes.subjectList.name,
+      component: () => import('@/views/subject/ListView.vue'),
+      meta: { requiresAuth: true, roles: [Role.Admin], title: 'Przedmioty' }
+    },
+    {
+      path: routes.studentList.path,
+      name: routes.studentList.name,
+      component: () => import('@/views/student/ListView.vue'),
+      meta: { requiresAuth: true, roles: [Role.Admin] }
+    },
+    {
       path: '/:pathMatch(.*)*',
       component: () => import('@/views/PageNotFound.vue')
     }
@@ -75,7 +102,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _, next) => {
-  const meta = to.meta as { requiresAuth?: boolean; requiresRole?: Role[]; title?: string }
+  const meta = to.meta as { requiresAuth?: boolean; roles?: Role[]; title?: string }
   const token = localStorage.getItem('token')
 
   if (!meta.requiresAuth) return next()
@@ -94,7 +121,7 @@ router.beforeEach((to, _, next) => {
     document.title = meta.title
   }
 
-  if (meta?.requiresRole?.length && (!user || !meta?.requiresRole?.includes(user.role))) {
+  if (meta?.roles?.length && (!user || !meta?.roles?.includes(user.role))) {
     next('/denied')
   } else {
     updateUser(user as SessionUser)
