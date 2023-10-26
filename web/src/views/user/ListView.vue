@@ -26,34 +26,40 @@ getUsers()
 
 <template>
   <MainLayout>
-    <h2>Lista użytkowników w systemie</h2>
-    <div class="table-responsive py-3">
-      <table class="table">
-        <thead class="table-light">
-          <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Imie</th>
-            <th scope="col">Nazwisko</th>
-            <th scope="col">Email</th>
-            <th scope="col">Aktywny</th>
-            <th scope="col">Zalogowany</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <td scope="row">{{ user.id }}</td>
-            <td>{{ user.name }}</td>
-            <td>{{ user.surname }}</td>
-            <td>{{ user.email }}</td>
-            <td>
-              <IconStatus :active="user.isActive || false" />
-            </td>
-            <td>
-              <IconStatus :active="user.sessionActive || false" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="container-lg">
+      <h2>Lista użytkowników w systemie</h2>
+      <div class="table-responsive py-3">
+        <table class="table">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Imie</th>
+              <th scope="col">Nazwisko</th>
+              <th scope="col" class="col-4">Email</th>
+              <th scope="col">Aktywny</th>
+              <th scope="col">Zalogowany</th>
+              <th scope="col">Akcje</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in users" :key="user.id">
+              <td scope="row">{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.surname }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <IconStatus :active="user.isActive || false" />
+              </td>
+              <td>
+                <IconStatus :active="user.sessionActive || false" />
+              </td>
+              <td>
+                <button class="btn btn-primary">Edytuj</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </MainLayout>
 </template>
