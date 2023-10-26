@@ -14,31 +14,32 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import InputText from '@/components/form/InputText.vue'
-import router, { routes } from '@/router';
+import router, { routes } from '@/router'
 
 const email = ref('')
 const password = ref('')
 const errorCode = ref('')
 
 const handleLogin = async () => {
-  console.log(email.value)
-
-  fetch('http://localhost:8080/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: email.value, password: password.value }) })
-      .then(res => res.json())
+  fetch('http://localhost:8080/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email.value, password: password.value })
+  })
+    .then((res) => res.json())
     .then(({ token }) => {
       localStorage.setItem('token', token)
-        router.push(routes.start.path)
-    }).catch(err => {
+      router.push(routes.start.path)
+    })
+    .catch((err) => {
       if (!err.message) {
-        errorCode.value = 'asdasdas'
+        errorCode.value = 'We could not handle request'
       } else {
         errorCode.value = err.message
-       }
+      }
 
-       console.log('err', err)
-      })
+      console.log('err', err)
+    })
 }
 </script>
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

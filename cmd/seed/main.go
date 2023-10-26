@@ -4,6 +4,7 @@ import (
 	"e-student/internal/adapters/db"
 	"e-student/internal/app"
 	"e-student/internal/app/domain"
+	"fmt"
 	"log"
 )
 
@@ -12,6 +13,19 @@ func main() {
 	conn, closeConn := db.NewGormDB(cfg)
 
 	defer closeConn()
+
+	userRoleDrop := `DROP TYPE IF EXISTS user_role`
+	userRoleCreate := fmt.Sprintf(`CREATE TYPE user_role AS ENUM ('%s', '%s', '%s');`, domain.AdminRole, domain.StudentRole, domain.TeacherRole)
+
+	if err := conn.Exec(userRoleDrop).Error; err != nil {
+		log.Panicln(err)
+	} else {
+		if err := conn.Exec(userRoleCreate).Error; err != nil {
+			fmt.Printf("Error creating enum type: %v\n", err)
+		} else {
+			fmt.Printf("[SEED]: user_role enum created!")
+		}
+	}
 
 	if err := conn.AutoMigrate(&domain.User{}); err != nil {
 		log.Panic("Could not boot User table: ", err)

@@ -12,6 +12,7 @@ type Route =
   | 'studentMarks'
   | 'subjectList'
   | 'studentList'
+  | 'userList'
 
 export const routes: Record<Route, { path: string; name: string }> = Object.freeze({
   login: {
@@ -41,6 +42,10 @@ export const routes: Record<Route, { path: string; name: string }> = Object.free
   studentList: {
     path: '/student/list',
     name: 'student-list'
+  },
+  userList: {
+    path: '/user/list',
+    name: 'user-list'
   }
 })
 
@@ -92,6 +97,12 @@ const router = createRouter({
       path: routes.studentList.path,
       name: routes.studentList.name,
       component: () => import('@/views/student/ListView.vue'),
+      meta: { requiresAuth: true, roles: [Role.Admin] }
+    },
+    {
+      path: routes.userList.path,
+      name: routes.userList.name,
+      component: () => import('@/views/user/ListView.vue'),
       meta: { requiresAuth: true, roles: [Role.Admin] }
     },
     {

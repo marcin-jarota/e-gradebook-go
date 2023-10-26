@@ -12,6 +12,7 @@ type UserRole string
 const (
 	AdminRole   UserRole = "admin"
 	StudentRole UserRole = "student"
+	TeacherRole UserRole = "teacher"
 )
 
 type User struct {

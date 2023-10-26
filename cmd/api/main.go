@@ -33,6 +33,7 @@ func main() {
 	authService := auth.NewAuthService(userRepo, storage, cfg)
 	studentService := student.NewStudentService(studentRepo)
 	subjectService := subject.NewSubjectService(subjectRepo)
+	userService := user.NewUserService(userRepo, storage)
 
 	// middlewares
 	authMiddleware := middleware.NewAuthMiddleware(authService)
@@ -40,12 +41,14 @@ func main() {
 	// handlers
 	studentHandler := student.NewStudentHandler(studentService)
 	authHandler := auth.NewAuthHandler(authService)
-	subhectHandler := subject.NewSubjectHandler(subjectService)
+	subjecthandler := subject.NewSubjectHandler(subjectService)
+	userHandler := user.NewUserHandler(userService)
 
 	// bind routing
 	studentHandler.BindRouting(server.App, authMiddleware)
 	authHandler.BindRouting(server.App, authMiddleware)
-	subhectHandler.BindRouting(server.App, authMiddleware)
+	subjecthandler.BindRouting(server.App, authMiddleware)
+	userHandler.BindRouting(server.App, authMiddleware)
 
 	server.Listen()
 }

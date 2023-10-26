@@ -19,4 +19,18 @@ type (
 		Email    string          `json:"email"`
 		Role     domain.UserRole `json:"role"`
 	}
+
+	UserOutput struct {
+		ID            uint            `json:"id"`
+		Name          string          `json:"name"`
+		Surname       string          `json:"surname"`
+		Email         string          `json:"email"`
+		Role          domain.UserRole `json:"role,omitempty"`
+		IsActive      bool            `json:"isActive,omitempty"`
+		SessionActive bool            `json:"sessionActive,omitempty"`
+	}
+
+	UserService interface {
+		GetAll() ([]*UserOutput, error)
+	}
 )

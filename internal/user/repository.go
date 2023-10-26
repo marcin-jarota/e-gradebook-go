@@ -26,6 +26,7 @@ func (u *GormUserRepository) GetOneByEmail(email string) (*domain.User, error) {
 
 	return &user, nil
 }
+
 func (u *GormUserRepository) GetOne(id int) (*domain.User, error) {
 	var user domain.User
 

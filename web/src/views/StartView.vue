@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import MainLayout from '@/layouts/MainLayout.vue';
-import { useSessionStore } from '@/stores/session';
-import { computed } from 'vue';
+import MainLayout from '@/layouts/MainLayout.vue'
+import { useSessionStore } from '@/stores/session'
+import { computed } from 'vue'
 
 const sessionStore = useSessionStore()
 
 const welcomeMessage = computed(() => {
-  const hour = (new Date()).getHours();
+  const hour = new Date().getHours()
   if (hour >= 5 && hour < 12) {
-    return `Dzień dobry, ${sessionStore.user?.name} 🌞`;
+    return `Dzień dobry, ${sessionStore.user?.name} 🌞`
   } else if (hour >= 12 && hour < 18) {
-    return `Witaj, ${sessionStore.user?.name} ☕`;
+    return `Witaj, ${sessionStore.user?.name} ☕`
   } else {
-    return `Dobry wieczór, ${sessionStore.user?.name} 🌛`;
+    return `Dobry wieczór, ${sessionStore.user?.name} 🌛`
   }
 })
-
 </script>
 
 <template>
-    <MainLayout>
-        <h1>{{ welcomeMessage }}</h1>
-    </MainLayout>
+  <MainLayout>
+    <h1>{{ welcomeMessage }}</h1>
+  </MainLayout>
 </template>

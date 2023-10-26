@@ -19,33 +19,21 @@ const handleLogOut = async () => {
 <template>
   <div class="sidebar d-flex flex-column flex-shrink-0 bg-light">
     <nav class="d-flex flex-column h-100">
-      <RouterLink
-        :to="routes.start.path"
-        class="d-block p-3 link-dark border-bottom text-decoration-none"
-      >
-        <img
-          width="50"
-          height="50"
-          src="/apple-touch-icon.png"
-          class="logo m-auto d-block"
-          alt="App logo"
-        />
+      <RouterLink :to="routes.start.path" class="d-block p-3 link-dark border-bottom text-decoration-none">
+        <img width="50" height="50" src="/apple-touch-icon.png" class="logo m-auto d-block" alt="App logo" />
       </RouterLink>
       <ul class="nav nav-pills nav-flush flex-column flex-grow-1 mb-auto text-center">
         <li v-if="isStudent" class="sidebar__link p-3 nav-link">
-          <RouterLink
-            :class="{ active: $route.name === routes.studentMarks.name }"
-            class="nav-link py-2"
-            :to="routes.studentMarks.path"
-          >
+          <RouterLink :class="{ active: $route.name === routes.studentMarks.name }" class="nav-link py-2"
+            :to="routes.studentMarks.path">
             <font-awesome-icon size="lg" icon="fa-solid fa-graduation-cap" />
             <span class="popover-content sidebar__hint">Oceny</span>
           </RouterLink>
         </li>
         <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
-          <RouterLink :to="routes.subjectList.path">
-            asdas
-            <span class="popover-content sidebar__hint">Lista przedmiotów</span>
+          <RouterLink :to="routes.userList.path">
+            <font-awesome-icon icon="fa-solid fa-user" />
+            <span class="popover-content sidebar__hint">Lista użytkowników</span>
           </RouterLink>
         </li>
         <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
@@ -55,16 +43,8 @@ const handleLogOut = async () => {
           </RouterLink>
         </li>
         <li class="sidebar__link p-3 nav-link">
-          <a
-            href="javascript:void(0)"
-            class="text-decoration-none cursor-pointer"
-            @click.prevent="handleLogOut"
-          >
-            <font-awesome-icon
-              size="lg"
-              class="logout-icon"
-              icon="fa-solid fa-right-from-bracket"
-            />
+          <a href="javascript:void(0)" class="text-decoration-none cursor-pointer" @click.prevent="handleLogOut">
+            <font-awesome-icon size="lg" class="logout-icon" icon="fa-solid fa-right-from-bracket" />
             <span class="popover-content sidebar__hint">Wyloguj</span>
           </a>
         </li>
@@ -103,6 +83,7 @@ const handleLogOut = async () => {
         @extend .nav-link; */
   }
 }
+
 .nav-link:hover {
   .popover-content {
     visibility: visible;
@@ -144,6 +125,7 @@ const handleLogOut = async () => {
 .logo {
   max-width: 50px;
 }
+
 .logout-icon {
   transform: rotate(180deg);
 }

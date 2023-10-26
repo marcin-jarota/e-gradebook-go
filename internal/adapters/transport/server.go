@@ -26,7 +26,7 @@ func NewFiberHttpServer(cfg *app.Config) *FiberHttpServer {
 
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
-		AllowOrigins:     "http://localhost:3001,http://localhost:5173",
+		AllowOrigins:     "http://localhost:3001,http://localhost:5173,http://127.0.0.1:5173",
 	}))
 
 	app.Use(logger.New(logger.Config{
