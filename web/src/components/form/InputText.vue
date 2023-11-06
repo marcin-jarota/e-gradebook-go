@@ -10,14 +10,9 @@ defineEmits(['update:modelValue'])
 </script>
 <template>
   <div class="mb-3">
-    <label :for="name">{{ label }}</label>
-    <input
-      class="form-control"
-      :placeholder="placeholder"
-      :type="type"
-      :value="modelValue"
-      :autocomplete="name+'_autocomplete'"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-    />
+    <label :for="name" class="pb-2">{{ label }}</label>
+    <input class="form-control" :placeholder="placeholder" :type="type" :value="modelValue"
+      :autocomplete="name + '_autocomplete'"
+      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)" />
   </div>
 </template>

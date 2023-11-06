@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import MainSidebar from '../components/MainSidebar.vue'
+import Snackbar from '@/components/common/SnackbarMessage.vue'
 </script>
 
 <template>
@@ -10,5 +11,6 @@ import MainSidebar from '../components/MainSidebar.vue'
     <main class="p-4 container-fluid">
       <slot />
     </main>
+    <Snackbar />
   </div>
 </template>

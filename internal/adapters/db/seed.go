@@ -12,7 +12,7 @@ func SeedAdminUser(db *gorm.DB) {
 	admin := &domain.User{
 		Name:     "Marcin",
 		Surname:  "Testowy",
-		Password: "zaq1@WSX",
+		Password: "devpass",
 		Email:    "admin@e-student.com",
 		Role:     domain.AdminRole,
 		Active:   true,
@@ -26,7 +26,7 @@ func SeedAdminUser(db *gorm.DB) {
 
 	admin.Password = hash
 
-	if err := db.First(&admin, "email = ?", "admin@e-student.com").Error; err != nil {
+	if err := db.First(&admin, "email = ?", "admin@e-gradebook.com").Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("[SEED]: ADMIN USER CREATED")
 			db.Create(&admin)

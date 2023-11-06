@@ -5,12 +5,21 @@ import {
   faUserGraduate,
   faUser,
   faCheck,
-  faXmark
+  faXmark,
+  faUserPlus
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import type { App } from 'vue'
 
 export const setupIcons = (app: App<Element>) => {
-  library.add(faRightFromBracket, faGraduationCap, faUserGraduate, faUser, faCheck, faXmark)
+  library.add(
+    faRightFromBracket,
+    faGraduationCap,
+    faUserGraduate,
+    faUser,
+    faCheck,
+    faXmark,
+    faUserPlus
+  )
   app.component('font-awesome-icon', FontAwesomeIcon)
 }

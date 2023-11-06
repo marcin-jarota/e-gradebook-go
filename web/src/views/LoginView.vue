@@ -1,13 +1,21 @@
 <template>
-  <div class="container login-container">
-    <div v-if="errorCode" class="alert alert-danger">
-      {{ errorCode }}
+  <div class="container-md vh-100 d-flex justify-content-center">
+    <div class="row align-items-center">
+      <div class="col py-4">
+        <div v-if="errorCode" class="alert alert-danger">
+          {{ errorCode }}
+        </div>
+        <h1 class="py-4"><img width="50" height="50" src="/favicon-32x32.png" /> gradebook</h1>
+        <form @submit.prevent="handleLogin">
+          <InputText v-model="email" type="email" name="email" label="Email" />
+          <InputText v-model="password" type="password" name="password" label="Hasło" />
+          <button class="btn btn-primary my-2">Zaloguj</button>
+        </form>
+      </div>
+      <div class="col">
+        <img src="/login_pic.jpeg" class="rounded-4 img-fluid" alt="" />
+      </div>
     </div>
-    <form @submit.prevent="handleLogin">
-      <InputText v-model="email" type="email" name="email" label="Email" />
-      <InputText v-model="password" type="password" name="password" label="Hasło" />
-      <button class="btn btn-primary my-2">Zaloguj</button>
-    </form>
   </div>
 </template>
 
@@ -15,7 +23,6 @@
 import { ref } from 'vue'
 import InputText from '@/components/form/InputText.vue'
 import router, { routes } from '@/router'
-
 const email = ref('')
 const password = ref('')
 const errorCode = ref('')
@@ -27,7 +34,12 @@ const handleLogin = async () => {
     body: JSON.stringify({ email: email.value, password: password.value })
   })
     .then((res) => res.json())
-    .then(({ token }) => {
+    .then(({ token, Error }) => {
+      if (Error) {
+        errorCode.value = Error
+        return
+      }
+
       localStorage.setItem('token', token)
       router.push(routes.start.path)
     })
@@ -35,7 +47,7 @@ const handleLogin = async () => {
       if (!err.message) {
         errorCode.value = 'We could not handle request'
       } else {
-        errorCode.value = err.message
+        errorCode.value = err.message || err.Error
       }
 
       console.log('err', err)

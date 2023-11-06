@@ -13,6 +13,8 @@ type Route =
   | 'subjectList'
   | 'studentList'
   | 'userList'
+  | 'createStudent'
+  | 'createUser'
 
 export const routes: Record<Route, { path: string; name: string }> = Object.freeze({
   login: {
@@ -46,6 +48,14 @@ export const routes: Record<Route, { path: string; name: string }> = Object.free
   userList: {
     path: '/user/list',
     name: 'user-list'
+  },
+  createStudent: {
+    path: '/student/create',
+    name: 'student-create'
+  },
+  createUser: {
+    path: '/user/create',
+    name: 'user-create'
   }
 })
 
@@ -103,6 +113,24 @@ const router = createRouter({
       path: routes.userList.path,
       name: routes.userList.name,
       component: () => import('@/views/user/ListView.vue'),
+      meta: { requiresAuth: true, roles: [Role.Admin] }
+    },
+    {
+      path: routes.createStudent.path,
+      name: routes.createStudent.name,
+      component: () => import('@/views/student/CreateView.vue'),
+      meta: { requiresAuth: true, roles: [Role.Admin] }
+    },
+    {
+      path: routes.createStudent.path,
+      name: routes.createStudent.name,
+      component: () => import('@/views/student/CreateView.vue'),
+      meta: { requiresAuth: true, roles: [Role.Admin] }
+    },
+    {
+      path: routes.createUser.path,
+      name: routes.createUser.name,
+      component: () => import('@/views/user/CreateView.vue'),
       meta: { requiresAuth: true, roles: [Role.Admin] }
     },
     {

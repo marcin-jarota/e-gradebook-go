@@ -37,6 +37,13 @@ const handleLogOut = async () => {
           </RouterLink>
         </li>
         <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
+          <RouterLink :to="routes.createUser.path">
+            <font-awesome-icon icon="user-plus" />
+            <span class="popover-content sidebar__hint">Dodaj użytkownika</span>
+          </RouterLink>
+        </li>
+
+        <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
           <RouterLink :to="routes.studentList.path">
             <font-awesome-icon size="lg" icon="fa-solid fa-user-graduate" />
             <span class="popover-content sidebar__hint">Lista studentów</span>
