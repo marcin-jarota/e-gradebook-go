@@ -8,6 +8,9 @@ type (
 		GetOne(id int) (*domain.User, error)
 		AddUser(user *domain.User) error
 		GetOneByEmail(email string) (*domain.User, error)
+		ExistsByEmail(email string) (bool, error)
+		Activate(userID uint) error
+		Deactivate(userID uint) error
 		// IsActive(user *domain.User) bool
 	}
 
@@ -30,7 +33,18 @@ type (
 		SessionActive bool            `json:"sessionActive,omitempty"`
 	}
 
+	AdminCreatePayload struct {
+		Name     string `json:"name"`
+		Surname  string `json:"surname"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
 	UserService interface {
 		GetAll() ([]*UserOutput, error)
+		AddAdmin(admin *AdminCreatePayload) error
+		Activate(userID uint) error
+		Deactivate(userID uint) error
+		DestroySession(userID uint) error
 	}
 )

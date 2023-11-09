@@ -30,7 +30,7 @@ func NewAuthService(userRepo ports.UserRepository, sessionStorage ports.SessionS
 	}
 }
 
-func (s *AuthService) IsLoggedIn(token string) (bool, *domain.User) {
+func (s *AuthService) IsTokenValid(token string) (bool, int) {
 	var userClaims claims
 
 	parsed, err := jwt.ParseWithClaims(token, &userClaims, func(t *jwt.Token) (interface{}, error) {
@@ -39,29 +39,34 @@ func (s *AuthService) IsLoggedIn(token string) (bool, *domain.User) {
 
 	if err != nil {
 		log.Println("Eerrror: ", err)
-		return false, nil
+		return false, 0
 	}
 
 	if !parsed.Valid {
 		log.Printf("Token %s invalid", token)
 
-		return false, nil
+		return false, 0
 	}
 
 	exists, err := s.sessionStorage.Get(strconv.Itoa(int(userClaims.SessionUser.ID)))
 
 	if err != nil {
 		log.Println("Storage errpr:", err)
+		return false, 0
+	}
+
+	return exists != nil, int(userClaims.SessionUser.ID)
+}
+
+func (s *AuthService) IsLoggedIn(token string) (bool, *domain.User) {
+	exists, userId := s.IsTokenValid(token)
+
+	if !exists {
+		log.Printf("User does not exisrts i nstorage")
 		return false, nil
 	}
 
-	if exists == nil {
-		log.Printf("Token %s does not exists in storage", token)
-
-		return false, nil
-	}
-
-	user, err := s.userRepo.GetOne(int(userClaims.SessionUser.ID))
+	user, err := s.userRepo.GetOne(userId)
 
 	if err != nil {
 		log.Println("Could not get user from storage", err)
@@ -86,7 +91,7 @@ func (s *AuthService) Login(email string, password string) (string, error) {
 	err = user.PaswordMatches(password)
 
 	if err != nil {
-		return "", err
+		return "", errors.New("password or email mismatch")
 	}
 
 	if !user.Active {

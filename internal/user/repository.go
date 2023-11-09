@@ -67,3 +67,26 @@ func (u *GormUserRepository) AddUser(user *domain.User) error {
 
 	return nil
 }
+
+func (u *GormUserRepository) Activate(userID uint) error {
+	return u.db.Model(&domain.User{}).Where("id = ?", userID).Update("active", true).Error
+}
+
+func (u *GormUserRepository) Deactivate(userID uint) error {
+	return u.db.Model(&domain.User{}).Where("id = ?", userID).Update("active", false).Error
+}
+
+func (r *GormUserRepository) ExistsByEmail(email string) (bool, error) {
+	var user domain.User
+	err := r.db.First(&user, "email = ?", email).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
+}

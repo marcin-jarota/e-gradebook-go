@@ -1,7 +1,9 @@
 package user
 
 import (
+	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
+	"errors"
 	"log"
 	"strconv"
 )
@@ -52,4 +54,43 @@ func (s *UserService) GetAll() ([]*ports.UserOutput, error) {
 	}
 
 	return userList, nil
+}
+
+func (s *UserService) Activate(userID uint) error {
+	return s.repo.Activate(userID)
+}
+
+func (s *UserService) Deactivate(userID uint) error {
+	err := s.repo.Deactivate(userID)
+
+	if err != nil {
+		return errors.New("could not deactivate user")
+	}
+
+	return s.DestroySession(userID)
+}
+
+func (s *UserService) DestroySession(userID uint) error {
+	return s.sessionStorage.Delete(strconv.Itoa(int(userID)))
+}
+
+func (s *UserService) AddAdmin(admin *ports.AdminCreatePayload) error {
+	exists, err := s.repo.ExistsByEmail(admin.Email)
+
+	if err != nil {
+		return errors.New("could not verify if user exists")
+	}
+
+	if exists {
+		return errors.New("user with this email exists")
+	}
+
+	return s.repo.AddUser(&domain.User{
+		Name:     admin.Name,
+		Surname:  admin.Surname,
+		Email:    admin.Email,
+		Password: admin.Password,
+		Role:     domain.AdminRole,
+		Active:   false,
+	})
 }
