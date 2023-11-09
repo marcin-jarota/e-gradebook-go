@@ -5,7 +5,7 @@
       <form @submit.prevent="handleSubmit">
         <InputText v-model="data.name" :required="true" name="user.name" label="Imię" type="text" />
         <InputText v-model="data.surname" :required="true" name="user.surname" label="Nazwisko" type="text" />
-        <InputText @keydown="validate('email')" v-model="data.email" :required="true" :error="errors.email"
+        <InputText @change="validate('email')" v-model="data.email" :required="true" :error="errors.email"
           name="user.email" label="E-mail" type="email" />
         <div class="mb-3">
           <label class="pb-2">Rola</label>
@@ -29,7 +29,9 @@ import { Role } from '@/types'
 import MainLayout from '@/layouts/MainLayout.vue'
 import InputText from '@/components/atoms/InputText.vue'
 import Button from '@/components/atoms/VButton.vue'
+import { useSnackbarStore } from '@/stores/snackbar'
 
+const snackbarStore = useSnackbarStore()
 type FormData<TRole> = {
   name: string
   surname: string
@@ -38,9 +40,9 @@ type FormData<TRole> = {
 }
 
 const formSchema = yup.object().shape({
-  name: yup.string().required('Imie wymagane').min(3).max(255),
-  surname: yup.string().required('Nazwisko wymagane').min(3).max(255),
-  email: yup.string().email('Niepoprawny adres email').required(),
+  name: yup.string().min(3, 'Imie minimum 3 znaki').max(255).required('Imie wymagane'),
+  surname: yup.string().required('Nazwisko wymagane').min(3, 'Nazwisko minimum 3 znaki').max(255),
+  email: yup.string().email('Niepoprawny adres email').required('Adres e-mail wymagany'),
   role: yup.mixed().required('Rola wymagana')
 })
 
@@ -58,13 +60,48 @@ const errors = reactive<FormData<string>>({
   role: ''
 })
 
+const urls: Record<Role, string> = {
+  [Role.Student]: import.meta.env.VITE_API_BASE_URL + '/student/create',
+  [Role.Teacher]: '',
+  [Role.Admin]: import.meta.env.VITE_API_BASE_URL + '/user/create'
+}
+
 const handleSubmit = async () => {
-  console.log(data)
   try {
     formSchema.validateSync(data)
+
+    if (!urls[data.role]) {
+      return
+    }
+
+    const res = await fetch(urls[data.role], {
+      method: 'POST',
+      body: JSON.stringify({ ...data, password: 'devpass' }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+
+    const json = await res.json()
+
+    if (json.error) {
+      snackbarStore.createsnackbar(json.error, { autoHideDelay: 5000 })
+      return
+    }
+    snackbarStore.createsnackbar('Użytkownik dodany pomyślnie!', { autoHideDelay: 5000 })
+    resetForm()
   } catch (err) {
+    snackbarStore.createsnackbar('Nie udało się zapisać danych', { autoHideDelay: 5000 })
     console.log(JSON.stringify(err))
   }
+}
+
+const resetForm = () => {
+  data.name = ''
+  data.surname = ''
+  data.email = ''
+  data.role = Role.Student
 }
 
 const validate = (field: keyof FormData<string>) => {

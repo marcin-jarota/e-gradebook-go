@@ -22,6 +22,7 @@ export const useCurrentUser = () => {
   return {
     userInitials,
     isStudent,
-    isAdmin
+    isAdmin,
+    user
   }
 }

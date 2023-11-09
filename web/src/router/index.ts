@@ -140,7 +140,7 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, _, next) => {
+router.beforeEach(async (to, _, next) => {
   const meta = to.meta as { requiresAuth?: boolean; roles?: Role[]; title?: string }
   const token = localStorage.getItem('token')
 
@@ -153,6 +153,18 @@ router.beforeEach((to, _, next) => {
 
   const session = token ? jwtDecode<{ sessionUser: SessionUser }>(token) : null
   const user = session?.sessionUser
+
+  const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/token-valid', {
+    headers: {
+      Authorization: 'Bearer ' + token
+    }
+  })
+
+  if (res.status === 401) {
+    localStorage.removeItem('token')
+    next('/login')
+    return
+  }
 
   const { updateUser } = useSessionStore()
 

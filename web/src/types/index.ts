@@ -18,7 +18,7 @@ export type SessionUser = {
 }
 
 export type UserOutput = {
-  id: string
+  id: number
   name: string
   surname: string
   email: string
