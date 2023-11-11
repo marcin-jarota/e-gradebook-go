@@ -27,4 +27,11 @@ export type UserOutput = {
   sessionActive?: boolean
 }
 
+export type UserInput = {
+  name: string
+  surname: string
+  email: string
+  role: Role
+}
+
 export type UserListResponse = ApiBaseResponse<UserOutput[]>

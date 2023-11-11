@@ -46,14 +46,16 @@
 
 <script lang="ts" setup>
 import IconStatus from '@/components/common/IconStatus.vue'
-import { useCurrentUser } from '@/composables/useCurrentUser'
-import { useSnackbarStore } from '@/stores/snackbar'
-import { userResource } from '@/resources/user'
-import { type UserOutput, Role } from '@/types'
 import { ref } from 'vue'
 
+import { useCurrentUser } from '@/composables/useCurrentUser'
+import { useSnackbar } from '@/composables/useSnackbar'
+import { userResource } from '@/resources/user'
+import { type UserOutput, Role } from '@/types'
+
 const { user: currentUser } = useCurrentUser()
-const snackbarStore = useSnackbarStore()
+const { errorSnackbar, successSnackbar } = useSnackbar()
+
 const users = ref<UserOutput[]>([])
 
 const roleName: Record<Role, string> = {
@@ -62,26 +64,24 @@ const roleName: Record<Role, string> = {
   [Role.Teacher]: 'Nauczyciel'
 }
 
+const SNAKCBAR_DURATION = 2000
+
 const getUsers = async () => {
   try {
     users.value = (await userResource.list()).data
   } catch (err) {
     console.log(err)
-    snackbarStore.createsnackbar('Nie udało się pobrać listy', { variant: 'danger' })
+    errorSnackbar('Nie udało się pobrać listy', SNAKCBAR_DURATION)
   }
 }
 
 const activate = async (userID: number) => {
   try {
     await userResource.activate(userID)
-
-    users.value = users.value.map((u) => {
-      if (u.id === userID) u.isActive = true
-      return u
-    })
-    snackbarStore.createsnackbar('Użytkownik aktywowany pomyślnie', { variant: 'success' })
+    updateUser(userID, 'isActive', true)
+    successSnackbar('Użytkownik aktywowany pomyślnie', SNAKCBAR_DURATION)
   } catch (err) {
-    snackbarStore.createsnackbar('Nie udało się aktytować użytkownika', { variant: 'danger' })
+    errorSnackbar('Nie udało się aktytować użytkownika', SNAKCBAR_DURATION)
   }
 }
 
@@ -90,9 +90,24 @@ const deactivate = async (userID: number) => {
     await userResource.deactivate(userID)
     updateUser(userID, 'isActive', false)
     updateUser(userID, 'sessionActive', false)
-    snackbarStore.createsnackbar('Użytkownik aktywowany pomyślnie', { variant: 'success' })
+    successSnackbar('Użytkownik deaktywowany pomyślnie', SNAKCBAR_DURATION)
   } catch (err) {
-    snackbarStore.createsnackbar('Nie udało się aktytować użytkownika', { variant: 'danger' })
+    errorSnackbar('Nie udało się deaktywować użytkownika', SNAKCBAR_DURATION)
+  }
+}
+
+const destroySession = async (userID: number) => {
+  try {
+    await userResource.destroySession(userID)
+    users.value = users.value.map((u) => {
+      if (u.id === userID) u.sessionActive = false
+      return u
+    })
+    updateUser(userID, 'sessionActive', false)
+    successSnackbar('Użytkownik wylogowany pomyślnie', 3000)
+  } catch (err) {
+    console.log(err)
+    errorSnackbar('Nie udało się wylogować użytkownika', 3000)
   }
 }
 
@@ -103,20 +118,6 @@ const updateUser = <K extends keyof UserOutput>(userID: number, key: K, value: U
     }
     return u
   })
-}
-
-const destroySession = async (userID: number) => {
-  try {
-    await userResource.destroySession(userID)
-    users.value = users.value.map((u) => {
-      if (u.id === userID) u.sessionActive = false
-      return u
-    })
-    snackbarStore.createsnackbar('Użytkownik wylogowany pomyślnie', { variant: 'success' })
-  } catch (err) {
-    console.log(err)
-    snackbarStore.createsnackbar('Nie udało się wylogować użytkownika', { variant: 'danger' })
-  }
 }
 
 getUsers()

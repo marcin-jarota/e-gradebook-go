@@ -1,9 +1,16 @@
 import client from '@/lib/axios'
-import type { ApiBaseResponse, UserListResponse } from '@/types'
+import type { ApiBaseResponse, UserListResponse, UserInput } from '@/types'
 
 export const userResource = {
   async list() {
     const response = await client.get<UserListResponse>('/user/list')
+    if (response.data.error) {
+      throw new Error(response.data.error)
+    }
+    return response.data
+  },
+  async create(payload: UserInput) {
+    const response = await client.post(`/user/${payload.role}/create`, payload)
     if (response.data.error) {
       throw new Error(response.data.error)
     }
