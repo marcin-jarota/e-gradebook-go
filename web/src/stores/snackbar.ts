@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 
 type SnackbarMessage = {
   id: string | number
+  variant?: 'success' | 'danger' | 'info'
   content: string
   title?: string
   autoHideDelay?: number
@@ -13,7 +14,7 @@ export const useSnackbarStore = defineStore('snackbar', () => {
 
   const createsnackbar = (
     content: string,
-    cfg: Partial<Pick<SnackbarMessage, 'title' | 'autoHideDelay'>>
+    cfg: Partial<Pick<SnackbarMessage, 'title' | 'autoHideDelay' | 'variant'>>
   ) => {
     const message = {
       id: Math.floor(Math.random() * 100),

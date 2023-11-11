@@ -26,6 +26,7 @@ func (h *UserHandler) BindRouting(app *fiber.App, auth *middleware.AuthMiddlewar
 
 	r.Get("/list", h.GetAll)
 	r.Get("/activate/:id", h.ActivateUser)
+	r.Get("/deactivate/:id", h.DeactivateUser)
 	r.Get("/destroy-session/:id", h.DestroyUserSession)
 	r.Post("/create", h.PostAddAdmin)
 }
@@ -43,15 +44,29 @@ func (h *UserHandler) GetAll(c *fiber.Ctx) error {
 func (h *UserHandler) ActivateUser(c *fiber.Ctx) error {
 	intId, err := strconv.Atoi(c.Params("id", "0"))
 
-	if intId == 0 {
+	if intId == 0 || err != nil {
 		return h.JSONError(c, errors.New("incorrect user id"), fiber.StatusBadRequest)
 	}
 
+	err = h.service.Activate(uint(intId))
+
 	if err != nil {
-		return h.JSONError(c, err, fiber.StatusBadRequest)
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
 	}
 
-	err = h.service.Activate(uint(intId))
+	return h.JSON(c, fiber.Map{
+		"ok": true,
+	})
+}
+
+func (h *UserHandler) DeactivateUser(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id", "0"))
+
+	if id == 0 || err != nil {
+		return h.JSONError(c, errors.New("incorrect user id"), fiber.StatusBadRequest)
+	}
+
+	err = h.service.Deactivate(uint(id))
 
 	if err != nil {
 		return h.JSONError(c, err, fiber.StatusInternalServerError)

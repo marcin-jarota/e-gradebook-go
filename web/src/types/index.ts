@@ -1,4 +1,4 @@
-export type ApiBaseResponse<T> = {
+export type ApiBaseResponse<T = any> = {
   error?: string
   data: T
 }
