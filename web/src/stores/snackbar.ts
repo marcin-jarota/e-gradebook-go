@@ -16,10 +16,10 @@ export const useSnackbarStore = defineStore('snackbar', () => {
     content: string,
     cfg: Partial<Pick<SnackbarMessage, 'title' | 'autoHideDelay' | 'variant'>>
   ) => {
-    const message = {
+    const message: SnackbarMessage = {
       id: Math.floor(Math.random() * 100),
       content,
-      title: cfg?.title
+      ...cfg
     }
     snackbars.value = [...snackbars.value, message]
 

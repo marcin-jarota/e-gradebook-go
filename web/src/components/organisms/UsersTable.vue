@@ -1,6 +1,6 @@
 <template>
   <div class="table-responsive py-3">
-    <table class="table">
+    <table class="table table-hover">
       <thead class="table-light">
         <tr>
           <th scope="col">ID</th>
@@ -14,7 +14,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in users" :key="user.id">
+        <tr v-for="user in users" :key="user.id" role="button">
           <td scope="row">{{ user.id }}</td>
           <td>{{ user.name }}</td>
           <td>{{ user.surname }}</td>
@@ -27,8 +27,7 @@
             <IconStatus :active="Boolean(user.sessionActive)" />
           </td>
           <td v-if="currentUser.id !== user.id">
-            <button class="btn btn-primary">Edytuj</button>
-            <button v-if="user.sessionActive" @click="destroySession(user.id)" class="btn btn-secondary ms-2">
+            <button v-if="user.sessionActive" @click="destroySession(user.id)" class="btn btn-secondary">
               Wyloguj
             </button>
             <button v-if="!user.isActive" @click="activate(user.id)" class="btn btn-success ms-2">
