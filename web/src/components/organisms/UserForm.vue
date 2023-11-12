@@ -20,16 +20,13 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import * as yup from 'yup'
-import { Role, UserInput } from '@/types'
+import { Role, type UserInput } from '@/types'
 import InputText from '@/components/atoms/InputText.vue'
 import Button from '@/components/atoms/VButton.vue'
+import { userResource } from '@/resources/user'
+import { useSnackbar } from '@/composables/useSnackbar'
 
-type FormData<TRole> = {
-  name: string
-  surname: string
-  email: string
-  role: TRole
-}
+const { errorSnackbar, successSnackbar } = useSnackbar()
 
 const props = defineProps<{ user?: UserInput }>()
 
@@ -40,11 +37,10 @@ const data = reactive<UserInput>({
   role: props.user?.role || Role.Student
 })
 
-const errors = reactive<FormData<string>>({
+const errors = reactive<Omit<UserInput, 'role'>>({
   name: '',
   surname: '',
-  email: '',
-  role: ''
+  email: ''
 })
 
 const validationSchema = yup.object().shape({
@@ -61,20 +57,24 @@ const resetForm = () => {
   data.role = Role.Student
 }
 
-const validate = (field: keyof FormData<string>) => {
+const validate = (field: keyof Omit<UserInput, 'role'>) => {
   try {
     const result = validationSchema.validateSyncAt(field, data)
     errors[field] = ''
     console.log(result)
   } catch (err) {
-    //@ts-ignore
-    console.log(err.message)
     errors[field] = (err as yup.ValidationError).message
   }
 }
 
-const handleSubmit = () => {
-  resetForm()
+const handleSubmit = async () => {
+  try {
+    await userResource.create(data)
+    successSnackbar('Użytkownik zapisane pomyślnie!', 3000)
+    resetForm()
+  } catch (err) {
+    errorSnackbar('Nie udało się zapisać użytkownika')
+  }
 }
 </script>
 
