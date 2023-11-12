@@ -1,5 +1,5 @@
 import client from '@/lib/axios'
-import type { ApiBaseResponse, UserListResponse, UserInput } from '@/types'
+import type { ApiBaseResponse, UserListResponse, UserInput, SetupPasswordPayload } from '@/types'
 
 export const userResource = {
   async list() {
@@ -9,8 +9,21 @@ export const userResource = {
     }
     return response.data
   },
+  async tokenValid() {
+    return client.get('/token-valid')
+  },
+  async setupPassword(payload: SetupPasswordPayload, token: string) {
+    const response = await client.post(`/setup-password?token=${token}`, payload)
+    if (response.data.error) {
+      throw new Error(response.data.error)
+    }
+    return response.data
+  },
   async create(payload: UserInput) {
-    const response = await client.post(`/user/${payload.role}/create`, payload)
+    const response = await client.post<ApiBaseResponse<{ activationLink: string }>>(
+      `/user/${payload.role}/create`,
+      payload
+    )
     if (response.data.error) {
       throw new Error(response.data.error)
     }

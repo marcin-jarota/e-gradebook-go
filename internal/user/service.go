@@ -4,6 +4,7 @@ import (
 	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
 )
@@ -72,6 +73,19 @@ func (s *UserService) Deactivate(userID uint) error {
 
 func (s *UserService) DestroySession(userID uint) error {
 	return s.sessionStorage.Delete(strconv.Itoa(int(userID)))
+}
+
+func (s *UserService) SetupPassword(email string, password string, passwordConfirm string) error {
+	if password == "" {
+		return errors.New("password is empty")
+	}
+
+	if password != passwordConfirm {
+		return errors.New("password not equal")
+	}
+
+	fmt.Println(password, email)
+	return s.repo.SetPassword(email, password)
 }
 
 func (s *UserService) AddAdmin(admin *ports.AdminCreatePayload) error {

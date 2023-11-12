@@ -34,4 +34,9 @@ export type UserInput = {
   role: Role
 }
 
+export type SetupPasswordPayload = {
+  password: string
+  passwordConfirm: string
+}
+
 export type UserListResponse = ApiBaseResponse<UserOutput[]>

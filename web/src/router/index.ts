@@ -3,6 +3,7 @@ import jwtDecode from 'jwt-decode'
 import { Role } from '@/types'
 import type { SessionUser } from '@/types'
 import { useSessionStore } from '@/stores/session'
+import { userResource } from '@/resources/user'
 
 type Route =
   | 'login'
@@ -15,11 +16,16 @@ type Route =
   | 'userList'
   | 'createStudent'
   | 'createUser'
+  | 'setupPassword'
 
 export const routes: Record<Route, { path: string; name: string }> = Object.freeze({
   login: {
     path: '/login',
     name: 'login'
+  },
+  setupPassword: {
+    path: '/setup-password',
+    name: 'setup-password'
   },
   student: {
     path: '/student',
@@ -73,6 +79,15 @@ const router = createRouter({
       path: routes.login.path,
       name: routes.login.name,
       component: () => import('@/views/LoginView.vue')
+    },
+    {
+      path: routes.setupPassword.path,
+      name: routes.setupPassword.name,
+      component: () => import('@/views/user/SetupPasswordView.vue'),
+      beforeEnter(to, from, next) {
+        if (!to.query.token) return next(routes.login.path)
+        next()
+      }
     },
     {
       path: '/student',
@@ -154,13 +169,9 @@ router.beforeEach(async (to, _, next) => {
   const session = token ? jwtDecode<{ sessionUser: SessionUser }>(token) : null
   const user = session?.sessionUser
 
-  const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/token-valid', {
-    headers: {
-      Authorization: 'Bearer ' + token
-    }
-  })
-
-  if (res.status === 401) {
+  try {
+    await userResource.tokenValid()
+  } catch (err) {
     localStorage.removeItem('token')
     next('/login')
     return

@@ -30,12 +30,10 @@
             <button v-if="user.sessionActive" @click="destroySession(user.id)" class="btn btn-secondary">
               Wyloguj
             </button>
-            <button v-if="!user.isActive" @click="activate(user.id)" class="btn btn-success ms-2">
-              Aktywuj
-            </button>
-            <button v-else @click="deactivate(user.id)" class="btn btn-warning ms-2">
+            <button v-if="user.isActive" @click="deactivate(user.id)" class="btn btn-warning ms-2">
               Deaktywuj
             </button>
+            <button v-else @click="activate(user.id)" class="btn btn-success ms-2">Aktywuj</button>
           </td>
           <td v-else>-</td>
         </tr>
@@ -113,7 +111,7 @@ const destroySession = async (userID: number) => {
 
 const updateUser = <K extends keyof UserOutput>(userID: number, key: K, value: UserOutput[K]) => {
   users.value = users.value.map((u) => {
-    if (u.id === userID && u?.[key]) {
+    if (u.id === userID) {
       u[key] = value
     }
     return u

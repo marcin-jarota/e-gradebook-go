@@ -52,20 +52,34 @@ func (u *GormUserRepository) GetAll() ([]*domain.User, error) {
 }
 
 func (u *GormUserRepository) AddUser(user *domain.User) error {
-	hash, err := user.GeneratePassword(user.Password)
+	if user.Password != "" {
+		hash, err := user.GeneratePassword(user.Password)
 
-	user.Password = hash
+		user.Password = hash
+		if err != nil {
+			return err
+		}
+	}
+
+	err := u.db.Create(user).Error
+
 	if err != nil {
 		return err
 	}
 
-	res := u.db.Create(user)
+	return nil
+}
 
-	if res.Error != nil {
+func (u *GormUserRepository) SetPassword(email string, password string) error {
+	var user domain.User
+
+	hash, err := user.GeneratePassword(password)
+
+	if err != nil {
 		return err
 	}
 
-	return nil
+	return u.db.Model(&domain.User{}).Where("email = ?", email).Update("password", hash).Error
 }
 
 func (u *GormUserRepository) Activate(userID uint) error {

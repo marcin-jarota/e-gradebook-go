@@ -5,8 +5,10 @@ import (
 	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -22,12 +24,64 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
+type passwordClaimsData struct {
+	Email string `json:"email"`
+	ID    uint   `json:"id"`
+}
+
+type passwordClaims struct {
+	jwt.RegisteredClaims
+	Data passwordClaimsData `json:"data"`
+}
+
 func NewAuthService(userRepo ports.UserRepository, sessionStorage ports.SessionStorage, cfg *app.Config) *AuthService {
 	return &AuthService{
 		sessionStorage: sessionStorage,
 		userRepo:       userRepo,
 		cfg:            cfg,
 	}
+}
+
+func (s *AuthService) GeneratePasswordToken(email string, expiresIn time.Duration) (string, error) {
+	user, err := s.userRepo.GetOneByEmail(email)
+
+	if err != nil {
+		return "", err
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, passwordClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiresIn)),
+		},
+		Data: passwordClaimsData{Email: email, ID: user.ID},
+	})
+
+	signedToken, err := token.SignedString([]byte(s.cfg.Secret))
+
+	if err != nil {
+		return "", err
+	}
+
+	return signedToken, nil
+}
+
+func (s *AuthService) IsGenerateTokenValid(token string) (string, uint, bool) {
+	var pClaims passwordClaims
+	parsed, err := jwt.ParseWithClaims(token, &pClaims, func(t *jwt.Token) (interface{}, error) {
+		return []byte(s.cfg.Secret), nil
+	})
+
+	if err != nil {
+		log.Println("Eerrror: ", err)
+		return "", 0, false
+	}
+
+	if !parsed.Valid {
+		log.Println("Token invalid")
+		return "", 0, false
+	}
+
+	return pClaims.Data.Email, pClaims.Data.ID, true
 }
 
 func (s *AuthService) IsTokenValid(token string) (bool, int) {
@@ -55,6 +109,7 @@ func (s *AuthService) IsTokenValid(token string) (bool, int) {
 		return false, 0
 	}
 
+	fmt.Println(exists)
 	return exists != nil, int(userClaims.SessionUser.ID)
 }
 

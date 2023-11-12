@@ -2,10 +2,13 @@ package user
 
 import (
 	"e-student/internal/adapters/transport"
+	"e-student/internal/app"
 	"e-student/internal/app/ports"
 	"e-student/internal/middleware"
 	"errors"
+	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -13,11 +16,15 @@ import (
 type UserHandler struct {
 	transport.Handler
 	service ports.UserService
+	auth    ports.AuthService
+	cfg     *app.Config
 }
 
-func NewUserHandler(service ports.UserService) *UserHandler {
+func NewUserHandler(service ports.UserService, auth ports.AuthService, cfg *app.Config) *UserHandler {
 	return &UserHandler{
 		service: service,
+		auth:    auth,
+		cfg:     cfg,
 	}
 }
 
@@ -28,7 +35,8 @@ func (h *UserHandler) BindRouting(app *fiber.App, auth *middleware.AuthMiddlewar
 	r.Get("/activate/:id", h.ActivateUser)
 	r.Get("/deactivate/:id", h.DeactivateUser)
 	r.Get("/destroy-session/:id", h.DestroyUserSession)
-	r.Post("/create", h.PostAddAdmin)
+	r.Post("/admin/create", h.PostAddAdmin)
+	app.Post("/setup-password", h.SetupPassword)
 }
 
 func (h *UserHandler) GetAll(c *fiber.Ctx) error {
@@ -39,6 +47,34 @@ func (h *UserHandler) GetAll(c *fiber.Ctx) error {
 	}
 
 	return h.JSON(c, users)
+}
+
+func (h *UserHandler) SetupPassword(c *fiber.Ctx) error {
+	var payload ports.SetupPasswordPayload
+	params := c.Queries()
+
+	if err := c.BodyParser(&payload); err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	email, userID, isValid := h.auth.IsGenerateTokenValid(params["token"])
+
+	fmt.Println(email, userID, isValid)
+	if !isValid {
+		return h.JSONError(c, errors.New("token invalid"), fiber.StatusBadRequest)
+	}
+
+	if err := h.service.SetupPassword(email, payload.Password, payload.PasswordConfirm); err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	if err := h.service.Activate(userID); err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, fiber.Map{
+		"ok": true,
+	})
 }
 
 func (h *UserHandler) ActivateUser(c *fiber.Ctx) error {
@@ -110,7 +146,13 @@ func (h *UserHandler) PostAddAdmin(c *fiber.Ctx) error {
 		return h.JSONError(c, err, fiber.StatusBadRequest)
 	}
 
+	token, err := h.auth.GeneratePasswordToken(p.Email, 15*time.Minute)
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
 	return h.JSON(c, map[string]any{
-		"ok": true,
+		"activationLink": fmt.Sprintf("%s/setup-password?token=%s&email=%s", h.cfg.BaseUrlFront, token, p.Email),
 	})
 }

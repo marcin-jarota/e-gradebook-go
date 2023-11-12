@@ -5,6 +5,7 @@
         <div v-if="errorCode" class="alert alert-danger">
           {{ errorCode }}
         </div>
+        <div v-if="setup" class="alert alert-success">Konto aktywowane, możesz się zalogować</div>
         <h1 class="py-4"><img width="50" height="50" src="/favicon-32x32.png" /> gradebook</h1>
         <form @submit.prevent="handleLogin">
           <InputText v-model="email" type="email" name="email" label="Email" />
@@ -20,13 +21,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import InputText from '@/components/form/InputText.vue'
 import router, { routes } from '@/router'
-const email = ref('')
+import { useQuery } from '@/composables/useQuery'
+
+const { getParam } = useQuery()
+
+const email = ref(getParam('email') || '')
 const password = ref('')
 const errorCode = ref('')
 
+const setup = computed(() => {
+  const params = new URL(location.href).searchParams
+  return params.get('setup')
+})
 const handleLogin = async () => {
   fetch('http://localhost:8080/login', {
     method: 'POST',

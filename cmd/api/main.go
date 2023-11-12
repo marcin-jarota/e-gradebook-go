@@ -42,7 +42,7 @@ func main() {
 	studentHandler := student.NewStudentHandler(studentService)
 	authHandler := auth.NewAuthHandler(authService)
 	subjecthandler := subject.NewSubjectHandler(subjectService)
-	userHandler := user.NewUserHandler(userService)
+	userHandler := user.NewUserHandler(userService, authService, cfg)
 
 	// bind routing
 	studentHandler.BindRouting(server.App, authMiddleware)

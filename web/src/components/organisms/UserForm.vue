@@ -1,4 +1,5 @@
 <template>
+  <div class="py-2 alert alert-success" v-if="link"><a :href="link">Aktywuj konto</a></div>
   <form @submit.prevent="handleSubmit">
     <InputText v-model="data.name" :required="true" name="user.name" label="Imię" type="text" />
     <InputText v-model="data.surname" :required="true" name="user.surname" label="Nazwisko" type="text" />
@@ -18,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import * as yup from 'yup'
 import { Role, type UserInput } from '@/types'
 import InputText from '@/components/atoms/InputText.vue'
@@ -36,6 +37,8 @@ const data = reactive<UserInput>({
   email: props.user?.email || '',
   role: props.user?.role || Role.Student
 })
+
+const link = ref('')
 
 const errors = reactive<Omit<UserInput, 'role'>>({
   name: '',
@@ -69,7 +72,8 @@ const validate = (field: keyof Omit<UserInput, 'role'>) => {
 
 const handleSubmit = async () => {
   try {
-    await userResource.create(data)
+    const { data: response } = await userResource.create(data)
+    link.value = response.activationLink
     successSnackbar('Użytkownik zapisane pomyślnie!', 3000)
     resetForm()
   } catch (err) {

@@ -11,6 +11,7 @@ type (
 		ExistsByEmail(email string) (bool, error)
 		Activate(userID uint) error
 		Deactivate(userID uint) error
+		SetPassword(email string, password string) error
 		// IsActive(user *domain.User) bool
 	}
 
@@ -40,11 +41,17 @@ type (
 		Password string `json:"password"`
 	}
 
+	SetupPasswordPayload struct {
+		Password        string `json:"password"`
+		PasswordConfirm string `json:"passwordConfirm"`
+	}
+
 	UserService interface {
 		GetAll() ([]*UserOutput, error)
 		AddAdmin(admin *AdminCreatePayload) error
 		Activate(userID uint) error
 		Deactivate(userID uint) error
 		DestroySession(userID uint) error
+		SetupPassword(email string, password string, passwordConfirm string) error
 	}
 )
