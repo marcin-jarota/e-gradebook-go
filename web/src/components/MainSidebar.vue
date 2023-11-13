@@ -30,23 +30,24 @@ const handleLogOut = async () => {
             <span class="popover-content sidebar__hint">Oceny</span>
           </RouterLink>
         </li>
-        <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
-          <RouterLink :to="routes.userList.path">
-            <font-awesome-icon icon="fa-solid fa-user" />
-            <span class="popover-content sidebar__hint">Lista użytkowników</span>
-          </RouterLink>
-        </li>
+
         <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
           <RouterLink :to="routes.createUser.path">
             <font-awesome-icon icon="user-plus" />
             <span class="popover-content sidebar__hint">Dodaj użytkownika</span>
           </RouterLink>
         </li>
+        <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
+          <RouterLink :to="routes.userList.path">
+            <font-awesome-icon icon="fa-solid fa-users" />
+            <span class="popover-content sidebar__hint">Lista użytkowników</span>
+          </RouterLink>
+        </li>
 
         <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
-          <RouterLink :to="routes.studentList.path">
-            <font-awesome-icon size="lg" icon="fa-solid fa-user-graduate" />
-            <span class="popover-content sidebar__hint">Lista studentów</span>
+          <RouterLink :to="routes.subjectList.path">
+            <font-awesome-icon icon="fa-solid fa-chalkboard" />
+            <span class="popover-content sidebar__hint">Lista przedmiotów</span>
           </RouterLink>
         </li>
         <li class="sidebar__link p-3 nav-link">

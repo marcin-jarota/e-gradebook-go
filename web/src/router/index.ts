@@ -170,9 +170,8 @@ router.beforeEach(async (to, _, next) => {
   const user = session?.sessionUser
 
   try {
-    await userResource.tokenValid()
+    await userResource.tokenValid(token as string)
   } catch (err) {
-    localStorage.removeItem('token')
     next('/login')
     return
   }

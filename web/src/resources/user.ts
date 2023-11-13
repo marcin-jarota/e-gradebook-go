@@ -3,51 +3,42 @@ import type { ApiBaseResponse, UserListResponse, UserInput, SetupPasswordPayload
 
 export const userResource = {
   async list() {
-    const response = await client.get<UserListResponse>('/user/list')
-    if (response.data.error) {
-      throw new Error(response.data.error)
-    }
-    return response.data
+    return handleRequest(client.get<UserListResponse>('/user/list'))
   },
-  async tokenValid() {
-    return client.get('/token-valid')
+  async tokenValid(token: string) {
+    return client.get('/token-valid', {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    })
   },
   async setupPassword(payload: SetupPasswordPayload, token: string) {
-    const response = await client.post(`/setup-password?token=${token}`, payload)
-    if (response.data.error) {
-      throw new Error(response.data.error)
-    }
-    return response.data
+    return handleRequest(client.post(`/setup-password?token=${token}`, payload))
   },
   async create(payload: UserInput) {
-    const response = await client.post<ApiBaseResponse<{ activationLink: string }>>(
-      `/user/${payload.role}/create`,
-      payload
+    return handleRequest(
+      client.post<ApiBaseResponse<{ activationLink: string }>>(
+        `/user/${payload.role}/create`,
+        payload
+      )
     )
-    if (response.data.error) {
-      throw new Error(response.data.error)
-    }
-    return response.data
   },
   async activate(userID: number) {
-    const response = await client.get<ApiBaseResponse<{ ok: boolean }>>(`/user/activate/${userID}`)
-    if (response.data.error) {
-      throw new Error(response.data.error)
-    }
-    return response.data
+    return handleRequest(client.get<ApiBaseResponse<{ ok: boolean }>>(`/user/activate/${userID}`))
   },
   async deactivate(userID: number) {
-    const response = await client.get<ApiBaseResponse>(`/user/deactivate/${userID}`)
-    if (response.data.error) {
-      throw new Error(response.data.error)
-    }
-    return response.data
+    return handleRequest(client.get<ApiBaseResponse>(`/user/deactivate/${userID}`))
   },
   async destroySession(userID: number) {
-    const response = await client.get<ApiBaseResponse<any>>(`/user/destroy-session/${userID}`)
-    if (response.data.error) {
-      throw new Error(response.data.error)
-    }
-    return response.data
+    return handleRequest(client.get<ApiBaseResponse<any>>(`/user/destroy-session/${userID}`))
   }
+}
+
+const handleRequest = async <T extends Promise<any>>(t: T): Promise<Awaited<T>> => {
+  const r = await t
+  if (r?.data?.error) {
+    throw new Error(r?.data?.error)
+  }
+
+  return r?.data
 }
