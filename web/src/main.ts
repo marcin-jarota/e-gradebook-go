@@ -4,11 +4,11 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { setupIcons } from './lib/fontAwesome'
-import TranslatePlugin from './plugins/translate'
+import translatePlugin from './plugins/translate'
 
 const app = createApp(App)
 
-app.use(TranslatePlugin, {
+app.use(translatePlugin, {
   subject: {
     error: {
       exists: 'Podany przedmiot już istnieje',
