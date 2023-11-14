@@ -10,8 +10,17 @@ const app = createApp(App)
 
 app.use(TranslatePlugin, {
   subject: {
-    exists: 'Podany przedmiot już istnieje',
-    missingName: 'Proszę podać nazwę przedmiotu'
+    error: {
+      exists: 'Podany przedmiot już istnieje',
+      missingName: 'Proszę podać nazwę przedmiotu'
+    }
+  },
+  login: {
+    error: {
+      mismatch: 'Niepoprawny e-mail lub hasło',
+      userInactive: 'Twoje konto jest nieaktywne, skontaktuj się z administratorem',
+      fallback: 'Nie udało się zalogować'
+    }
   }
 })
 

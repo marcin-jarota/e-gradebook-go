@@ -1,9 +1,9 @@
 import client from '@/lib/axios'
-import type { ApiBaseResponse, UserListResponse, UserInput, SetupPasswordPayload } from '@/types'
+import type { ApiBaseResponse, UserOutput, UserInput, SetupPasswordPayload } from '@/types'
 
 export const userResource = {
   async list() {
-    return handleRequest(client.get<UserListResponse>('/user/list'))
+    return handleRequest(client.get<UserOutput[]>('/user/list'))
   },
   async tokenValid(token: string) {
     return client.get('/token-valid', {

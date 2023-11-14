@@ -140,17 +140,17 @@ func (s *AuthService) Login(email string, password string) (string, error) {
 	user, err := s.userRepo.GetOneByEmail(email)
 
 	if err != nil {
-		return "", errors.New("password or email not found")
+		return "", errors.New("login.error.mismatch")
 	}
 
 	err = user.PaswordMatches(password)
 
 	if err != nil {
-		return "", errors.New("password or email mismatch")
+		return "", errors.New("login.error.mismatch")
 	}
 
 	if !user.Active {
-		return "", errors.New("your account is not activated")
+		return "", errors.New("login.error.userInactive")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims{
@@ -173,7 +173,7 @@ func (s *AuthService) Login(email string, password string) (string, error) {
 	err = s.sessionStorage.Set(strconv.Itoa(int(user.ID)), signedToken)
 
 	if err != nil {
-		return "", errors.Join(err, errors.New("could not login"))
+		return "", errors.Join(err, errors.New("login.error.fallback"))
 	}
 
 	return signedToken, nil

@@ -66,9 +66,9 @@ const SNAKCBAR_DURATION = 2000
 
 const getUsers = async () => {
   try {
-    users.value = (await userResource.list()).data
+    const { data } = await userResource.list()
+    users.value = data.sort((a, b) => a.id - b.id)
   } catch (err) {
-    console.log(err)
     errorSnackbar('Nie udało się pobrać listy', SNAKCBAR_DURATION)
   }
 }
@@ -76,7 +76,7 @@ const getUsers = async () => {
 const activate = async (userID: number) => {
   try {
     await userResource.activate(userID)
-    updateUser(userID, 'isActive', true)
+    await getUsers()
     successSnackbar('Użytkownik aktywowany pomyślnie', SNAKCBAR_DURATION)
   } catch (err) {
     errorSnackbar('Nie udało się aktytować użytkownika', SNAKCBAR_DURATION)
@@ -86,8 +86,7 @@ const activate = async (userID: number) => {
 const deactivate = async (userID: number) => {
   try {
     await userResource.deactivate(userID)
-    updateUser(userID, 'isActive', false)
-    updateUser(userID, 'sessionActive', false)
+    await getUsers()
     successSnackbar('Użytkownik deaktywowany pomyślnie', SNAKCBAR_DURATION)
   } catch (err) {
     errorSnackbar('Nie udało się deaktywować użytkownika', SNAKCBAR_DURATION)
@@ -97,25 +96,12 @@ const deactivate = async (userID: number) => {
 const destroySession = async (userID: number) => {
   try {
     await userResource.destroySession(userID)
-    users.value = users.value.map((u) => {
-      if (u.id === userID) u.sessionActive = false
-      return u
-    })
-    updateUser(userID, 'sessionActive', false)
+    await getUsers()
     successSnackbar('Użytkownik wylogowany pomyślnie', 3000)
   } catch (err) {
     console.log(err)
     errorSnackbar('Nie udało się wylogować użytkownika', 3000)
   }
-}
-
-const updateUser = <K extends keyof UserOutput>(userID: number, key: K, value: UserOutput[K]) => {
-  users.value = users.value.map((u) => {
-    if (u.id === userID) {
-      u[key] = value
-    }
-    return u
-  })
 }
 
 getUsers()

@@ -3,9 +3,9 @@
     <div class="row align-items-center">
       <div class="col py-4">
         <div v-if="errorCode" class="alert alert-danger">
-          {{ errorCode }}
+          {{ $translate(errorCode) }}
         </div>
-        <div v-if="setup" class="alert alert-success">Konto aktywowane, możesz się zalogować</div>
+        <div v-if="setup" class="alert alert-success">Konto aktywowane, możesz się zalogować</div>
         <h1 class="py-4"><img width="50" height="50" src="/favicon-32x32.png" /> gradebook</h1>
         <form @submit.prevent="handleLogin">
           <InputText v-model="email" type="email" name="email" label="Email" />
