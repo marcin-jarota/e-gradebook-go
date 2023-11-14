@@ -33,7 +33,7 @@ func (s *SubjectService) GetAll() ([]*ports.SubjectOutput, error) {
 
 func (s *SubjectService) AddSubject(name string) error {
 	if name == "" {
-		return errors.New("missing name")
+		return errors.New("subject.missingName")
 	}
 
 	exists, err := s.repo.Exists(name)
@@ -43,7 +43,7 @@ func (s *SubjectService) AddSubject(name string) error {
 	}
 
 	if exists {
-		return errors.New("subject exists")
+		return errors.New("subject.exists")
 	}
 
 	err = s.repo.AddSubject(&domain.Subject{Name: name})

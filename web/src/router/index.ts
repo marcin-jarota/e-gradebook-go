@@ -83,11 +83,7 @@ const router = createRouter({
     {
       path: routes.setupPassword.path,
       name: routes.setupPassword.name,
-      component: () => import('@/views/user/SetupPasswordView.vue'),
-      beforeEnter(to, from, next) {
-        if (!to.query.token) return next(routes.login.path)
-        next()
-      }
+      component: () => import('@/views/user/SetupPasswordView.vue')
     },
     {
       path: '/student',

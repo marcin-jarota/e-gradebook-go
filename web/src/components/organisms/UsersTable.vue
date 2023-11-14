@@ -27,13 +27,13 @@
             <IconStatus :active="Boolean(user.sessionActive)" />
           </td>
           <td v-if="currentUser.id !== user.id">
-            <button v-if="user.sessionActive" @click="destroySession(user.id)" class="btn btn-secondary">
+            <button v-if="user.sessionActive" @click="destroySession(user.id)" class="btn btn-secondary me-2">
               Wyloguj
             </button>
-            <button v-if="user.isActive" @click="deactivate(user.id)" class="btn btn-warning ms-2">
+            <button v-if="user.isActive" @click="deactivate(user.id)" class="btn btn-warning">
               Deaktywuj
             </button>
-            <button v-else @click="activate(user.id)" class="btn btn-success ms-2">Aktywuj</button>
+            <button v-else @click="activate(user.id)" class="btn btn-success">Aktywuj</button>
           </td>
           <td v-else>-</td>
         </tr>
