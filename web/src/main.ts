@@ -12,7 +12,8 @@ app.use(translatePlugin, {
   subject: {
     error: {
       exists: 'Podany przedmiot już istnieje',
-      missingName: 'Proszę podać nazwę przedmiotu'
+      missingName: 'Proszę podać nazwę przedmiotu',
+      cantDelete: 'Nie udało się usunąć przedmiotu'
     }
   },
   login: {

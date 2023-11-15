@@ -2,8 +2,8 @@
   <MainLayout>
     <div class="container">
       <h2 class="pb-2">Lista przedmiotów</h2>
-      <SubjectList :subjects="subjects" />
-      <VButton @click="openModal" variant="primary" type="button">Dodaj przedmiot</VButton>
+      <SubjectList :subjects="subjects" @delete-click="openDeleteModal" />
+      <VButton @click="openModal(modal)" variant="primary" type="button">Dodaj przedmiot</VButton>
     </div>
 
     <!-- Modal -->
@@ -27,6 +27,28 @@
         </div>
       </div>
     </div>
+    <!-- delete modal -->
+    <div class="modal fade" ref="deleteModal" tabindex="-1" id="deleteModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Czy jesteś pewien?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="deleteModal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div v-if="errorCode" class="alert alert-danger">
+              {{ $translate(errorCode) }}
+            </div>
+            <div v-else>
+              <span> Oceny powiązane z przedmiotem zostaną zarchiwizowane</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <VButton @click="deleteSubject" variant="danger" type="button">Usuń</VButton>
+          </div>
+        </div>
+      </div>
+    </div>
   </MainLayout>
 </template>
 <script lang="ts" setup>
@@ -44,23 +66,35 @@ const { successSnackbar } = useSnackbar()
 const subjects = ref<Subject[]>([])
 const subjectName = ref('')
 const errorCode = ref('')
+const subjectID = ref<number | null>(null)
 
 const modal = ref<HTMLDivElement | null>(null)
+const deleteModal = ref<HTMLDivElement | null>(null)
 
-const openModal = () => {
-  if (modal.value) {
-    const bModal = new Modal(modal.value)
+const openModal = (e: HTMLDivElement | null) => {
+  if (e) {
+    const bModal = new Modal(e)
     bModal.show()
   }
 }
 
-const closeModal = () => {
-  if (modal.value) {
-    const bModal = Modal.getInstance(modal.value)
+const closeModal = (e: HTMLDivElement | null) => {
+  if (e) {
+    const bModal = Modal.getInstance(e)
     if (bModal) {
       bModal.hide()
     }
   }
+}
+
+const openDeleteModal = (id: number) => {
+  openModal(deleteModal.value)
+  subjectID.value = id
+}
+
+const closeDeleteModal = () => {
+  closeModal(deleteModal.value)
+  subjectID.value = null
 }
 
 const saveSubject = async (e: Event) => {
@@ -69,7 +103,25 @@ const saveSubject = async (e: Event) => {
     e.stopPropagation()
     await subjectResource.create({ name: subjectName.value })
     successSnackbar('Przedmiot dodany', 4000)
-    closeModal()
+    closeModal(modal.value)
+    await getSubjects()
+  } catch (err) {
+    const code = (err as any)?.response?.data?.error
+    if (code) {
+      errorCode.value = code
+    }
+  }
+}
+
+const deleteSubject = async (e: Event) => {
+  try {
+    e.preventDefault()
+    e.stopPropagation()
+    await subjectResource.delete(subjectID.value)
+
+    closeDeleteModal()
+    successSnackbar('Przedmiot usunięty', 4000)
+
     await getSubjects()
   } catch (err) {
     const code = (err as any)?.response?.data?.error

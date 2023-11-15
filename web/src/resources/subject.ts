@@ -8,6 +8,9 @@ export const subjectResource = {
   },
   async create(payload: SubjectCreatePayload) {
     return handleRequest(client.post('/subject/create', payload))
+  },
+  async delete(id: number) {
+    return handleRequest(client.get('/subject/delete/' + id))
   }
 }
 

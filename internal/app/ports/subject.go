@@ -8,6 +8,7 @@ type (
 		GetAll() ([]*domain.Subject, error)
 		GetOneByName(name string) (*domain.Subject, error)
 		Exists(name string) (bool, error)
+		DeleteByID(id uint) error
 	}
 
 	SubjectOutput struct {
@@ -22,5 +23,6 @@ type (
 	SubjectService interface {
 		AddSubject(name string) error
 		GetAll() ([]*SubjectOutput, error)
+		Delete(id uint) error
 	}
 )

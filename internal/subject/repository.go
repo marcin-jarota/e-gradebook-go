@@ -31,6 +31,18 @@ func (r *GormSubjectRepository) GetAll() ([]*domain.Subject, error) {
 	return subjects, nil
 }
 
+func (r *GormSubjectRepository) DeleteByID(id uint) error {
+	if err := r.db.Where("subject_id = ?", id).Delete(&domain.Mark{}).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Delete(&domain.Subject{}, id).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *GormSubjectRepository) GetOneByName(name string) (*domain.Subject, error) {
 	var subject domain.Subject
 	err := r.db.First(&subject, "name = ?", name).Error

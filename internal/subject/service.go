@@ -4,6 +4,7 @@ import (
 	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
 	"errors"
+	"fmt"
 )
 
 type SubjectService struct {
@@ -29,6 +30,17 @@ func (s *SubjectService) GetAll() ([]*ports.SubjectOutput, error) {
 	}
 
 	return response, nil
+}
+
+func (s *SubjectService) Delete(id uint) error {
+	err := s.repo.DeleteByID(id)
+
+	if err != nil {
+		fmt.Println(err)
+		return errors.New("subject.error.cantDelete")
+	}
+
+	return nil
 }
 
 func (s *SubjectService) AddSubject(name string) error {
