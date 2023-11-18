@@ -11,10 +11,12 @@ import (
 type Mark struct {
 	gorm.Model
 	Value     float32
-	Subject   Subject `gorm:"foreignKey:subject_id;references:id"`
-	StudentID uint    `gorm:"foreignKey:student_id;references:id"`
+	Subject   Subject
+	StudentID uint
 	Comment   string
 	Date      *time.Time
 	SubjectID uint
+	Student   Student
+	Teacher   Teacher
 	TeacherID uint
 }

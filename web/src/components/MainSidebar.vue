@@ -50,6 +50,13 @@ const handleLogOut = async () => {
             <span class="popover-content sidebar__hint">Lista przedmiotów</span>
           </RouterLink>
         </li>
+        <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
+          <RouterLink :to="routes.classGroupList.path">
+            <font-awesome-icon icon="fa-solid fa-school" />
+            <span class="popover-content sidebar__hint">Lista klas</span>
+          </RouterLink>
+        </li>
+
         <li class="sidebar__link p-3 nav-link">
           <a href="javascript:void(0)" class="text-decoration-none cursor-pointer" @click.prevent="handleLogOut">
             <font-awesome-icon size="lg" class="logout-icon" icon="fa-solid fa-right-from-bracket" />

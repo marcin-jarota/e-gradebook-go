@@ -11,6 +11,8 @@ type (
 		AddStudent(student *domain.Student) error
 		GetMarks(studentID int) ([]domain.Mark, error)
 		ExistsByEmail(email string) (bool, error)
+		SetClassGroup(studentID uint, classGroupID uint) error
+		RemoveClassGroup(studentID uint) error
 	}
 
 	StudentOutput struct {
@@ -38,9 +40,15 @@ type (
 		Password string `json:"password"`
 	}
 
+	SetClassGroupPayload struct {
+		StudentID    int `json:"studentID"`
+		ClassGroupID int `json:"classGroupID"`
+	}
+
 	StudentService interface {
 		GetAll() ([]*StudentOutput, error)
 		GetMarks(studentID int) ([]*StudentMarkOutput, error)
 		AddStudent(student *StudentCreatePayload) error
+		SetClassGroup(payload *SetClassGroupPayload) error
 	}
 )

@@ -41,6 +41,10 @@ func (s *StudentService) GetAll() ([]*ports.StudentOutput, error) {
 	return studentsResponse, nil
 }
 
+func (s *StudentService) SetClassGroup(payload *ports.SetClassGroupPayload) error {
+	return s.studentRepo.SetClassGroup(uint(payload.StudentID), uint(payload.ClassGroupID))
+}
+
 func (s *StudentService) GetMarks(studentId int) ([]*ports.StudentMarkOutput, error) {
 	var studentMarks []*ports.StudentMarkOutput
 	marks, err := s.studentRepo.GetMarks(studentId)

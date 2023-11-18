@@ -4,6 +4,6 @@ import "gorm.io/gorm"
 
 type ClassGroup struct {
 	gorm.Model
-	Name     string    `json:"name"`
-	Students []Student `json:"students"`
+	Name     string
+	Students []Student `gorm:"foreignkey:ClassGroupID"`
 }

@@ -25,6 +25,24 @@ func (h *StudentHandler) BindRouting(app fiber.Router, auth *middleware.AuthMidd
 	r := app.Group("/student", auth.IsAuthenticatedByHeader())
 	r.Get("/:studentId/marks", auth.IsStudent(), h.GetMarks)
 	r.Post("/create", auth.IsAdmin(), h.AddStudent)
+	r.Patch("/class-group", auth.IsAdmin(), h.AssignToClassGroup)
+}
+
+func (h *StudentHandler) AssignToClassGroup(c *fiber.Ctx) error {
+	var p ports.SetClassGroupPayload
+
+	if err := c.BodyParser(&p); err != nil {
+		return h.JSONError(c, err, http.StatusBadRequest)
+	}
+
+	err := h.service.SetClassGroup(&p)
+
+	if err != nil {
+		return h.JSONError(c, err, http.StatusBadRequest)
+	}
+
+	return h.JSON(c, fiber.Map{"success": true})
+
 }
 
 func (h *StudentHandler) GetMarks(c *fiber.Ctx) error {

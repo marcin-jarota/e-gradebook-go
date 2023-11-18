@@ -18,7 +18,7 @@ func main() {
 	userRoleCreate := fmt.Sprintf(`CREATE TYPE user_role AS ENUM ('%s', '%s', '%s');`, domain.AdminRole, domain.StudentRole, domain.TeacherRole)
 
 	if err := conn.Exec(userRoleDrop).Error; err != nil {
-		log.Panicln(err)
+		log.Println(err)
 	} else {
 		if err := conn.Exec(userRoleCreate).Error; err != nil {
 			fmt.Printf("Error creating enum type: %v\n", err)
@@ -51,6 +51,10 @@ func main() {
 		log.Panic("Could migrate Teacher table: ", err)
 	}
 
-	db.SeedAdminUser(conn)
-	db.SeedSubject(conn)
+	// db.SeedAdminUser(conn)
+	// db.SeedSubject(conn)
+	// db.SeedClassGroup(conn)
+	// db.SeedStudentUser(conn)
+	// db.SeedTeacherUser(conn)
+	db.SeedMarks(conn)
 }

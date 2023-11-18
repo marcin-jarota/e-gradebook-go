@@ -8,7 +8,8 @@ import (
 type Student struct {
 	gorm.Model
 	UserID       uint
-	User         User
+	User         User `gorm:"foreignkey:UserID"`
 	Marks        []Mark
 	ClassGroupID uint
+	ClassGroup   ClassGroup `gorm:"foreignkey:ClassGroupID"`
 }

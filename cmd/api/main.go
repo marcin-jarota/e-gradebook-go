@@ -7,6 +7,7 @@ import (
 	"e-student/internal/adapters/transport"
 	core "e-student/internal/app"
 	"e-student/internal/auth"
+	classgroup "e-student/internal/class_group"
 	"e-student/internal/middleware"
 	"e-student/internal/student"
 	"e-student/internal/subject"
@@ -28,12 +29,14 @@ func main() {
 	userRepo := user.NewGormUserRepository(conn)
 	studentRepo := student.NewGormStudentRepository(conn)
 	subjectRepo := subject.NewGormSubjectRepository(conn)
+	classgroupRepo := classgroup.NewClassGroupRepository(conn)
 
 	// services
 	authService := auth.NewAuthService(userRepo, storage, cfg)
 	studentService := student.NewStudentService(studentRepo)
 	subjectService := subject.NewSubjectService(subjectRepo)
 	userService := user.NewUserService(userRepo, storage)
+	classgroupService := classgroup.NewClassGroupService(classgroupRepo)
 
 	// middlewares
 	authMiddleware := middleware.NewAuthMiddleware(authService)
@@ -43,12 +46,14 @@ func main() {
 	authHandler := auth.NewAuthHandler(authService)
 	subjecthandler := subject.NewSubjectHandler(subjectService)
 	userHandler := user.NewUserHandler(userService, authService, cfg)
+	classgroupHandler := classgroup.NewClassGroupHandler(classgroupService)
 
 	// bind routing
 	studentHandler.BindRouting(server.App, authMiddleware)
 	authHandler.BindRouting(server.App, authMiddleware)
 	subjecthandler.BindRouting(server.App, authMiddleware)
 	userHandler.BindRouting(server.App, authMiddleware)
+	classgroupHandler.BindRouting(server.App, authMiddleware)
 
 	server.Listen()
 }

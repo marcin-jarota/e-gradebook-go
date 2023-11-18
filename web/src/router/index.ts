@@ -17,6 +17,7 @@ type Route =
   | 'createStudent'
   | 'createUser'
   | 'setupPassword'
+  | 'classGroupList'
 
 export const routes: Record<Route, { path: string; name: string }> = Object.freeze({
   login: {
@@ -62,6 +63,10 @@ export const routes: Record<Route, { path: string; name: string }> = Object.free
   createUser: {
     path: '/user/create',
     name: 'user-create'
+  },
+  classGroupList: {
+    path: '/class-group/list',
+    name: 'class-group-list'
   }
 })
 
@@ -142,6 +147,12 @@ const router = createRouter({
       path: routes.createUser.path,
       name: routes.createUser.name,
       component: () => import('@/views/user/CreateView.vue'),
+      meta: { requiresAuth: true, roles: [Role.Admin] }
+    },
+    {
+      path: routes.classGroupList.path,
+      name: routes.classGroupList.name,
+      component: () => import('@/views/classGroup/ListView.vue'),
       meta: { requiresAuth: true, roles: [Role.Admin] }
     },
     {
