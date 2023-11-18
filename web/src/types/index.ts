@@ -1,5 +1,5 @@
 export type ApiBaseResponse<T = any> = {
-  error?: string
+  error: string | null
   data: T
 }
 

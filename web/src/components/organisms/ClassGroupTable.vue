@@ -1,0 +1,28 @@
+<template>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Nazwa klasy</th>
+        <th>Liczba uczniów</th>
+        <th scope="col">Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="classgroup in classGroups" :key="classgroup.id">
+        <th scope="row">{{ classgroup.id }}</th>
+        <td>{{ classgroup.name }}</td>
+        <td>{{ classgroup.studentsCount }}</td>
+        <td>
+          <VButton variant="danger" type="button" @click="$emit('deleteClick', classgroup.id)">Usuń</VButton>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</template>
+<script setup lang="ts">
+import type { ClassGroupOutput } from '@/types/ClassGroup'
+import VButton from '@/components/atoms/VButton.vue'
+defineProps<{ classGroups: ClassGroupOutput[] }>()
+defineEmits<{ (e: 'deleteClick', id: number): void }>()
+</script>

@@ -20,8 +20,26 @@ func NewClassGroupHandler(service ports.ClassGroupService) *ClassGroupHandler {
 }
 
 func (h *ClassGroupHandler) BindRouting(app fiber.Router, auth *middleware.AuthMiddleware) {
-	r := app.Group("/class")
-	r.Get("/all", h.GetAll)
+	r := app.Group("/class", auth.IsAuthenticatedByHeader())
+	r.Get("/all", auth.IsAdmin(), h.GetAll)
+	r.Post("/create", auth.IsAdmin(), h.Create)
+}
+
+func (h *ClassGroupHandler) Create(c *fiber.Ctx) error {
+	var p ports.AddClassGroupInput
+
+	if err := c.BodyParser(&p); err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	if err := h.service.AddClassGroup(&p); err != nil {
+
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	return h.JSON(c, fiber.Map{
+		"success": true,
+	})
 }
 
 func (h *ClassGroupHandler) GetAll(c *fiber.Ctx) error {

@@ -2,8 +2,8 @@
   <MainLayout>
     <div class="container">
       <h2 class="pb-2">Lista klas</h2>
-      <SubjectList :subjects="subjects" @delete-click="openDeleteModal" />
-      <VButton @click="openModal(modal)" variant="primary" type="button">Dodaj przedmiot</VButton>
+      <ClassGroupTable :class-groups="classGroups" @delete-click="openDeleteModal" />
+      <VButton @click="openModal(modal)" variant="primary" type="button">Dodaj klasę</VButton>
     </div>
 
     <!-- Modal -->
@@ -18,11 +18,11 @@
             <div v-if="errorCode" class="alert alert-danger">
               {{ $translate(errorCode) }}
             </div>
-            <InputText v-model="subjectName" required placeholder="Informatyka" type="text" name="subject-name"
-              label="Nazwa przedmiotu" />
+            <InputText v-model="classGroupName" required placeholder="2c Informatyczna" type="text" name="class-name"
+              label="Nazwa klasy" />
           </div>
           <div class="modal-footer">
-            <VButton @click="saveSubject" variant="primary" type="button">Zapisz</VButton>
+            <VButton @click="saveClassGroup" variant="primary" type="button">Zapisz</VButton>
           </div>
         </div>
       </div>
@@ -40,11 +40,11 @@
               {{ $translate(errorCode) }}
             </div>
             <div v-else>
-              <span> Oceny powiązane z przedmiotem zostaną zarchiwizowane</span>
+              <span> Osoby przypisane do klasy zostaną z niej wypisane</span>
             </div>
           </div>
           <div class="modal-footer">
-            <VButton @click="deleteSubject" variant="danger" type="button">Usuń</VButton>
+            <!-- <VButton @click="deleteSubject" variant="danger" type="button">Usuń</VButton> -->
           </div>
         </div>
       </div>
@@ -53,18 +53,18 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue'
-import type { Subject } from '@/types/Subject'
 import { Modal } from 'bootstrap'
-import { subjectResource } from '@/resources/subject'
+import { classGroupResource } from '@/resources/classGroup'
 import MainLayout from '@/layouts/MainLayout.vue'
-import SubjectList from '@/components/SubjectList.vue'
 import VButton from '@/components/atoms/VButton.vue'
 import InputText from '@/components/form/InputText.vue'
 import { useSnackbar } from '@/composables/useSnackbar'
+import type { ClassGroupOutput } from '@/types/ClassGroup'
+import ClassGroupTable from '@/components/organisms/ClassGroupTable.vue'
 
 const { successSnackbar } = useSnackbar()
-const subjects = ref<Subject[]>([])
-const subjectName = ref('')
+const classGroups = ref<ClassGroupOutput[]>([])
+const classGroupName = ref('')
 const errorCode = ref('')
 const subjectID = ref<number | null>(null)
 
@@ -97,14 +97,14 @@ const closeDeleteModal = () => {
   subjectID.value = null
 }
 
-const saveSubject = async (e: Event) => {
+const saveClassGroup = async (e: Event) => {
   try {
     e.preventDefault()
     e.stopPropagation()
-    await subjectResource.create({ name: subjectName.value })
-    successSnackbar('Przedmiot dodany', 4000)
+    await classGroupResource.create({ name: classGroupName.value })
+    successSnackbar('Klasa stworzona', 3000)
     closeModal(modal.value)
-    await getSubjects()
+    await getClassGroups()
   } catch (err) {
     const code = (err as any)?.response?.data?.error
     if (code) {
@@ -112,31 +112,31 @@ const saveSubject = async (e: Event) => {
     }
   }
 }
+//
+// const deleteSubject = async (e: Event) => {
+//   try {
+//     e.preventDefault()
+//     e.stopPropagation()
+//     await subjectResource.delete(subjectID.value as number)
+//
+//     closeDeleteModal()
+//     successSnackbar('Przedmiot usunięty', 4000)
+//
+//     await getSubjects()
+//   } catch (err) {
+//     const code = (err as any)?.response?.data?.error
+//     if (code) {
+//       errorCode.value = code
+//     }
+//   }
+// }
 
-const deleteSubject = async (e: Event) => {
-  try {
-    e.preventDefault()
-    e.stopPropagation()
-    await subjectResource.delete(subjectID.value as number)
-
-    closeDeleteModal()
-    successSnackbar('Przedmiot usunięty', 4000)
-
-    await getSubjects()
-  } catch (err) {
-    const code = (err as any)?.response?.data?.error
-    if (code) {
-      errorCode.value = code
-    }
-  }
+const getClassGroups = async () => {
+  const { data } = await classGroupResource.list()
+  classGroups.value = data.data
 }
 
-const getSubjects = async () => {
-  const { data } = await subjectResource.list()
-  subjects.value = data.data
-}
-
-getSubjects()
+getClassGroups()
 </script>
 
 <style></style>

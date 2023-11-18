@@ -18,6 +18,7 @@ type (
 	}
 
 	ListClassGroupsOutput struct {
+		ID            int    `json:"id"`
 		Name          string `json:"name"`
 		StudentsCount int    `json:"studentsCount"`
 	}

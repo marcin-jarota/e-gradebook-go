@@ -10,13 +10,15 @@ type Handler struct{}
 
 func (h *Handler) JSONError(c *fiber.Ctx, err error, status int) error {
 	return c.Status(status).JSON(fiber.Map{
+		"data":  nil,
 		"error": err.Error(),
 	})
 }
 
 func (h *Handler) JSON(c *fiber.Ctx, data interface{}) error {
 	return c.JSON(fiber.Map{
-		"data": data,
+		"data":  data,
+		"error": nil,
 	})
 }
 

@@ -17,10 +17,6 @@ func NewClassGroupService(repo ports.ClassGroupRepository) *ClassGroupService {
 	}
 }
 
-// ListStudents(classGroupID uint) ([]*ListStudentsOutput, error)
-// AddStudent(studentID uint, classGroupID uint) error
-// AddClassGroup(input *AddClassGroupInput) error
-
 func (s *ClassGroupService) GetAll() ([]*ports.ListClassGroupsOutput, error) {
 	var output []*ports.ListClassGroupsOutput
 	classGroups, err := s.repo.GetAll()
@@ -32,6 +28,7 @@ func (s *ClassGroupService) GetAll() ([]*ports.ListClassGroupsOutput, error) {
 
 	for _, c := range classGroups {
 		output = append(output, &ports.ListClassGroupsOutput{
+			ID:            int(c.ID),
 			Name:          c.Name,
 			StudentsCount: len(c.Students),
 		})
