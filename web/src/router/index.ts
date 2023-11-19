@@ -1,165 +1,114 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import jwtDecode from 'jwt-decode'
 import { Role } from '@/types'
 import type { SessionUser } from '@/types'
 import { useSessionStore } from '@/stores/session'
 import { userResource } from '@/resources/user'
 
-type Route =
-  | 'login'
-  | 'student'
-  | 'start'
-  | 'profile'
-  | 'studentMarks'
-  | 'subjectList'
-  | 'studentList'
-  | 'userList'
-  | 'createStudent'
-  | 'createUser'
-  | 'setupPassword'
-  | 'classGroupList'
-
-export const routes: Record<Route, { path: string; name: string }> = Object.freeze({
+export const routes: Record<
+  string,
+  RouteRecordRaw & {
+    meta?: { roles: Role[]; title: string; requiresAuth: boolean; sidebar?: boolean; icon?: string }
+  }
+> = {
+  home: {
+    path: '/',
+    name: 'home',
+    redirect() {
+      return { name: 'login' }
+    }
+  },
   login: {
     path: '/login',
-    name: 'login'
+    name: 'login',
+    component: () => import('@/views/LoginView.vue')
   },
   setupPassword: {
     path: '/setup-password',
-    name: 'setup-password'
-  },
-  student: {
-    path: '/student',
-    name: 'student'
-  },
-  studentMarks: {
-    path: '/student/marks',
-    name: 'student-marks'
+    name: 'setup-password',
+    component: () => import('@/views/user/SetupPasswordView.vue')
   },
   start: {
     path: '/start',
-    name: 'start'
+    name: '/start',
+    meta: { requiresAuth: true, roles: [Role.Student, Role.Admin], title: 'Start' },
+    component: () => import('@/views/StartView.vue')
   },
-  profile: {
-    path: '/profile',
-    name: 'profile'
+  studentMarks: {
+    path: '/student/marks',
+    name: 'student.marks',
+    meta: {
+      requiresAuth: true,
+      mainNav: true,
+      roles: [Role.Student],
+      sidebar: true,
+      title: 'Oceny',
+      icon: 'fa-graduation-cap'
+    },
+    component: () => import('@/views/student/MarksView.vue')
   },
   subjectList: {
     path: '/subject/list',
-    name: 'subject-list'
+    name: 'subject.list',
+    meta: {
+      requiresAuth: true,
+      roles: [Role.Admin],
+      sidebar: true,
+      title: 'Przedmioty',
+      icon: 'fa-chalkboard'
+    },
+    component: () => import('@/views/subject/ListView.vue')
   },
-  studentList: {
-    path: '/student/list',
-    name: 'student-list'
-  },
-  userList: {
+  usetList: {
     path: '/user/list',
-    name: 'user-list'
+    name: 'user.list',
+    meta: {
+      requiresAuth: true,
+      roles: [Role.Admin],
+      sidebar: true,
+      title: 'Użytkownicy',
+      icon: 'fa-users'
+    },
+    component: () => import('@/views/user/ListView.vue')
   },
-  createStudent: {
-    path: '/student/create',
-    name: 'student-create'
-  },
-  createUser: {
+  userCreate: {
     path: '/user/create',
-    name: 'user-create'
+    name: 'user.create',
+    meta: {
+      requiresAuth: true,
+      roles: [Role.Admin],
+      sidebar: true,
+      title: 'Dodawanie użytkownika',
+      icon: 'user-plus'
+    },
+    component: () => import('@/views/user/CreateView.vue')
   },
   classGroupList: {
     path: '/class-group/list',
-    name: 'class-group-list'
+    name: 'class-group-list',
+    meta: {
+      requiresAuth: true,
+      roles: [Role.Admin],
+      sidebar: true,
+      title: 'Klasy',
+      icon: 'fa-school'
+    },
+    component: () => import('@/views/classGroup/ListView.vue')
+  },
+  accessDenied: {
+    path: '/denied',
+    name: 'denied',
+    component: () => import('@/views/DeniedView.vue')
+  },
+  notFound: {
+    path: '/:pathMatch(.*)*',
+    component: () => import('@/views/PageNotFound.vue')
   }
-})
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      redirect(to) {
-        return { name: 'login' }
-      }
-    },
-    {
-      path: routes.login.path,
-      name: routes.login.name,
-      component: () => import('@/views/LoginView.vue')
-    },
-    {
-      path: routes.setupPassword.path,
-      name: routes.setupPassword.name,
-      component: () => import('@/views/user/SetupPasswordView.vue')
-    },
-    {
-      path: '/student',
-      name: 'student',
-      component: () => import('@/views/StudentView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Student], title: 'Student' }
-    },
-    {
-      path: '/denied',
-      name: 'denied',
-      component: () => import('@/views/DeniedView.vue')
-    },
-    {
-      path: routes.start.path,
-      name: routes.start.name,
-      component: () => import('@/views/StartView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Student, Role.Admin], title: 'Start' }
-    },
-    {
-      path: routes.studentMarks.path,
-      name: routes.studentMarks.name,
-      component: () => import('@/views/student/MarksView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Student], title: 'Oceny' }
-    },
-    {
-      path: routes.subjectList.path,
-      name: routes.subjectList.name,
-      component: () => import('@/views/subject/ListView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Admin], title: 'Przedmioty' }
-    },
-    {
-      path: routes.studentList.path,
-      name: routes.studentList.name,
-      component: () => import('@/views/student/ListView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Admin] }
-    },
-    {
-      path: routes.userList.path,
-      name: routes.userList.name,
-      component: () => import('@/views/user/ListView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Admin] }
-    },
-    {
-      path: routes.createStudent.path,
-      name: routes.createStudent.name,
-      component: () => import('@/views/student/CreateView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Admin] }
-    },
-    {
-      path: routes.createStudent.path,
-      name: routes.createStudent.name,
-      component: () => import('@/views/student/CreateView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Admin] }
-    },
-    {
-      path: routes.createUser.path,
-      name: routes.createUser.name,
-      component: () => import('@/views/user/CreateView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Admin] }
-    },
-    {
-      path: routes.classGroupList.path,
-      name: routes.classGroupList.name,
-      component: () => import('@/views/classGroup/ListView.vue'),
-      meta: { requiresAuth: true, roles: [Role.Admin] }
-    },
-    {
-      path: '/:pathMatch(.*)*',
-      component: () => import('@/views/PageNotFound.vue')
-    }
-  ]
+  routes: Object.values(routes)
 })
 
 router.beforeEach(async (to, _, next) => {

@@ -19,10 +19,13 @@ export const useCurrentUser = () => {
     return user?.role === Role.Admin
   })
 
+  const hasPermission = (requiredRole: Role) => user.role === requiredRole
+
   return {
     userInitials,
     isStudent,
     isAdmin,
+    hasPermission,
     user
   }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MainSidebar from '../components/MainSidebar.vue'
+import MainSidebar from '@/components/organisms/MainSidebar.vue'
 import Snackbar from '@/components/common/SnackbarMessage.vue'
 </script>
 

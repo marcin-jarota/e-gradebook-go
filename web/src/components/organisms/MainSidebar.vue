@@ -3,7 +3,7 @@ import { RouterLink } from 'vue-router'
 import router, { routes } from '@/router'
 import { useCurrentUser } from '@/composables/useCurrentUser'
 
-const { userInitials, isAdmin, isStudent } = useCurrentUser()
+const { userInitials, hasPermission } = useCurrentUser()
 
 const handleLogOut = async () => {
   try {
@@ -14,6 +14,10 @@ const handleLogOut = async () => {
     console.error(err)
   }
 }
+
+const sidebarRoutes = Object.values(routes).filter((r) => r?.meta?.sidebar)
+
+console.log(sidebarRoutes)
 </script>
 
 <template>
@@ -23,39 +27,14 @@ const handleLogOut = async () => {
         <img width="50" height="50" src="/apple-touch-icon.png" class="logo m-auto d-block" alt="App logo" />
       </RouterLink>
       <ul class="nav nav-pills nav-flush flex-column flex-grow-1 mb-auto text-center">
-        <li v-if="isStudent" class="sidebar__link p-3 nav-link">
-          <RouterLink :class="{ active: $route.name === routes.studentMarks.name }" class="nav-link py-2"
-            :to="routes.studentMarks.path">
-            <font-awesome-icon size="lg" icon="fa-solid fa-graduation-cap" />
-            <span class="popover-content sidebar__hint">Oceny</span>
-          </RouterLink>
-        </li>
-
-        <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
-          <RouterLink :to="routes.createUser.path">
-            <font-awesome-icon icon="user-plus" />
-            <span class="popover-content sidebar__hint">Dodaj użytkownika</span>
-          </RouterLink>
-        </li>
-        <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
-          <RouterLink :to="routes.userList.path">
-            <font-awesome-icon icon="fa-solid fa-users" />
-            <span class="popover-content sidebar__hint">Lista użytkowników</span>
-          </RouterLink>
-        </li>
-
-        <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
-          <RouterLink :to="routes.subjectList.path">
-            <font-awesome-icon icon="fa-solid fa-chalkboard" />
-            <span class="popover-content sidebar__hint">Lista przedmiotów</span>
-          </RouterLink>
-        </li>
-        <li v-if="isAdmin" class="sidebar__link p-3 nav-link">
-          <RouterLink :to="routes.classGroupList.path">
-            <font-awesome-icon icon="fa-solid fa-school" />
-            <span class="popover-content sidebar__hint">Lista klas</span>
-          </RouterLink>
-        </li>
+        <template v-for="route in sidebarRoutes">
+          <li v-if="route.meta?.roles?.some(hasPermission)" :key="route.name" class="sidebar__link p-3 nav-link">
+            <RouterLink :class="{ active: $route.name === route.name }" class="nav-link py-2" :to="route.path">
+              <font-awesome-icon v-if="route?.meta?.icon" size="lg" :icon="['fa-solid', route.meta?.icon]" />
+              <span class="popover-content sidebar__hint">{{ route?.meta?.title }}</span>
+            </RouterLink>
+          </li>
+        </template>
 
         <li class="sidebar__link p-3 nav-link">
           <a href="javascript:void(0)" class="text-decoration-none cursor-pointer" @click.prevent="handleLogOut">
@@ -64,7 +43,7 @@ const handleLogOut = async () => {
           </a>
         </li>
         <li class="d-flex mt-auto align-items-center justify-content-center py-4 cursor-pointer">
-          <RouterLink :to="routes.profile.path" class="text-decoration-none">
+          <RouterLink :to="'/'" class="text-decoration-none">
             <span class="sidebar__user-initials">{{ userInitials }}</span>
           </RouterLink>
         </li>
@@ -99,7 +78,7 @@ const handleLogOut = async () => {
   }
 }
 
-.nav-link:hover {
+.nav-link>a:hover {
   .popover-content {
     visibility: visible;
     opacity: 1;
@@ -121,7 +100,7 @@ const handleLogOut = async () => {
   top: 50%;
   transform: translateY(-50%);
   padding: 4px 8px;
-  font-size: 12px;
+  font-size: 14px;
   transition: 0.3s;
 }
 
