@@ -36,7 +36,7 @@ func (s *UserService) GetAll() ([]*ports.UserOutput, error) {
 
 		if err != nil {
 			// TODO log this error to system
-			log.Println("[ERR]: Could not get session from storage", err)
+			log.Println("[ERR]: Could not get session from storage", err.Error())
 		}
 
 		if exists != nil {
@@ -65,7 +65,7 @@ func (s *UserService) Deactivate(userID uint) error {
 	err := s.repo.Deactivate(userID)
 
 	if err != nil {
-		return errors.New("could not deactivate user")
+		return errors.New("deactivate.errorFallback")
 	}
 
 	return s.DestroySession(userID)
@@ -77,11 +77,11 @@ func (s *UserService) DestroySession(userID uint) error {
 
 func (s *UserService) SetupPassword(email string, password string, passwordConfirm string) error {
 	if password == "" {
-		return errors.New("password is empty")
+		return errors.New("password.errorEmpty")
 	}
 
 	if password != passwordConfirm {
-		return errors.New("password not equal")
+		return errors.New("password.errorNotEqual")
 	}
 
 	fmt.Println(password, email)
@@ -92,11 +92,11 @@ func (s *UserService) AddAdmin(admin *ports.AdminCreatePayload) error {
 	exists, err := s.repo.ExistsByEmail(admin.Email)
 
 	if err != nil {
-		return errors.New("could not verify if user exists")
+		return errors.New("user.add.errorFallback")
 	}
 
 	if exists {
-		return errors.New("user with this email exists")
+		return errors.New("user.add.errorExists")
 	}
 
 	return s.repo.AddUser(&domain.User{
