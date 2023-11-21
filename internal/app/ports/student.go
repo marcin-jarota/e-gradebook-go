@@ -7,9 +7,9 @@ import (
 
 type (
 	StudentRepository interface {
-		GetAll() ([]*domain.Student, error)
+		GetAll() ([]domain.Student, error)
+		GetAllByClassGroup(classGroupID uint) ([]domain.Student, error)
 		AddStudent(student *domain.Student) error
-		GetMarks(studentID int) ([]domain.Mark, error)
 		ExistsByEmail(email string) (bool, error)
 		SetClassGroup(studentID uint, classGroupID uint) error
 		RemoveClassGroup(studentID uint) error
@@ -40,6 +40,13 @@ type (
 		Password string `json:"password"`
 	}
 
+	StudentByClassGroup struct {
+		Name    string  `json:"name"`
+		Surname string  `json:"surname"`
+		Email   string  `json:"email"`
+		AvgMark float32 `json:"avgMark"`
+	}
+
 	SetClassGroupPayload struct {
 		StudentID    int `json:"studentID"`
 		ClassGroupID int `json:"classGroupID"`
@@ -47,8 +54,9 @@ type (
 
 	StudentService interface {
 		GetAll() ([]*StudentOutput, error)
-		GetMarks(studentID int) ([]*StudentMarkOutput, error)
+		GetAllByClassGroup(classGroupID int) ([]StudentByClassGroup, error)
+		// GetMarks(studentID int) ([]*StudentMarkOutput, error)
 		AddStudent(student *StudentCreatePayload) error
-		SetClassGroup(payload *SetClassGroupPayload) error
+		SetClassGroup(payload SetClassGroupPayload) error
 	}
 )

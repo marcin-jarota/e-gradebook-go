@@ -55,3 +55,13 @@ func (u *User) IsAdmin() bool {
 func (u *User) IsStudent() bool {
 	return u.Role == StudentRole
 }
+
+func (u *User) Is(roles ...UserRole) bool {
+	for _, role := range roles {
+		if role == u.Role {
+			return true
+		}
+	}
+
+	return false
+}

@@ -17,8 +17,8 @@ func NewClassGroupService(repo ports.ClassGroupRepository) *ClassGroupService {
 	}
 }
 
-func (s *ClassGroupService) GetAll() ([]*ports.ListClassGroupsOutput, error) {
-	var output []*ports.ListClassGroupsOutput
+func (s *ClassGroupService) GetAll() ([]ports.ClassGroupOutput, error) {
+	var output []ports.ClassGroupOutput
 	classGroups, err := s.repo.GetAll()
 
 	if err != nil {
@@ -27,7 +27,7 @@ func (s *ClassGroupService) GetAll() ([]*ports.ListClassGroupsOutput, error) {
 	}
 
 	for _, c := range classGroups {
-		output = append(output, &ports.ListClassGroupsOutput{
+		output = append(output, ports.ClassGroupOutput{
 			ID:            int(c.ID),
 			Name:          c.Name,
 			StudentsCount: len(c.Students),
@@ -37,40 +37,10 @@ func (s *ClassGroupService) GetAll() ([]*ports.ListClassGroupsOutput, error) {
 	return output, nil
 }
 
-func (s *ClassGroupService) ListStudents(classGroupID uint) ([]*ports.ListStudentsOutput, error) {
-	var output []*ports.ListStudentsOutput
-
-	students, err := s.repo.GetStudents(classGroupID)
-
-	if err != nil {
-		fmt.Println(err)
-		return nil, errors.New("classGroup.error.studentsFetch")
-	}
-
-	for _, student := range students {
-		output = append(output, &ports.ListStudentsOutput{
-			Name:    student.User.Name,
-			Surname: student.User.Surname,
-			Email:   student.User.Email,
-			AvgMark: s.calculateAverageMark(student.Marks),
-		})
-	}
-
-	return output, nil
-}
-
-func (s *ClassGroupService) AddClassGroup(input *ports.AddClassGroupInput) error {
+func (s *ClassGroupService) AddClassGroup(input ports.AddClassGroupInput) error {
 	err := s.repo.AddClassGroup(&domain.ClassGroup{
 		Name: input.Name,
 	})
 
 	return err
-}
-
-func (s *ClassGroupService) calculateAverageMark(marks []domain.Mark) float32 {
-	var avgMark float32
-	for _, mark := range marks {
-		avgMark = avgMark + mark.Value
-	}
-	return avgMark
 }

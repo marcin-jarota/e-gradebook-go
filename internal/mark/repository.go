@@ -6,28 +6,26 @@ import (
 	"gorm.io/gorm"
 )
 
-type GormMarkRepository struct {
+type gormMarkRepository struct {
 	db *gorm.DB
 }
 
-func NewGormMarkRepository(db *gorm.DB) *GormMarkRepository {
+func NewGormMarkRepository(db *gorm.DB) *gormMarkRepository {
 
-	return &GormMarkRepository{
+	return &gormMarkRepository{
 		db: db,
 	}
 }
 
-func (r *GormMarkRepository) AddMark(mark *domain.Mark) error {
+func (r *gormMarkRepository) AddMark(mark domain.Mark) error {
 	return r.db.Create(mark).Error
 }
 
-func (r *GormMarkRepository) GetMarksByStudent(studentId int) ([]*domain.Mark, error) {
-	var marks []*domain.Mark
+func (r *gormMarkRepository) GetByStudent(studentID int) ([]domain.Mark, error) {
+	var marks []domain.Mark
 
-	res := r.db.Preload("Subject").Where("student_id = ?", studentId).Find(&marks)
-
-	if res.Error != nil {
-		return nil, res.Error
+	if err := r.db.Joins("Teacher.User").Joins("Subject").Where("student_id = ?", studentID).Find(&marks).Error; err != nil {
+		return nil, err
 	}
 
 	return marks, nil

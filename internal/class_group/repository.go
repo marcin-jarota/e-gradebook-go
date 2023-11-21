@@ -31,13 +31,3 @@ func (r *GormClassGroupRepository) GetAll() ([]domain.ClassGroup, error) {
 func (r *GormClassGroupRepository) AddClassGroup(classGroup *domain.ClassGroup) error {
 	return r.db.Create(classGroup).Error
 }
-
-func (r *GormClassGroupRepository) GetStudents(classGroupID uint) ([]domain.Student, error) {
-	var students []domain.Student
-
-	if err := r.db.Preload("User").Preload("Marks").Where("class_group_id = ?", classGroupID).Find(&students).Error; err != nil {
-		return nil, err
-	}
-
-	return students, nil
-}

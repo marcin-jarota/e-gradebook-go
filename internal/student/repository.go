@@ -21,12 +21,22 @@ func NewGormStudentRepository(db *gorm.DB) *GormStudentRepository {
 	}
 }
 
-func (r *GormStudentRepository) GetAll() ([]*domain.Student, error) {
-	var students []*domain.Student
+func (r *GormStudentRepository) GetAll() ([]domain.Student, error) {
+	var students []domain.Student
 
 	res := r.db.Preload("User").Preload("Marks").Find(&students)
 	if res.Error != nil {
 		return students, res.Error
+	}
+
+	return students, nil
+}
+
+func (r *GormStudentRepository) GetAllByClassGroup(classGroupID uint) ([]domain.Student, error) {
+	var students []domain.Student
+
+	if err := r.db.Preload("User").Preload("Marks").Where("class_group_id = ?", classGroupID).Find(&students).Error; err != nil {
+		return nil, err
 	}
 
 	return students, nil

@@ -27,14 +27,14 @@ func (m *AuthMiddleware) IsAuthenticatedByHeader() fiber.Handler {
 		parts := strings.Split(authHeader, " ")
 
 		if len(parts) < 2 {
-			return m.JSONError(c, errors.New("missing_token"), fiber.StatusBadRequest)
+			return m.JSONError(c, errors.New("auth.missing_token"), fiber.StatusBadRequest)
 		}
 
 		schema := parts[0]
 		token := parts[1]
 
 		if schema != "Bearer" || token == "" {
-			return m.JSONError(c, errors.New("unauthorized"), fiber.StatusUnauthorized)
+			return m.JSONError(c, errors.New("auth.unauthorized"), fiber.StatusUnauthorized)
 		}
 
 		isLoggedIn, user := m.auth.IsLoggedIn(token)
@@ -48,16 +48,32 @@ func (m *AuthMiddleware) IsAuthenticatedByHeader() fiber.Handler {
 	}
 }
 
+func (m *AuthMiddleware) UserIs(roles ...domain.UserRole) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		u, ok := c.Locals("user").(*domain.User)
+
+		if !ok {
+			return m.JSONError(c, errors.New("auth.session_error"), fiber.StatusUnauthorized)
+		}
+
+		if u.Is(roles...) {
+			return c.Next()
+		}
+
+		return m.JSONError(c, errors.New("auth.unauthorized"), fiber.StatusUnauthorized)
+	}
+}
+
 func (m *AuthMiddleware) IsAdmin() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		u, ok := c.Locals("user").(*domain.User)
 
 		if !ok {
-			return m.JSONError(c, errors.New("no session user"), fiber.StatusUnauthorized)
+			return m.JSONError(c, errors.New("auth.session_error"), fiber.StatusUnauthorized)
 		}
 
 		if !u.IsAdmin() {
-			return m.JSONError(c, errors.New("unauthorized"), fiber.StatusUnauthorized)
+			return m.JSONError(c, errors.New("auth.unauthorized"), fiber.StatusUnauthorized)
 		}
 
 		return c.Next()
@@ -69,7 +85,7 @@ func (m *AuthMiddleware) IsStudent() fiber.Handler {
 		u, ok := c.Locals("user").(*domain.User)
 
 		if !ok {
-			return m.JSONError(c, errors.New("no session user"), fiber.StatusUnauthorized)
+			return m.JSONError(c, errors.New("auth.session_error"), fiber.StatusUnauthorized)
 		}
 
 		if !u.IsStudent() {

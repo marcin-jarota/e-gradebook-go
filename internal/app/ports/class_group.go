@@ -6,20 +6,12 @@ type (
 	ClassGroupRepository interface {
 		GetAll() ([]domain.ClassGroup, error)
 		AddClassGroup(classGroup *domain.ClassGroup) error
-		GetStudents(classGroupID uint) ([]domain.Student, error)
 		// AddStudent(studentID uint, classGroupID uint) error
 		// RemoveStudent(studentID uint, classGroupID uint) error
 		// DeleteByID(classGroupID uint) error
 	}
 
-	ListStudentsOutput struct {
-		Name    string  `json:"name"`
-		Surname string  `json:"surname"`
-		Email   string  `json:"email"`
-		AvgMark float32 `json:"avgMark"`
-	}
-
-	ListClassGroupsOutput struct {
+	ClassGroupOutput struct {
 		ID            int    `json:"id"`
 		Name          string `json:"name"`
 		StudentsCount int    `json:"studentsCount"`
@@ -29,9 +21,12 @@ type (
 		Name string `json:"name"`
 	}
 
+	AddStudentToClassGroupPayload struct {
+		StudentID int `json:"studentID"`
+	}
+
 	ClassGroupService interface {
-		GetAll() ([]*ListClassGroupsOutput, error)
-		ListStudents(classGroupID uint) ([]*ListStudentsOutput, error)
-		AddClassGroup(input *AddClassGroupInput) error
+		GetAll() ([]ClassGroupOutput, error)
+		AddClassGroup(input AddClassGroupInput) error
 	}
 )

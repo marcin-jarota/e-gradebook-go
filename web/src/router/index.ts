@@ -31,7 +31,7 @@ export const routes: Record<
   start: {
     path: '/start',
     name: '/start',
-    meta: { requiresAuth: true, roles: [Role.Student, Role.Admin], title: 'Start' },
+    meta: { requiresAuth: true, roles: [], title: 'Start' },
     component: () => import('@/views/StartView.vue')
   },
   studentMarks: {
