@@ -47,10 +47,12 @@ func (s *ClassGroupService) ListStudents(classGroupID uint) ([]*ports.ListStuden
 		return nil, errors.New("classGroup.error.studentsFetch")
 	}
 
-	for _, s := range students {
+	for _, student := range students {
 		output = append(output, &ports.ListStudentsOutput{
-			Name:    s.User.Name,
-			Surname: s.User.Surname,
+			Name:    student.User.Name,
+			Surname: student.User.Surname,
+			Email:   student.User.Email,
+			AvgMark: s.calculateAverageMark(student.Marks),
 		})
 	}
 
@@ -63,4 +65,12 @@ func (s *ClassGroupService) AddClassGroup(input *ports.AddClassGroupInput) error
 	})
 
 	return err
+}
+
+func (s *ClassGroupService) calculateAverageMark(marks []domain.Mark) float32 {
+	var avgMark float32
+	for _, mark := range marks {
+		avgMark = avgMark + mark.Value
+	}
+	return avgMark
 }

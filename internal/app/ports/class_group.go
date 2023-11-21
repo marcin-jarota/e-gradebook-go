@@ -13,8 +13,10 @@ type (
 	}
 
 	ListStudentsOutput struct {
-		Name    string `json:"name"`
-		Surname string `json:"surname"`
+		Name    string  `json:"name"`
+		Surname string  `json:"surname"`
+		Email   string  `json:"email"`
+		AvgMark float32 `json:"avgMark"`
 	}
 
 	ListClassGroupsOutput struct {
