@@ -23,7 +23,7 @@
             <td>{{ student.surname }}</td>
             <td>{{ student.avgMark }}</td>
             <td>
-              <AddMark :studentID="student.id" />
+              <AddMark @on-add="getClassGroupStudents" :studentID="student.id" />
             </td>
           </tr>
         </tbody>

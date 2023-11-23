@@ -49,10 +49,12 @@ import { Modal } from 'bootstrap'
 import { type Subject } from '@/types/Subject'
 import { markResource } from '@/resources/mark'
 import { useCurrentUser } from '@/composables/useCurrentUser'
+import { useSnackbar } from '@/composables/useSnackbar'
 
 const { user } = useCurrentUser()
+const { successSnackbar } = useSnackbar()
 const props = defineProps<{ studentID: number }>()
-defineEmits(['on-add'])
+const $emit = defineEmits(['on-add'])
 
 const marksMap = {
   '1': 1,
@@ -90,6 +92,13 @@ const closeModal = (e: HTMLDivElement | null) => {
     }
   }
 }
+function formatDateToMMDDYYYY(date: Date) {
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0')
+  const year = date.getFullYear()
+
+  return `${month}-${day}-${year}`
+}
 
 const save = async () => {
   try {
@@ -97,11 +106,14 @@ const save = async () => {
     await markResource.addMark({
       subjectID: subject.value?.id,
       comment: comment.value,
-      date: markDate.value,
+      date: markDate.value && formatDateToMMDDYYYY(new Date(markDate.value)),
       value: markValue.value,
       studentID: props.studentID,
       teacherID: user.id
     })
+    successSnackbar('Ocena dodana', 3000)
+    closeModal(modal.value)
+    $emit('on-add')
   } catch (err) {
     errorCode.value = (err as any).response?.data?.error
   }

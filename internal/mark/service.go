@@ -4,6 +4,9 @@ import (
 	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
 	"errors"
+	"fmt"
+	"strconv"
+	"time"
 )
 
 type markService struct {
@@ -43,6 +46,30 @@ func (s *markService) GetByStudent(studentID int) ([]ports.MarkOutput, error) {
 	return list, nil
 }
 
+func (s *markService) CreateMark(p ports.MarkCreatePayload) error {
+	date := time.Now()
+
+	if p.Date != "" {
+		parsed, err := time.Parse("01-02-2006", p.Date)
+
+		if err != nil {
+			fmt.Println(err)
+			return errors.New("mark.create.invalidDate")
+		}
+
+		date = parsed
+	}
+
+	return s.markRepository.AddMark(&domain.Mark{
+		TeacherID: uint(p.TeacherID),
+		StudentID: uint(p.StudentID),
+		SubjectID: uint(p.SubjectID),
+		Comment:   p.Comment,
+		Value:     p.Value,
+		Date:      &date,
+	})
+}
+
 func (s *markService) GetByClassGroup(classGroupID int) ([]ports.SimpleMark, error) {
 	output := []ports.SimpleMark{}
 	marks, err := s.markRepository.GetByClassGroup(classGroupID)
@@ -68,5 +95,9 @@ func (s *markService) CalculateAverage(marks []domain.Mark) float32 {
 		avgMarg += mark.Value
 	}
 
-	return avgMarg
+	avg := avgMarg / float32(len(marks))
+
+	val, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", avg), 32)
+
+	return float32(val)
 }

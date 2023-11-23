@@ -60,6 +60,7 @@ func (s *StudentService) GetAllByClassGroup(classGroupID int) ([]ports.StudentBy
 
 	for _, student := range students {
 		list = append(list, ports.StudentByClassGroup{
+			ID:      int(student.ID),
 			Name:    student.User.Name,
 			Surname: student.User.Surname,
 			Email:   student.User.Email,

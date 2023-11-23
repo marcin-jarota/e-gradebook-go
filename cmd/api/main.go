@@ -51,6 +51,7 @@ func main() {
 	subjecthandler := subject.NewSubjectHandler(subjectService)
 	userHandler := user.NewUserHandler(userService, authService, cfg)
 	classgroupHandler := classgroup.NewClassGroupHandler(classgroupService, studentService, markService)
+	markHandler := mark.NewMarkHandler(markService)
 
 	// bind routing
 	studentHandler.BindRouting(server.App, authMiddleware)
@@ -58,6 +59,7 @@ func main() {
 	subjecthandler.BindRouting(server.App, authMiddleware)
 	userHandler.BindRouting(server.App, authMiddleware)
 	classgroupHandler.BindRouting(server.App, authMiddleware)
+	markHandler.BindRouting(server.App, authMiddleware)
 
 	server.Listen()
 }
