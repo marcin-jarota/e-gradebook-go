@@ -25,7 +25,8 @@ export const setupIcons = (app: App<Element>) => {
     faUserPlus,
     faChalkboard,
     faUsers,
-    faSchool
+    faSchool,
+    faXmark
   )
   app.component('font-awesome-icon', FontAwesomeIcon)
 }

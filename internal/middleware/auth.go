@@ -53,7 +53,7 @@ func (m *AuthMiddleware) UserIs(roles ...domain.UserRole) fiber.Handler {
 		u, ok := c.Locals("user").(*domain.User)
 
 		if !ok {
-			return m.JSONError(c, errors.New("auth.session_error"), fiber.StatusUnauthorized)
+			return m.JSONError(c, errors.New("auth.missing_permission"), fiber.StatusUnauthorized)
 		}
 
 		if u.Is(roles...) {

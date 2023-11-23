@@ -9,6 +9,7 @@
             <th scope="col">Imię</th>
             <th>Nazwisko</th>
             <th scope="col">Średnia ocen</th>
+            <th></th>
           </tr>
         </thead>
         <tbody v-if="students?.length">
@@ -21,6 +22,9 @@
             </td>
             <td>{{ student.surname }}</td>
             <td>{{ student.avgMark }}</td>
+            <td>
+              <AddMark :studentID="student.id" />
+            </td>
           </tr>
         </tbody>
         <tbody v-else>
@@ -39,11 +43,13 @@ import { classGroupResource } from '@/resources/classGroup'
 import type { ClassGroupOutput, ClassGroupStudent } from '@/types/ClassGroup'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import AddMark from '@/components/organisms/AddMark.vue'
 
 const route = useRoute()
 const students = ref<ClassGroupStudent[]>()
 const details = ref<ClassGroupOutput>()
-const getClassGroup = async () => {
+
+const getClassGroupStudents = async () => {
   const { data } = await classGroupResource.students(Number(route.params.id))
 
   students.value = data
@@ -55,7 +61,7 @@ const getClassGroupDetails = async () => {
   details.value = data
 }
 
-getClassGroup()
+getClassGroupStudents()
 getClassGroupDetails()
 </script>
 

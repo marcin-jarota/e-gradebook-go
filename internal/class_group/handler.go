@@ -24,12 +24,12 @@ func NewClassGroupHandler(classGroupService ports.ClassGroupService, studentsSer
 }
 
 func (h *classGroupHandler) BindRouting(app fiber.Router, auth *middleware.AuthMiddleware) {
-	r := app.Group("/class-groups")
+	r := app.Group("/class-groups", auth.IsAuthenticatedByHeader())
 	r.Get("/", h.GetAll)
 	r.Post("/", auth.IsAdmin(), h.Create)
 	r.Get("/:classGroupID", auth.IsAdmin(), h.Details)
 	r.Get("/:classGroupID/students", auth.IsAdmin(), h.ListStudents)
-	r.Get("/:classGroupID/marks", h.ListMarks)
+	r.Get("/:classGroupID/marks", auth.UserIs("admin", "teacher"), h.ListMarks)
 	r.Post("/:classGroupID/students", auth.IsAdmin(), h.AddStudentToClassGroup)
 }
 

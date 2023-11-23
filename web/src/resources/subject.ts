@@ -4,7 +4,7 @@ import { type SubjectCreatePayload, type Subject } from '@/types/Subject'
 
 export const subjectResource = {
   list() {
-    return client.get<ApiBaseResponse<Subject[]>>('/subject/all')
+    return unwrapRequestData(client.get<ApiBaseResponse<Subject[]>>('/subject/all'))
   },
   async create(payload: SubjectCreatePayload) {
     return unwrapRequestData(client.post('/subject/create', payload))
