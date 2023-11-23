@@ -31,3 +31,13 @@ func (r *GormClassGroupRepository) GetAll() ([]domain.ClassGroup, error) {
 func (r *GormClassGroupRepository) AddClassGroup(classGroup *domain.ClassGroup) error {
 	return r.db.Create(classGroup).Error
 }
+
+func (r *GormClassGroupRepository) GetOneByID(classGroupID int) (domain.ClassGroup, error) {
+	var classGroup domain.ClassGroup
+
+	if err := r.db.Find(&classGroup, "id = ?", classGroupID).Error; err != nil {
+		return classGroup, err
+	}
+
+	return classGroup, nil
+}

@@ -50,7 +50,7 @@ func main() {
 	authHandler := auth.NewAuthHandler(authService)
 	subjecthandler := subject.NewSubjectHandler(subjectService)
 	userHandler := user.NewUserHandler(userService, authService, cfg)
-	classgroupHandler := classgroup.NewClassGroupHandler(classgroupService, studentService)
+	classgroupHandler := classgroup.NewClassGroupHandler(classgroupService, studentService, markService)
 
 	// bind routing
 	studentHandler.BindRouting(server.App, authMiddleware)

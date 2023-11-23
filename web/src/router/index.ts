@@ -95,6 +95,16 @@ export const routes: Record<
     },
     component: () => import('@/views/classGroup/ListView.vue')
   },
+  classGroup: {
+    path: '/class-group/:id',
+    name: 'class-group',
+    meta: {
+      title: 'Dane klasy',
+      roles: [Role.Admin, Role.Teacher],
+      requiresAuth: true
+    },
+    component: () => import('@/views/classGroup/IndexView.vue')
+  },
   accessDenied: {
     path: '/denied',
     name: 'denied',

@@ -23,10 +23,34 @@ const welcomeMessage = computed(() => {
     return `Dobry wieczór, ${sessionStore.user?.name} 🌛`
   }
 })
+
+const options = {
+  chart: {
+    width: 380,
+    type: 'pie'
+  },
+  labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
+  responsive: [
+    {
+      breakpoint: 480,
+      options: {
+        chart: {
+          width: 200
+        },
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  ]
+}
+
+const series = [44, 55, 13, 43, 22]
 </script>
 
 <template>
   <MainLayout>
     <h1>{{ welcomeMessage }}</h1>
+    <apex-chart width="500" type="pie" :options="options" :series="series"></apex-chart>
   </MainLayout>
 </template>

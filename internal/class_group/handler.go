@@ -8,28 +8,64 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type ClassGroupHandler struct {
+type classGroupHandler struct {
 	transport.Handler
 	classGroupService ports.ClassGroupService
 	studentsService   ports.StudentService
+	markService       ports.MarkService
 }
 
-func NewClassGroupHandler(classGroupService ports.ClassGroupService, studentsService ports.StudentService) *ClassGroupHandler {
-	return &ClassGroupHandler{
+func NewClassGroupHandler(classGroupService ports.ClassGroupService, studentsService ports.StudentService, markService ports.MarkService) *classGroupHandler {
+	return &classGroupHandler{
 		classGroupService: classGroupService,
 		studentsService:   studentsService,
+		markService:       markService,
 	}
 }
 
-func (h *ClassGroupHandler) BindRouting(app fiber.Router, auth *middleware.AuthMiddleware) {
-	r := app.Group("/class-groups", auth.IsAuthenticatedByHeader())
+func (h *classGroupHandler) BindRouting(app fiber.Router, auth *middleware.AuthMiddleware) {
+	r := app.Group("/class-groups")
 	r.Get("/", h.GetAll)
 	r.Post("/", auth.IsAdmin(), h.Create)
+	r.Get("/:classGroupID", auth.IsAdmin(), h.Details)
 	r.Get("/:classGroupID/students", auth.IsAdmin(), h.ListStudents)
+	r.Get("/:classGroupID/marks", h.ListMarks)
 	r.Post("/:classGroupID/students", auth.IsAdmin(), h.AddStudentToClassGroup)
 }
 
-func (h *ClassGroupHandler) ListStudents(c *fiber.Ctx) error {
+func (h *classGroupHandler) Details(c *fiber.Ctx) error {
+	classGroupID, err := h.ParseIntParam(c.Params("classGroupID", "0"))
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	res, err := h.classGroupService.GetOneByID(classGroupID)
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, res)
+}
+
+func (h *classGroupHandler) ListMarks(c *fiber.Ctx) error {
+	classGroupID, err := h.ParseIntParam(c.Params("classGroupID", "0"))
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	res, err := h.markService.GetByClassGroup(classGroupID)
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, res)
+}
+
+func (h *classGroupHandler) ListStudents(c *fiber.Ctx) error {
 	classGroupID, err := h.ParseIntParam(c.Params("classGroupID", "0"))
 
 	if err != nil {
@@ -45,7 +81,7 @@ func (h *ClassGroupHandler) ListStudents(c *fiber.Ctx) error {
 	return h.JSON(c, output)
 }
 
-func (h *ClassGroupHandler) AddStudentToClassGroup(c *fiber.Ctx) error {
+func (h *classGroupHandler) AddStudentToClassGroup(c *fiber.Ctx) error {
 	var p ports.AddStudentToClassGroupPayload
 	classGroupID, err := h.ParseIntParam(c.Params("classGroupID", "0"))
 
@@ -69,7 +105,7 @@ func (h *ClassGroupHandler) AddStudentToClassGroup(c *fiber.Ctx) error {
 	return h.JSON(c, nil)
 }
 
-func (h *ClassGroupHandler) Create(c *fiber.Ctx) error {
+func (h *classGroupHandler) Create(c *fiber.Ctx) error {
 	var p ports.AddClassGroupInput
 
 	if err := c.BodyParser(&p); err != nil {
@@ -85,7 +121,7 @@ func (h *ClassGroupHandler) Create(c *fiber.Ctx) error {
 	})
 }
 
-func (h *ClassGroupHandler) GetAll(c *fiber.Ctx) error {
+func (h *classGroupHandler) GetAll(c *fiber.Ctx) error {
 	classGroups, err := h.classGroupService.GetAll()
 
 	if err != nil {

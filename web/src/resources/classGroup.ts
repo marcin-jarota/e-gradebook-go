@@ -1,24 +1,28 @@
-import client from '@/lib/axios'
+import client, { unwrapRequestData } from '@/lib/axios'
 import type { ApiBaseResponse } from '@/types'
-import { type ClassGroupOutput, type ClassGroupPayload } from '@/types/ClassGroup'
+import {
+  type ClassGroupOutput,
+  type ClassGroupPayload,
+  type ClassGroupStudent
+} from '@/types/ClassGroup'
 
 export const classGroupResource = {
   list() {
-    return client.get<ApiBaseResponse<ClassGroupOutput[]>>('/class/all')
+    return client.get<ApiBaseResponse<ClassGroupOutput[]>>('/class-groups')
+  },
+  students(classGroupID: number) {
+    return unwrapRequestData(
+      client.get<ApiBaseResponse<ClassGroupStudent[]>>(
+        '/class-groups/' + classGroupID + '/students'
+      )
+    )
+  },
+  getOne(classGroupID: number) {
+    return unwrapRequestData(
+      client.get<ApiBaseResponse<ClassGroupOutput>>('/class-groups/' + classGroupID)
+    )
   },
   async create(payload: ClassGroupPayload) {
-    return handleRequest(client.post('/class/create', payload))
+    return unwrapRequestData(client.post('/class-groups', payload))
   }
-  // async delete(id: number) {
-  //   return handleRequest(client.get('/subject/delete/' + id))
-  // }
-}
-
-const handleRequest = async <T extends Promise<any>>(t: T): Promise<Awaited<T>> => {
-  const r = await t
-  if (r?.data?.error) {
-    throw new Error(r?.data?.error)
-  }
-
-  return r?.data
 }

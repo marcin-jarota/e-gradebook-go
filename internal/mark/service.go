@@ -17,7 +17,7 @@ func NewMarkService(markRepository ports.MarkRepository) *markService {
 }
 
 func (s *markService) GetByStudent(studentID int) ([]ports.MarkOutput, error) {
-	var list []ports.MarkOutput
+	list := []ports.MarkOutput{}
 	marks, err := s.markRepository.GetByStudent(studentID)
 
 	if err != nil {
@@ -41,6 +41,24 @@ func (s *markService) GetByStudent(studentID int) ([]ports.MarkOutput, error) {
 	}
 
 	return list, nil
+}
+
+func (s *markService) GetByClassGroup(classGroupID int) ([]ports.SimpleMark, error) {
+	output := []ports.SimpleMark{}
+	marks, err := s.markRepository.GetByClassGroup(classGroupID)
+
+	if err != nil {
+		return output, err
+	}
+
+	for _, mark := range marks {
+		output = append(output, ports.SimpleMark{
+			ID:    int(mark.ID),
+			Value: mark.Value,
+		})
+	}
+
+	return output, nil
 }
 
 func (s *markService) CalculateAverage(marks []domain.Mark) float32 {

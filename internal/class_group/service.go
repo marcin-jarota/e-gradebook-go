@@ -37,6 +37,23 @@ func (s *ClassGroupService) GetAll() ([]ports.ClassGroupOutput, error) {
 	return output, nil
 }
 
+func (s *ClassGroupService) GetOneByID(classGroupID int) (ports.ClassGroupOutput, error) {
+	var output ports.ClassGroupOutput
+	classGroup, err := s.repo.GetOneByID(classGroupID)
+
+	if err != nil {
+		return output, errors.New("classGroup.error.fetchOne")
+	}
+
+	output = ports.ClassGroupOutput{
+		ID:            int(classGroup.ID),
+		Name:          classGroup.Name,
+		StudentsCount: len(classGroup.Students),
+	}
+
+	return output, nil
+}
+
 func (s *ClassGroupService) AddClassGroup(input ports.AddClassGroupInput) error {
 	err := s.repo.AddClassGroup(&domain.ClassGroup{
 		Name: input.Name,

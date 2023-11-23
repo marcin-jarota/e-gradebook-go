@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { setupIcons } from './lib/fontAwesome'
+import { setupCharts } from './lib/apesCharts'
 import translatePlugin from './plugins/translate'
 
 const app = createApp(App)
@@ -29,5 +30,6 @@ app.use(createPinia())
 app.use(router)
 
 setupIcons(app)
+setupCharts(app)
 
 app.mount('#app')

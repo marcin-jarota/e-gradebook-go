@@ -30,3 +30,16 @@ func (r *gormMarkRepository) GetByStudent(studentID int) ([]domain.Mark, error) 
 
 	return marks, nil
 }
+
+func (r *gormMarkRepository) GetByClassGroup(classGroupID int) ([]domain.Mark, error) {
+	var marks []domain.Mark
+
+	if err := r.db.
+		Joins("JOIN students ON students.id = marks.student_id").
+		Where("students.class_group_id = ?", classGroupID).
+		Find(&marks).Error; err != nil {
+		return nil, err
+	}
+
+	return marks, nil
+}

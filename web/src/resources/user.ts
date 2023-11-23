@@ -1,9 +1,9 @@
-import client from '@/lib/axios'
+import client, { unwrapRequestData } from '@/lib/axios'
 import type { ApiBaseResponse, UserOutput, UserInput, SetupPasswordPayload } from '@/types'
 
 export const userResource = {
   async list() {
-    return handleRequest(client.get<UserOutput[]>('/user/list'))
+    return unwrapRequestData(client.get<ApiBaseResponse<UserOutput[]>>('/user/list'))
   },
   async tokenValid(token: string) {
     return client.get('/token-valid', {
@@ -13,10 +13,10 @@ export const userResource = {
     })
   },
   async setupPassword(payload: SetupPasswordPayload, token: string) {
-    return handleRequest(client.post(`/setup-password?token=${token}`, payload))
+    return unwrapRequestData(client.post(`/setup-password?token=${token}`, payload))
   },
   async create(payload: UserInput) {
-    return handleRequest(
+    return unwrapRequestData(
       client.post<ApiBaseResponse<{ activationLink: string }>>(
         `/user/${payload.role}/create`,
         payload
@@ -24,21 +24,14 @@ export const userResource = {
     )
   },
   async activate(userID: number) {
-    return handleRequest(client.get<ApiBaseResponse<{ ok: boolean }>>(`/user/activate/${userID}`))
+    return unwrapRequestData(
+      client.get<ApiBaseResponse<{ ok: boolean }>>(`/user/activate/${userID}`)
+    )
   },
   async deactivate(userID: number) {
-    return handleRequest(client.get<ApiBaseResponse>(`/user/deactivate/${userID}`))
+    return unwrapRequestData(client.get<ApiBaseResponse>(`/user/deactivate/${userID}`))
   },
   async destroySession(userID: number) {
-    return handleRequest(client.get<ApiBaseResponse<any>>(`/user/destroy-session/${userID}`))
+    return unwrapRequestData(client.get<ApiBaseResponse<any>>(`/user/destroy-session/${userID}`))
   }
-}
-
-const handleRequest = async <T extends Promise<any>>(t: T): Promise<Awaited<T>> => {
-  const r = await t
-  if (r?.data?.error) {
-    throw new Error(r?.data?.error)
-  }
-
-  return r?.data
 }

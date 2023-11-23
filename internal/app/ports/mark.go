@@ -6,6 +6,7 @@ type (
 	MarkRepository interface {
 		AddMark(mark domain.Mark) error
 		GetByStudent(studentID int) ([]domain.Mark, error)
+		GetByClassGroup(classGroupID int) ([]domain.Mark, error)
 	}
 
 	MarkOutputSubject struct {
@@ -26,8 +27,14 @@ type (
 		Teacher MarkOutputTeacher `json:"teacher"`
 	}
 
+	SimpleMark struct {
+		ID    int     `json:"id"`
+		Value float32 `json:"value"`
+	}
+
 	MarkService interface {
 		CalculateAverage(marks []domain.Mark) float32
 		GetByStudent(studentID int) ([]MarkOutput, error)
+		GetByClassGroup(classGroupID int) ([]SimpleMark, error)
 	}
 )
