@@ -115,6 +115,7 @@ const saveSubject = async (e: Event) => {
 
 const deleteSubject = async (e: Event) => {
   try {
+    if (subjectID.value === null) return
     e.preventDefault()
     e.stopPropagation()
     await subjectResource.delete(subjectID.value)
@@ -133,7 +134,7 @@ const deleteSubject = async (e: Event) => {
 
 const getSubjects = async () => {
   const { data } = await subjectResource.list()
-  subjects.value = data.data
+  subjects.value = data
 }
 
 getSubjects()

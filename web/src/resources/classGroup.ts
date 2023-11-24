@@ -22,6 +22,13 @@ export const classGroupResource = {
       client.get<ApiBaseResponse<ClassGroupOutput>>('/class-groups/' + classGroupID)
     )
   },
+  getMarks(classGroupID: number) {
+    return unwrapRequestData(
+      client.get<ApiBaseResponse<{ value: number; id: number }[]>>(
+        '/class-groups/' + classGroupID + '/marks'
+      )
+    )
+  },
   async create(payload: ClassGroupPayload) {
     return unwrapRequestData(client.post('/class-groups', payload))
   }
