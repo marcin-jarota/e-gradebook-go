@@ -29,15 +29,12 @@ func (s *StudentService) GetAll() ([]*ports.StudentOutput, error) {
 
 	for _, student := range students {
 		studentsResponse = append(studentsResponse, &ports.StudentOutput{
-			ID:        student.ID,
-			Name:      student.User.Name,
-			Surname:   student.User.Surname,
-			FullName:  student.User.GetFullName(),
-			Email:     student.User.Email,
-			Active:    student.User.Active,
-			Marks:     student.Marks,
-			CreatedAt: student.CreatedAt,
-			UpdatedAt: student.UpdatedAt,
+			ID:       student.ID,
+			Name:     student.User.Name,
+			Surname:  student.User.Surname,
+			FullName: student.User.GetFullName(),
+			Email:    student.User.Email,
+			Marks:    student.Marks,
 		})
 	}
 

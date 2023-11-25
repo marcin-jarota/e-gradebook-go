@@ -91,6 +91,10 @@ func (s *markService) GetByClassGroup(classGroupID int) ([]ports.SimpleMark, err
 func (s *markService) CalculateAverage(marks []domain.Mark) float32 {
 	var avgMarg float32
 
+	if len(marks) == 0 {
+		return 0
+	}
+
 	for _, mark := range marks {
 		avgMarg += mark.Value
 	}

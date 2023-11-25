@@ -53,7 +53,7 @@ func (r *GormStudentRepository) GetMarks(studentID int) ([]domain.Mark, error) {
 }
 
 func (r *GormStudentRepository) SetClassGroup(studentID uint, classGroupID uint) error {
-	student := domain.Student{}
+	var student domain.Student
 
 	// Find the existing student by ID
 	if err := r.db.First(&student, studentID).Error; err != nil {
@@ -61,7 +61,7 @@ func (r *GormStudentRepository) SetClassGroup(studentID uint, classGroupID uint)
 	}
 
 	// Update the student's ClassID to associate it with the desired class group
-	student.ClassGroupID = &studentID
+	student.ClassGroupID = &classGroupID
 
 	// Save the updated student information to the database
 	if err := r.db.Save(&student).Error; err != nil {

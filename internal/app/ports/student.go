@@ -2,7 +2,6 @@ package ports
 
 import (
 	"e-student/internal/app/domain"
-	"time"
 )
 
 type (
@@ -16,15 +15,12 @@ type (
 	}
 
 	StudentOutput struct {
-		ID        uint          `json:"id"`
-		Name      string        `json:"name"`
-		Surname   string        `json:"surname"`
-		FullName  string        `json:"fullName"`
-		Email     string        `json:"email"`
-		Active    bool          `json:"active"`
-		Marks     []domain.Mark `json:"marks"`
-		CreatedAt time.Time     `json:"createdAt"`
-		UpdatedAt time.Time     `json:"updatedAt"`
+		ID       uint          `json:"id"`
+		Name     string        `json:"name"`
+		Surname  string        `json:"surname"`
+		FullName string        `json:"fullName"`
+		Email    string        `json:"email"`
+		Marks    []domain.Mark `json:"marks"`
 	}
 
 	StudentMarkOutput struct {

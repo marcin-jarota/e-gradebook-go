@@ -1,12 +1,12 @@
 <template>
   <div class="position-relative">
-    <InputText v-if="!selectedSubject" type="text" name="subject" label="Przedmiot" @focusin="listVisible = true"
-      v-model="query" @blur="closeList" placeholder="Nazwa przedmiotu" />
+    <InputText v-if="!selected" type="text" name="subject" :label="title" @focusin="listVisible = true" v-model="query"
+      @blur="closeList" :placeholder="placeholder" />
     <div v-else class="d-flex align-items-end">
-      <InputText label="Przedmiot" class="flex-grow-1" :disabled="true" v-model="selectedSubject.name" type="text"
-        name="subject-value" placeholder="Nazwa przedmiotu" />
+      <InputText :label="title" class="flex-grow-1" :disabled="true" type="text" v-model="selected.name"
+        name="subject-value" :placeholder="placeholder" />
 
-      <button type="button" class="btn btn-danger d-inline clear-btn text-left" @click="selectedSubject = null">
+      <button type="button" class="btn btn-danger d-inline clear-btn text-left" @click="selected = null">
         <font-awesome-icon icon="fa-solid fa-xmark" />
       </button>
     </div>
@@ -26,21 +26,19 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends { id: number; name: string }">
 import InputText from '@/components/atoms/InputText.vue'
-import { subjectResource } from '@/resources/subject'
-import type { Subject } from '@/types/Subject'
 import { computed, ref } from 'vue'
 
-const $emit = defineEmits(['on-subject-select'])
+const $emit = defineEmits(['on-select'])
 const query = ref('')
-const selectedSubject = ref<Subject | null>(null)
-const subjects = ref<Subject[]>()
+const selected = ref<T | null>()
+const props = defineProps<{ items: T[]; title: string; placeholder: string }>()
 const listVisible = ref(false)
 
-const selectSubject = (sub: Subject) => {
-  selectedSubject.value = sub
-  $emit('on-subject-select', sub)
+const selectSubject = (sub: T) => {
+  selected.value = sub
+  $emit('on-select', sub)
 }
 
 const closeList = () => {
@@ -50,16 +48,8 @@ const closeList = () => {
 }
 
 const subjectsList = computed(() => {
-  return subjects.value?.filter((s) => s.name.toLowerCase().includes(query.value.toLowerCase()))
+  return props.items?.filter((s) => s.name.toLowerCase().includes(query.value.toLowerCase()))
 })
-
-const getSubjects = async () => {
-  const { data } = await subjectResource.list()
-
-  subjects.value = data
-}
-
-getSubjects()
 </script>
 
 <style scoped lang="scss">

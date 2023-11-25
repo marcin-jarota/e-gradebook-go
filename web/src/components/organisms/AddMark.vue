@@ -12,7 +12,9 @@
             <div v-if="errorCode" class="alert alert-danger">
               {{ $translate(errorCode) }}
             </div>
-            <SubjectSelector @on-subject-select="(s) => (subject = s)" />
+
+            <DynamicSelector :items="subjects" title="Dodaj ocenę" placeholder="Dodaj ocenę"
+              @on-select="(s: Subject) => (subject = s)" />
 
             <InputText v-model="comment" required placeholder="Sprawdzian" type="text" name="mark-comment"
               label="Komentarz do oceny" />
@@ -43,14 +45,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import VButton from '@/components/atoms/VButton.vue'
-import SubjectSelector from '@/components/molecules/SubjectSelector.vue'
 import InputText from '@/components/form/InputText.vue'
 import { Modal } from 'bootstrap'
 import { type Subject } from '@/types/Subject'
 import { markResource } from '@/resources/mark'
 import { useCurrentUser } from '@/composables/useCurrentUser'
 import { useSnackbar } from '@/composables/useSnackbar'
-
+import { subjectResource } from '@/resources/subject'
+import DynamicSelector from '@/components/molecules/DynamicSelector.vue'
 const { user } = useCurrentUser()
 const { successSnackbar } = useSnackbar()
 const props = defineProps<{ studentID: number }>()
@@ -74,6 +76,7 @@ const subject = ref<Subject | null>(null)
 const markDate = ref('')
 const comment = ref('')
 const markValue = ref<number>()
+const subjects = ref<Subject[]>([])
 
 const modal = ref<HTMLDivElement | null>(null)
 
@@ -92,6 +95,15 @@ const closeModal = (e: HTMLDivElement | null) => {
     }
   }
 }
+
+const getSubjects = async () => {
+  const { data } = await subjectResource.list()
+
+  subjects.value = data
+}
+
+getSubjects()
+
 function formatDateToMMDDYYYY(date: Date) {
   const month = String(date.getMonth() + 1).padStart(2, '0') // Months are zero-based
   const day = String(date.getDate()).padStart(2, '0')

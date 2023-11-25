@@ -24,7 +24,18 @@ func NewStudentHandler(service ports.StudentService, markService ports.MarkServi
 
 func (h *StudentHandler) BindRouting(app fiber.Router, auth *middleware.AuthMiddleware) {
 	r := app.Group("/students", auth.IsAuthenticatedByHeader())
+	r.Get("/", auth.UserIs("teacher", "admin"), h.GetAll)
 	r.Get("/:studentID/marks", auth.UserIs(domain.AdminRole, domain.StudentRole), h.GetMarks)
+}
+
+func (h *StudentHandler) GetAll(c *fiber.Ctx) error {
+	students, err := h.studentService.GetAll()
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, students)
 }
 
 func (h *StudentHandler) GetMarks(c *fiber.Ctx) error {

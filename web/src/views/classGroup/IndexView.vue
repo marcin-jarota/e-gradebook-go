@@ -23,7 +23,7 @@
                   {{ student.name }}
                 </td>
                 <td>{{ student.surname }}</td>
-                <td>{{ student.avgMark }}</td>
+                <td>{{ student.avgMark || 'brak ocen' }}</td>
                 <td>
                   <AddMark @on-add="refresh" :studentID="student.id" />
                 </td>
@@ -35,6 +35,7 @@
               </tr>
             </tbody>
           </table>
+          <AddStudent :class-group-id="classGroupID" @on-add="getClassGroupStudents" />
         </div>
         <div class="col-4">
           <h3 class="pb-4">Oceny w klasie</h3>
@@ -52,6 +53,7 @@ import type { ClassGroupOutput, ClassGroupStudent } from '@/types/ClassGroup'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AddMark from '@/components/organisms/AddMark.vue'
+import AddStudent from '@/components/organisms/AddStudent.vue'
 
 const route = useRoute()
 const students = ref<ClassGroupStudent[]>()
@@ -86,23 +88,23 @@ const refresh = () => {
   getMarks()
 }
 
+const classGroupID = computed(() => Number(route.params.id))
+
 const getClassGroupStudents = async () => {
-  const { data } = await classGroupResource.students(Number(route.params.id))
+  const { data } = await classGroupResource.students(classGroupID.value)
 
   students.value = data
 }
 
 const getClassGroupDetails = async () => {
-  const { data } = await classGroupResource.getOne(Number(route.params.id))
+  const { data } = await classGroupResource.getOne(classGroupID.value)
 
   details.value = data
 }
 
 const getMarks = async () => {
-  const { data } = await classGroupResource.getMarks(Number(route.params.id))
+  const { data } = await classGroupResource.getMarks(classGroupID.value)
   marks.value = data
-
-  console.log(marks.value)
 
   const x = data.reduce(
     (acc, mark) => {

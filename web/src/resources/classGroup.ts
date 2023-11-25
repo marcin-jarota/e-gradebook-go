@@ -29,6 +29,13 @@ export const classGroupResource = {
       )
     )
   },
+  assignStudent({ studentID, classGroupID }: { studentID: number; classGroupID: number }) {
+    return unwrapRequestData(
+      client.post<ApiBaseResponse<{ success: boolean }>>(`/class-groups/${classGroupID}/students`, {
+        studentID
+      })
+    )
+  },
   async create(payload: ClassGroupPayload) {
     return unwrapRequestData(client.post('/class-groups', payload))
   }
