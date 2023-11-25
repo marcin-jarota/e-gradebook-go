@@ -12,6 +12,7 @@ import (
 	"e-student/internal/middleware"
 	"e-student/internal/student"
 	"e-student/internal/subject"
+	"e-student/internal/teacher"
 	"e-student/internal/user"
 )
 
@@ -32,11 +33,12 @@ func main() {
 	subjectRepo := subject.NewGormSubjectRepository(conn)
 	classgroupRepo := classgroup.NewClassGroupRepository(conn)
 	markRepo := mark.NewGormMarkRepository(conn)
+	teacherRepo := teacher.NewTeacherRepository(conn)
 
 	// services
 	authService := auth.NewAuthService(userRepo, storage, cfg)
 	markService := mark.NewMarkService(markRepo)
-
+	teacherService := teacher.NewTeacherService(teacherRepo)
 	studentService := student.NewStudentService(studentRepo, markService)
 	subjectService := subject.NewSubjectService(subjectRepo)
 	userService := user.NewUserService(userRepo, storage)
@@ -49,7 +51,7 @@ func main() {
 	studentHandler := student.NewStudentHandler(studentService, markService)
 	authHandler := auth.NewAuthHandler(authService)
 	subjecthandler := subject.NewSubjectHandler(subjectService)
-	userHandler := user.NewUserHandler(userService, authService, cfg)
+	userHandler := user.NewUserHandler(userService, studentService, teacherService, authService, cfg)
 	classgroupHandler := classgroup.NewClassGroupHandler(classgroupService, studentService, markService)
 	markHandler := mark.NewMarkHandler(markService)
 

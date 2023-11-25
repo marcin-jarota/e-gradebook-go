@@ -5,7 +5,6 @@ import (
 	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
 	"e-student/internal/middleware"
-	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -26,7 +25,6 @@ func NewStudentHandler(service ports.StudentService, markService ports.MarkServi
 func (h *StudentHandler) BindRouting(app fiber.Router, auth *middleware.AuthMiddleware) {
 	r := app.Group("/students", auth.IsAuthenticatedByHeader())
 	r.Get("/:studentID/marks", auth.UserIs(domain.AdminRole, domain.StudentRole), h.GetMarks)
-	r.Post("/create", auth.IsAdmin(), h.AddStudent)
 }
 
 func (h *StudentHandler) GetMarks(c *fiber.Ctx) error {
@@ -53,20 +51,4 @@ func (h *StudentHandler) GetAllStudents(c *fiber.Ctx) error {
 	}
 
 	return h.JSON(c, studentsList)
-}
-
-func (h *StudentHandler) AddStudent(c *fiber.Ctx) error {
-	var p ports.StudentCreatePayload
-
-	if err := c.BodyParser(&p); err != nil {
-		return h.JSONError(c, err, http.StatusBadRequest)
-	}
-
-	err := h.studentService.AddStudent(&p)
-
-	if err != nil {
-		return h.JSONError(c, err, http.StatusBadRequest)
-	}
-
-	return h.JSON(c, fiber.Map{"success": true})
 }

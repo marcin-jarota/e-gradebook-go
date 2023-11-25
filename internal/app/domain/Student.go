@@ -10,6 +10,6 @@ type Student struct {
 	UserID       uint
 	User         User `gorm:"foreignkey:UserID"`
 	Marks        []Mark
-	ClassGroupID uint
-	ClassGroup   ClassGroup `gorm:"foreignkey:ClassGroupID"`
+	ClassGroupID *uint `gorm:"default:null"`
+	ClassGroup   ClassGroup
 }

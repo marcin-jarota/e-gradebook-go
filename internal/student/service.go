@@ -71,26 +71,7 @@ func (s *StudentService) GetAllByClassGroup(classGroupID int) ([]ports.StudentBy
 	return list, nil
 }
 
-// func (s *StudentService) GetMarks(studentId int) ([]*ports.StudentMarkOutput, error) {
-// 	var studentMarks []*ports.StudentMarkOutput
-// 	marks, err := s.studentRepo.GetMarks(studentId)
-//
-// 	if err != nil {
-// 		return nil, err
-// 	}
-//
-// 	for _, mark := range marks {
-// 		studentMarks = append(studentMarks, &ports.StudentMarkOutput{
-// 			ID:      mark.ID,
-// 			Value:   mark.Value,
-// 			Subject: mark.Subject,
-// 		})
-// 	}
-//
-// 	return studentMarks, nil
-// }
-
-func (s *StudentService) AddStudent(student *ports.StudentCreatePayload) error {
+func (s *StudentService) AddStudent(student ports.UserCreatePayload) error {
 	// TODO: validate
 	exists, err := s.studentRepo.ExistsByEmail(student.Email)
 
@@ -102,13 +83,15 @@ func (s *StudentService) AddStudent(student *ports.StudentCreatePayload) error {
 		return errors.New("student with this email exists")
 	}
 
+	var classGroupID *uint
+
 	return s.studentRepo.AddStudent(&domain.Student{
+		ClassGroupID: classGroupID,
 		User: domain.User{
-			Name:     student.Name,
-			Surname:  student.Surname,
-			Email:    student.Email,
-			Password: student.Password,
-			Role:     domain.StudentRole,
+			Name:    student.Name,
+			Surname: student.Surname,
+			Email:   student.Email,
+			Role:    domain.StudentRole,
 		},
 	})
 }

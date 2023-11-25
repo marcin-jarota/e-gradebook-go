@@ -88,7 +88,7 @@ func (s *UserService) SetupPassword(email string, password string, passwordConfi
 	return s.repo.SetPassword(email, password)
 }
 
-func (s *UserService) AddAdmin(admin *ports.AdminCreatePayload) error {
+func (s *UserService) AddAdmin(admin ports.UserCreatePayload) error {
 	exists, err := s.repo.ExistsByEmail(admin.Email)
 
 	if err != nil {
@@ -100,11 +100,10 @@ func (s *UserService) AddAdmin(admin *ports.AdminCreatePayload) error {
 	}
 
 	return s.repo.AddUser(&domain.User{
-		Name:     admin.Name,
-		Surname:  admin.Surname,
-		Email:    admin.Email,
-		Password: admin.Password,
-		Role:     domain.AdminRole,
-		Active:   false,
+		Name:    admin.Name,
+		Surname: admin.Surname,
+		Email:   admin.Email,
+		Role:    domain.AdminRole,
+		Active:  false,
 	})
 }

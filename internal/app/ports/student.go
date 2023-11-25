@@ -33,13 +33,6 @@ type (
 		Subject domain.Subject `json:"subject"`
 	}
 
-	StudentCreatePayload struct {
-		Name     string `json:"name"`
-		Surname  string `json:"surname"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
 	StudentByClassGroup struct {
 		ID      int     `json:"id"`
 		Name    string  `json:"name"`
@@ -57,7 +50,7 @@ type (
 		GetAll() ([]*StudentOutput, error)
 		GetAllByClassGroup(classGroupID int) ([]StudentByClassGroup, error)
 		// GetMarks(studentID int) ([]*StudentMarkOutput, error)
-		AddStudent(student *StudentCreatePayload) error
+		AddStudent(user UserCreatePayload) error
 		SetClassGroup(payload SetClassGroupPayload) error
 	}
 )

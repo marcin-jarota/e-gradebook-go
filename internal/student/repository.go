@@ -43,27 +43,7 @@ func (r *GormStudentRepository) GetAllByClassGroup(classGroupID uint) ([]domain.
 }
 
 func (r *GormStudentRepository) AddStudent(student *domain.Student) error {
-	return r.db.Transaction(func(tx *gorm.DB) error {
-		hash, err := student.User.GeneratePassword(student.User.Password)
-		if err != nil {
-			return errors.Join(err, ErrCouldNotCreateStudent)
-		}
-
-		student.User.Password = hash
-
-		if err := tx.Create(&student.User).Error; err != nil {
-			return err
-		}
-
-		student.UserID = student.User.ID
-
-		if err := tx.Create(&student).Error; err != nil {
-			return err
-		}
-
-		return nil
-
-	})
+	return r.db.Create(student).Error
 }
 
 func (r *GormStudentRepository) GetMarks(studentID int) ([]domain.Mark, error) {
@@ -81,7 +61,7 @@ func (r *GormStudentRepository) SetClassGroup(studentID uint, classGroupID uint)
 	}
 
 	// Update the student's ClassID to associate it with the desired class group
-	student.ClassGroupID = 0
+	student.ClassGroupID = &studentID
 
 	// Save the updated student information to the database
 	if err := r.db.Save(&student).Error; err != nil {
@@ -99,8 +79,9 @@ func (r *GormStudentRepository) RemoveClassGroup(studentID uint) error {
 		return err
 	}
 
+	var classGroupID *uint
 	// Disassociate the student from the class group by setting ClassID to zero or nil
-	student.ClassGroupID = 0 // or nil (depends on the type of ClassID field)
+	student.ClassGroupID = classGroupID // or nil (depends on the type of ClassID field)
 
 	// Save the updated student information to the database
 	if err := r.db.Save(&student).Error; err != nil {

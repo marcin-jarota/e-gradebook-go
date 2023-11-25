@@ -24,6 +24,12 @@ type (
 		Role     domain.UserRole `json:"role"`
 	}
 
+	UserCreatePayload struct {
+		Name    string `json:"name"`
+		Surname string `json:"surname"`
+		Email   string `json:"email"`
+	}
+
 	UserOutput struct {
 		ID            uint            `json:"id"`
 		Name          string          `json:"name"`
@@ -34,13 +40,6 @@ type (
 		SessionActive bool            `json:"sessionActive,omitempty"`
 	}
 
-	AdminCreatePayload struct {
-		Name     string `json:"name"`
-		Surname  string `json:"surname"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
 	SetupPasswordPayload struct {
 		Password        string `json:"password"`
 		PasswordConfirm string `json:"passwordConfirm"`
@@ -48,7 +47,7 @@ type (
 
 	UserService interface {
 		GetAll() ([]*UserOutput, error)
-		AddAdmin(admin *AdminCreatePayload) error
+		AddAdmin(user UserCreatePayload) error
 		Activate(userID uint) error
 		Deactivate(userID uint) error
 		DestroySession(userID uint) error

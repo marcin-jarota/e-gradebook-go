@@ -15,16 +15,20 @@ import (
 
 type UserHandler struct {
 	transport.Handler
-	service ports.UserService
-	auth    ports.AuthService
-	cfg     *app.Config
+	service        ports.UserService
+	studentService ports.StudentService
+	teacherService ports.TeacherService
+	auth           ports.AuthService
+	cfg            *app.Config
 }
 
-func NewUserHandler(service ports.UserService, auth ports.AuthService, cfg *app.Config) *UserHandler {
+func NewUserHandler(service ports.UserService, studentService ports.StudentService, teacherService ports.TeacherService, auth ports.AuthService, cfg *app.Config) *UserHandler {
 	return &UserHandler{
-		service: service,
-		auth:    auth,
-		cfg:     cfg,
+		service:        service,
+		auth:           auth,
+		studentService: studentService,
+		teacherService: teacherService,
+		cfg:            cfg,
 	}
 }
 
@@ -35,7 +39,7 @@ func (h *UserHandler) BindRouting(app *fiber.App, auth *middleware.AuthMiddlewar
 	r.Get("/activate/:id", h.ActivateUser)
 	r.Get("/deactivate/:id", h.DeactivateUser)
 	r.Get("/destroy-session/:id", h.DestroyUserSession)
-	r.Post("/admin/create", h.PostAddAdmin)
+	r.Post("/create/:role", h.PostAddUser)
 	app.Post("/setup-password", h.SetupPassword)
 }
 
@@ -133,14 +137,27 @@ func (h *UserHandler) DestroyUserSession(c *fiber.Ctx) error {
 	})
 }
 
-func (h *UserHandler) PostAddAdmin(c *fiber.Ctx) error {
-	var p ports.AdminCreatePayload
+func (h *UserHandler) PostAddUser(c *fiber.Ctx) error {
+	role := c.Params("role", "student")
+	var p ports.UserCreatePayload
 
 	if err := c.BodyParser(&p); err != nil {
 		return h.JSONError(c, err, fiber.StatusBadRequest)
 	}
 
-	err := h.service.AddAdmin(&p)
+	var err error
+
+	if role == "student" {
+		err = h.studentService.AddStudent(p)
+	}
+
+	if role == "admin" {
+		err = h.service.AddAdmin(p)
+	}
+
+	if role == "teacher" {
+		err = h.teacherService.AddTeacher(p)
+	}
 
 	if err != nil {
 		return h.JSONError(c, err, fiber.StatusBadRequest)

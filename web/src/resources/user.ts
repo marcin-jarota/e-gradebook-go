@@ -16,11 +16,9 @@ export const userResource = {
     return unwrapRequestData(client.post(`/setup-password?token=${token}`, payload))
   },
   async create(payload: UserInput) {
+    const { role, ...restPayload } = payload
     return unwrapRequestData(
-      client.post<ApiBaseResponse<{ activationLink: string }>>(
-        `/user/${payload.role}/create`,
-        payload
-      )
+      client.post<ApiBaseResponse<{ activationLink: string }>>(`/user/create/${role}`, restPayload)
     )
   },
   async activate(userID: number) {
