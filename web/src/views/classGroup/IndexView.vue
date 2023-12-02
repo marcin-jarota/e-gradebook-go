@@ -35,11 +35,11 @@
               </tr>
             </tbody>
           </table>
-          <AddStudent :class-group-id="classGroupID" @on-add="getClassGroupStudents" />
+          <AddStudent :class-group-id="classGroupID" @on-add="refresh" />
         </div>
         <div class="col-4">
           <h3 class="pb-4">Oceny w klasie</h3>
-          <apex-chart width="500" type="pie" :options="options" :series="series"></apex-chart>
+          <apex-chart width="500" type="pie" :options="options.settings" :series="options.series"></apex-chart>
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@
 import MainLayout from '@/layouts/MainLayout.vue'
 import { classGroupResource } from '@/resources/classGroup'
 import type { ClassGroupOutput, ClassGroupStudent } from '@/types/ClassGroup'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AddMark from '@/components/organisms/AddMark.vue'
 import AddStudent from '@/components/organisms/AddStudent.vue'
@@ -58,33 +58,62 @@ import AddStudent from '@/components/organisms/AddStudent.vue'
 const route = useRoute()
 const students = ref<ClassGroupStudent[]>()
 const details = ref<ClassGroupOutput>()
-const marks = ref<{ value: number; id: number }[]>()
-const series = ref<number[]>([])
-const labels = ref<string[]>([])
+const marks = reactive<{ list: { value: number; id: number }[] }>({ list: [] })
 
-const options = computed(() => ({
-  chart: {
-    width: 380,
-    type: 'pie'
-  },
-  labels: labels.value,
-  responsive: [
-    {
-      breakpoint: 480,
-      options: {
-        chart: {
-          width: 200
-        },
-        legend: {
-          position: 'bottom'
-        }
+const options = computed(() => {
+  const val = marks.list.reduce(
+    (acc, mark) => {
+      const value = acc[mark.value]
+      if (value === undefined) {
+        acc[mark.value] = 1
+      } else {
+        acc[mark.value] += 1
       }
-    }
-  ]
-}))
 
-const refresh = () => {
-  getClassGroupStudents()
+      return acc
+    },
+    {} as Record<number, number>
+  )
+
+  const series: number[] = []
+  const labels: string[] = []
+
+  if (val) {
+    Object.entries(val)
+      .sort(([keyA], [keyB]) => keyA - keyB)
+      .forEach(([key, value]) => {
+        series.push(value)
+        labels.push(`${marksMap[key] || key}`)
+      })
+  }
+
+  return {
+    series,
+    settings: {
+      chart: {
+        width: 380,
+        type: 'pie'
+      },
+      labels,
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      ]
+    }
+  }
+})
+
+const refresh = async () => {
+  await getClassGroupStudents()
   getMarks()
 }
 
@@ -102,32 +131,21 @@ const getClassGroupDetails = async () => {
   details.value = data
 }
 
+const marksMap = {
+  1: 'niedotateczny',
+  1.5: 'niedostateczny +',
+  2: 'dopuszczający',
+  3: 'dostateczny',
+  3.5: 'dostateczny +',
+  4: 'dobry',
+  4.5: 'dobry +',
+  5: 'bardzo dobry',
+  5.5: 'bardzo dobry +',
+  6: 'celujący'
+}
 const getMarks = async () => {
   const { data } = await classGroupResource.getMarks(classGroupID.value)
-  marks.value = data
-
-  const x = data.reduce(
-    (acc, mark) => {
-      const value = acc[mark.value]
-      if (value === undefined) {
-        acc[mark.value] = 1
-      } else {
-        acc[mark.value] += 1
-      }
-
-      return acc
-    },
-    {} as Record<number, number>
-  )
-
-  series.value = []
-  labels.value = []
-  Object.entries(x).forEach(([key, value]) => {
-    series.value = [...series.value, value]
-    labels.value = [...labels.value, `Ocena ${key}`]
-  })
-  console.log(series.value)
-  console.log(labels.value)
+  marks.list = data
 }
 
 getClassGroupStudents()

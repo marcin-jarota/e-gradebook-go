@@ -105,3 +105,11 @@ func (r *GormStudentRepository) ExistsByEmail(email string) (bool, error) {
 
 	return true, nil
 }
+
+func (r *GormStudentRepository) GetByUserID(userID int) (domain.Student, error) {
+	var student domain.Student
+
+	err := r.db.First(&student).Where("user_id = ?", userID).Error
+
+	return student, err
+}

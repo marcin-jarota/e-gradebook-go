@@ -11,7 +11,6 @@ export const useCurrentUser = () => {
   })
 
   const isStudent = computed(() => {
-    console.log(user)
     return user?.role === Role.Student
   })
 

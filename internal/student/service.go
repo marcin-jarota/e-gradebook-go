@@ -92,3 +92,18 @@ func (s *StudentService) AddStudent(student ports.UserCreatePayload) error {
 		},
 	})
 }
+
+func (s *StudentService) GetByUserID(userID int) (ports.StudentByUserID, error) {
+	student, err := s.studentRepo.GetByUserID(userID)
+
+	if err != nil {
+		return ports.StudentByUserID{}, errors.New("students.byUserID.fetchError")
+	}
+
+	output := ports.StudentByUserID{
+		StudentID:    int(student.ID),
+		ClassGroupID: int(*student.ClassGroupID),
+	}
+
+	return output, nil
+}

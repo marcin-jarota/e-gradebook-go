@@ -12,6 +12,7 @@ type (
 		ExistsByEmail(email string) (bool, error)
 		SetClassGroup(studentID uint, classGroupID uint) error
 		RemoveClassGroup(studentID uint) error
+		GetByUserID(userID int) (domain.Student, error)
 	}
 
 	StudentOutput struct {
@@ -42,11 +43,17 @@ type (
 		ClassGroupID int `json:"classGroupID"`
 	}
 
+	StudentByUserID struct {
+		StudentID    int `json:"studentID"`
+		ClassGroupID int `json:"classGroupID"`
+	}
+
 	StudentService interface {
 		GetAll() ([]*StudentOutput, error)
 		GetAllByClassGroup(classGroupID int) ([]StudentByClassGroup, error)
 		// GetMarks(studentID int) ([]*StudentMarkOutput, error)
 		AddStudent(user UserCreatePayload) error
 		SetClassGroup(payload SetClassGroupPayload) error
+		GetByUserID(userID int) (StudentByUserID, error)
 	}
 )

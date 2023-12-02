@@ -33,13 +33,14 @@ func NewUserHandler(service ports.UserService, studentService ports.StudentServi
 }
 
 func (h *UserHandler) BindRouting(app *fiber.App, auth *middleware.AuthMiddleware) {
-	r := app.Group("/user", auth.IsAuthenticatedByHeader(), auth.IsAdmin())
+	r := app.Group("/user", auth.IsAuthenticatedByHeader())
 
-	r.Get("/list", h.GetAll)
-	r.Get("/activate/:id", h.ActivateUser)
-	r.Get("/deactivate/:id", h.DeactivateUser)
-	r.Get("/destroy-session/:id", h.DestroyUserSession)
-	r.Post("/create/:role", h.PostAddUser)
+	r.Get("/list", auth.IsAdmin(), h.GetAll)
+	r.Get("/activate/:id", auth.IsAdmin(), h.ActivateUser)
+	r.Get("/deactivate/:id", auth.IsAdmin(), h.DeactivateUser)
+	r.Get("/destroy-session/:id", auth.IsAdmin(), h.DestroyUserSession)
+	r.Post("/create/:role", auth.IsAdmin(), h.PostAddUser)
+	r.Get("/:id/student-data", auth.UserIs("student"), h.GetStudentByUserID)
 	app.Post("/setup-password", h.SetupPassword)
 }
 
@@ -172,4 +173,20 @@ func (h *UserHandler) PostAddUser(c *fiber.Ctx) error {
 	return h.JSON(c, map[string]any{
 		"activationLink": fmt.Sprintf("%s/setup-password?token=%s&email=%s", h.cfg.BaseUrlFront, token, p.Email),
 	})
+}
+
+func (h *UserHandler) GetStudentByUserID(c *fiber.Ctx) error {
+	id, err := h.ParseIntParam(c.Params("id", "0"))
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	student, err := h.studentService.GetByUserID(id)
+
+	if err != nil {
+		h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, student)
 }

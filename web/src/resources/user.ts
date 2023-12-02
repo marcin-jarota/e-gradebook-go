@@ -31,5 +31,15 @@ export const userResource = {
   },
   async destroySession(userID: number) {
     return unwrapRequestData(client.get<ApiBaseResponse<any>>(`/user/destroy-session/${userID}`))
+  },
+  async studentDataByUserID(userID: number) {
+    return unwrapRequestData(
+      client.get<ApiBaseResponse<{ studentID: number; classGroupID: number }>>(
+        `/user/${userID}/student-data`
+      )
+    )
+  },
+  logout() {
+    return unwrapRequestData(client.get('/logout'))
   }
 }

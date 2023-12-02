@@ -80,12 +80,11 @@ const save = async () => {
       classGroupID: props.classGroupId
     })
     successSnackbar('Student przypisany', 3000)
-    closeModal(modal.value)
     $emit('on-add')
+    closeModal(modal.value)
   } catch (err) {
     errorCode.value = (err as any).response?.data?.error
   }
-  console.log(subject.value, markDate.value, comment.value, markValue.value)
 }
 </script>
 

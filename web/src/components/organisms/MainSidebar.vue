@@ -2,13 +2,14 @@
 import { RouterLink } from 'vue-router'
 import router, { routes } from '@/router'
 import { useCurrentUser } from '@/composables/useCurrentUser'
+import { userResource } from '@/resources/user'
 
 const { userInitials, hasPermission } = useCurrentUser()
 
 const handleLogOut = async () => {
   try {
-    await fetch(import.meta.env.VITE_API_BASE_URL + '/logout')
-    localStorage.setItem('token', '')
+    await userResource.logout()
+    localStorage.removeItem('token')
     router.push('/login')
   } catch (err) {
     console.error(err)

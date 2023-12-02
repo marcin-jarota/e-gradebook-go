@@ -2,7 +2,6 @@ package student
 
 import (
 	"e-student/internal/adapters/transport"
-	"e-student/internal/app/domain"
 	"e-student/internal/app/ports"
 	"e-student/internal/middleware"
 
@@ -25,7 +24,7 @@ func NewStudentHandler(service ports.StudentService, markService ports.MarkServi
 func (h *StudentHandler) BindRouting(app fiber.Router, auth *middleware.AuthMiddleware) {
 	r := app.Group("/students", auth.IsAuthenticatedByHeader())
 	r.Get("/", auth.UserIs("teacher", "admin"), h.GetAll)
-	r.Get("/:studentID/marks", auth.UserIs(domain.AdminRole, domain.StudentRole), h.GetMarks)
+	r.Get("/:studentID/marks", auth.UserIs("teacher", "student"), h.GetMarks)
 }
 
 func (h *StudentHandler) GetAll(c *fiber.Ctx) error {
