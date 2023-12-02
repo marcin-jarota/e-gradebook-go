@@ -3,6 +3,7 @@ package app
 import (
 	"flag"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -14,6 +15,7 @@ type Config struct {
 	Secret       string
 	BaseUrl      string
 	BaseUrlFront string
+	SqlLogInfo   bool
 }
 
 func NewConfig() *Config {
@@ -30,6 +32,12 @@ func NewConfig() *Config {
 	baseUrl := flag.String("baseUrl", os.Getenv("BASE_URL"), "Addres of backend application")
 	baseUrlFront := flag.String("baseUrlFront", os.Getenv("BASE_URL_FRONT"), "Addres of frontend application")
 
+	defaultSqlLogInfo, err := strconv.ParseBool(os.Getenv("SQL_LOG_INFO"))
+	if err != nil {
+		defaultSqlLogInfo = false
+	}
+	sqlLogInfo := flag.Bool("sqlLogInfo", defaultSqlLogInfo, "Flag to determinate if program shoudld print all SQL queries")
+
 	flag.Parse()
 
 	// time.Sleep(time.Second * 5)
@@ -41,5 +49,6 @@ func NewConfig() *Config {
 		RedisAddr:    *redisAddr,
 		BaseUrl:      *baseUrl,
 		BaseUrlFront: *baseUrlFront,
+		SqlLogInfo:   *sqlLogInfo,
 	}
 }

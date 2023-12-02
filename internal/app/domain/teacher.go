@@ -6,7 +6,8 @@ import (
 
 type Teacher struct {
 	gorm.Model
-	User   User
-	UserID uint
-	Marks  []Mark
+	User     User
+	UserID   uint
+	Marks    []Mark
+	Subjects []Subject `gorm:"many2many:subject_teachers;"`
 }

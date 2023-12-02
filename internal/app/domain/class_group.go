@@ -6,4 +6,5 @@ type ClassGroup struct {
 	gorm.Model
 	Name     string
 	Students []Student `gorm:"foreignkey:ClassGroupID"`
+	Subjects []Subject `gorm:"many2many:subject_class_groups;"`
 }

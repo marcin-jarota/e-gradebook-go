@@ -45,7 +45,7 @@ type (
 
 	StudentByUserID struct {
 		StudentID    int `json:"studentID"`
-		ClassGroupID int `json:"classGroupID"`
+		ClassGroupID int `json:"classGroupID,omitempty"`
 	}
 
 	StudentService interface {

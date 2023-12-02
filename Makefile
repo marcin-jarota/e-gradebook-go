@@ -7,4 +7,4 @@ build:
 fe-dev:
 	cd ./web && npm run dev
 seed:
-	go run ./cmd/seed/. -dsn ${SEED_DSN}
+	go run ./cmd/seed/. -dsn ${SEED_DSN} -sqlLogInfo=false

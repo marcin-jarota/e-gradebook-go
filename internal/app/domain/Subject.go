@@ -6,6 +6,8 @@ import (
 
 type Subject struct {
 	gorm.Model
-	Name  string
-	Marks []Mark
+	Name        string
+	Marks       []Mark
+	ClassGroups []ClassGroup `gorm:"many2many:subject_class_groups;"`
+	Teachers    []Teacher    `gorm:"many2many:subject_teachers;"`
 }

@@ -14,6 +14,8 @@ func main() {
 
 	defer closeConn()
 
+	db.AskForCleanDatabase(conn)
+
 	userRoleDrop := `DROP TYPE IF EXISTS user_role`
 	userRoleCreate := fmt.Sprintf(`CREATE TYPE user_role AS ENUM ('%s', '%s', '%s');`, domain.AdminRole, domain.StudentRole, domain.TeacherRole)
 
@@ -51,10 +53,10 @@ func main() {
 		log.Panic("Could migrate Teacher table: ", err)
 	}
 
-	// db.SeedAdminUser(conn)
-	// db.SeedSubject(conn)
-	// db.SeedClassGroup(conn)
-	// db.SeedStudentUser(conn)
-	// db.SeedTeacherUser(conn)
+	db.SeedAdminUser(conn)
+	db.SeedSubject(conn)
+	db.SeedClassGroup(conn)
+	db.SeedStudentUser(conn)
+	db.SeedTeacherUser(conn)
 	db.SeedMarks(conn)
 }
