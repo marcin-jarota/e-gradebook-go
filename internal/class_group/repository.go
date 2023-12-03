@@ -41,3 +41,24 @@ func (r *GormClassGroupRepository) GetOneByID(classGroupID int) (domain.ClassGro
 
 	return classGroup, nil
 }
+
+func (r *GormClassGroupRepository) AddSubject(classGroupID int, subjectID int) error {
+	var subject domain.Subject
+	var classGroup domain.ClassGroup
+
+	if err := r.db.First(&subject, "id = ?", subjectID).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Joins("Subjects").First(&classGroup, "id = ?", classGroupID).Error; err != nil {
+		return err
+	}
+
+	for _, subject := range classGroup.Subjects {
+		if int(subject.ID) == subjectID {
+			return nil
+		}
+	}
+
+	return r.db.Model(&classGroup).Association("Subjects").Append(&subject)
+}

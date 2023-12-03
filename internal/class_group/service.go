@@ -61,3 +61,7 @@ func (s *ClassGroupService) AddClassGroup(input ports.AddClassGroupInput) error 
 
 	return err
 }
+
+func (s *ClassGroupService) AddSubject(input ports.AddSubjectToClassGroupPayload) error {
+	return s.repo.AddSubject(input.ClassGroupID, input.SubjectID)
+}

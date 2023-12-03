@@ -95,7 +95,6 @@ func (s *StudentService) AddStudent(student ports.UserCreatePayload) error {
 
 func (s *StudentService) GetByUserID(userID int) (ports.StudentByUserID, error) {
 	var output ports.StudentByUserID
-	fmt.Println("USEEEEER ID IISSSSS", userID)
 	student, err := s.studentRepo.GetByUserID(userID)
 
 	if err != nil {

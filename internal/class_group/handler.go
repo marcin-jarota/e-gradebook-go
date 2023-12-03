@@ -31,6 +31,7 @@ func (h *classGroupHandler) BindRouting(app fiber.Router, auth *middleware.AuthM
 	r.Get("/:classGroupID/students", auth.IsAdmin(), h.ListStudents)
 	r.Get("/:classGroupID/marks", auth.UserIs("admin", "teacher"), h.ListMarks)
 	r.Post("/:classGroupID/students", auth.IsAdmin(), h.AddStudentToClassGroup)
+	r.Post("/:classGroupID/subjects", auth.IsAdmin(), h.AddSubjectToClassGroup)
 }
 
 func (h *classGroupHandler) Details(c *fiber.Ctx) error {
@@ -99,6 +100,27 @@ func (h *classGroupHandler) AddStudentToClassGroup(c *fiber.Ctx) error {
 	}
 
 	if err := h.studentsService.SetClassGroup(setClassGroupData); err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, nil)
+}
+
+func (h *classGroupHandler) AddSubjectToClassGroup(c *fiber.Ctx) error {
+	var p ports.AddSubjectToClassGroupPayload
+	classGroupID, err := h.ParseIntParam(c.Params("classGroupID", "0"))
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	if err := c.BodyParser(&p); err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	p.ClassGroupID = classGroupID
+
+	if err := h.classGroupService.AddSubject(p); err != nil {
 		return h.JSONError(c, err, fiber.StatusInternalServerError)
 	}
 
