@@ -8,6 +8,8 @@ type (
 		GetOneByID(id int) (domain.ClassGroup, error)
 		AddClassGroup(classGroup *domain.ClassGroup) error
 		AddSubject(classGroupID int, subjectID int) error
+		AddTeacher(classGroupID int, teacherID int) error
+		GetTeachers(classGroupID int) ([]domain.Teacher, error)
 		// AddStudent(studentID uint, classGroupID uint) error
 		// RemoveStudent(studentID uint, classGroupID uint) error
 		// DeleteByID(classGroupID uint) error
@@ -32,10 +34,24 @@ type (
 		ClassGroupID int `json:"classGroupID"`
 	}
 
+	TeacherClassGroup struct {
+		TeacherID    int `json:"teacherID"`
+		ClassGroupID int `json:"classGroupID"`
+	}
+
+	ClassGroupTeacher struct {
+		ID      int    `json:"id"`
+		Name    string `json:"name"`
+		Surname string `json:"surname"`
+		Email   string `json:"email"`
+	}
+
 	ClassGroupService interface {
 		GetAll() ([]ClassGroupOutput, error)
 		GetOneByID(id int) (ClassGroupOutput, error)
 		AddClassGroup(input AddClassGroupInput) error
 		AddSubject(input AddSubjectToClassGroupPayload) error
+		AddTeacher(input TeacherClassGroup) error
+		GetTeachers(classGroupID int) ([]ClassGroupTeacher, error)
 	}
 )

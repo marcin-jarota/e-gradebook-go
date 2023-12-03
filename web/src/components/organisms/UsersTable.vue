@@ -18,7 +18,10 @@
           <td scope="row">{{ user.id }}</td>
           <td>{{ user.name }}</td>
           <td>{{ user.surname }}</td>
-          <td>{{ user.email }}</td>
+          <td>
+            <a v-if="currentUser.id !== user.id" :href="'mailto:' + user.email">{{ user.email }}</a>
+            <span v-else>{{ user.email }}</span>
+          </td>
           <td>{{ roleName[user.role] }}</td>
           <td>
             <IconStatus :active="Boolean(user.isActive)" />

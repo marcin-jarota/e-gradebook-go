@@ -16,6 +16,22 @@ func NewTeacherService(repo ports.TeacherRepository) *TeacherService {
 	}
 }
 
+func (s *TeacherService) GetAll() ([]ports.TeacherBaseOutput, error) {
+	var output []ports.TeacherBaseOutput
+
+	teachers, err := s.repo.GetAll()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, t := range teachers {
+		output = append(output, ports.TeacherBaseOutput{ID: int(t.ID), Name: t.User.Name, Surname: t.User.Surname})
+	}
+
+	return output, nil
+}
+
 func (s *TeacherService) AddTeacher(user ports.UserCreatePayload) error {
 
 	exists, err := s.repo.ExistsByEmail(user.Email)

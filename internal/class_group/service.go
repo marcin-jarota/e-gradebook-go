@@ -65,3 +65,28 @@ func (s *ClassGroupService) AddClassGroup(input ports.AddClassGroupInput) error 
 func (s *ClassGroupService) AddSubject(input ports.AddSubjectToClassGroupPayload) error {
 	return s.repo.AddSubject(input.ClassGroupID, input.SubjectID)
 }
+
+func (s *ClassGroupService) GetTeachers(classGroupID int) ([]ports.ClassGroupTeacher, error) {
+	var output []ports.ClassGroupTeacher
+
+	teachers, err := s.repo.GetTeachers(classGroupID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, teacher := range teachers {
+		output = append(output, ports.ClassGroupTeacher{
+			ID:      int(teacher.ID),
+			Name:    teacher.User.Name,
+			Surname: teacher.User.Surname,
+			Email:   teacher.User.Email,
+		})
+	}
+
+	return output, nil
+}
+
+func (s *ClassGroupService) AddTeacher(input ports.TeacherClassGroup) error {
+	return s.repo.AddTeacher(input.ClassGroupID, input.TeacherID)
+}

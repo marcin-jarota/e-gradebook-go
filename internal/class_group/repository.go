@@ -62,3 +62,34 @@ func (r *GormClassGroupRepository) AddSubject(classGroupID int, subjectID int) e
 
 	return r.db.Model(&classGroup).Association("Subjects").Append(&subject)
 }
+
+func (r *GormClassGroupRepository) AddTeacher(classGroupID int, teacherID int) error {
+	var teacher domain.Teacher
+	var classGroup domain.ClassGroup
+
+	if err := r.db.First(&teacher, teacherID).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.Preload("Teachers").First(&classGroup, classGroupID).Error; err != nil {
+		return err
+	}
+
+	for _, teacher := range classGroup.Teachers {
+		if int(teacher.ID) == teacherID {
+			return nil
+		}
+	}
+
+	return r.db.Model(&classGroup).Association("Teachers").Append(&teacher)
+}
+
+func (r *GormClassGroupRepository) GetTeachers(classGroupID int) ([]domain.Teacher, error) {
+	var classGroup domain.ClassGroup
+
+	if err := r.db.Preload("Teachers.User").First(&classGroup, classGroupID).Error; err != nil {
+		return nil, err
+	}
+
+	return classGroup.Teachers, nil
+}

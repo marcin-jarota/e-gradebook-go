@@ -1,5 +1,5 @@
 <template>
-  <VButton type="button" variant="primary" @click="openModal(modal)">Dodaj ocenę</VButton>
+  <VButton type="button" variant="light" @click="openModal(modal)">Dodaj ocenę</VButton>
   <Teleport to="body">
     <div class="modal fade" ref="modal" tabindex="-1" id="exampleModal">
       <div class="modal-dialog">

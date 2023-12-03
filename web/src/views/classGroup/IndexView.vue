@@ -3,8 +3,10 @@
     <div class="container">
       <div class="row">
         <div class="col-8">
-          <h2 class="pb-2">{{ details?.name }}</h2>
-          <table class="table table-hover">
+          <h2 class="pb-4">Panel klasy {{ details?.name }}</h2>
+          <h3 class="py-2">Uczniowie</h3>
+
+          <table class="table">
             <thead>
               <tr>
                 <th scope="col">ID</th>
@@ -35,7 +37,39 @@
               </tr>
             </tbody>
           </table>
-          <AddStudent :class-group-id="classGroupID" @on-add="refresh" />
+          <AssignStudent :class-group-id="classGroupID" @save-success="refresh" />
+          <h3 class="py-4">Nauczyciele</h3>
+          <table class="table table-hover mt-2">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Imię</th>
+                <th>Nazwisko</th>
+                <th>E-mail</th>
+              </tr>
+            </thead>
+            <tbody v-if="teachers.length">
+              <tr v-for="t in teachers" :key="t.id">
+                <th scope="row">
+                  {{ t.id }}
+                </th>
+                <td>
+                  {{ t.name }}
+                </td>
+                <td>{{ t.surname }}</td>
+                <td>
+                  <a :href="'mailto:' + t.email">{{ t.email }}</a>
+                </td>
+              </tr>
+            </tbody>
+            <tbody v-else>
+              <tr>
+                <td colspan="4">Brak nauczycieli przypisanych do klasy</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <AssignTeacher :class-group-id="classGroupID" @save-success="getClassgroupTeachers" />
         </div>
         <div class="col-4">
           <h3 class="pb-4">Oceny w klasie</h3>
@@ -53,10 +87,13 @@ import type { ClassGroupOutput, ClassGroupStudent } from '@/types/ClassGroup'
 import { computed, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AddMark from '@/components/organisms/AddMark.vue'
-import AddStudent from '@/components/organisms/AddStudent.vue'
+import AssignStudent from '@/components/organisms/AssignStudent.vue'
+import AssignTeacher from '@/components/organisms/AssignTeacher.vue'
+import type { TeacherOutput } from '@/types/Teacher'
 
 const route = useRoute()
-const students = ref<ClassGroupStudent[]>()
+const students = ref<ClassGroupStudent[]>([])
+const teachers = ref<TeacherOutput[]>([])
 const details = ref<ClassGroupOutput>()
 const marks = reactive<{ list: { value: number; id: number }[] }>({ list: [] })
 
@@ -80,9 +117,11 @@ const options = computed(() => {
 
   if (val) {
     Object.entries(val)
+      //@ts-ignore
       .sort(([keyA], [keyB]) => keyA - keyB)
       .forEach(([key, value]) => {
         series.push(value)
+        //@ts-ignore
         labels.push(`${marksMap[key] || key}`)
       })
   }
@@ -125,6 +164,12 @@ const getClassGroupStudents = async () => {
   students.value = data
 }
 
+const getClassgroupTeachers = async () => {
+  const { data } = await classGroupResource.teachers(classGroupID.value)
+
+  teachers.value = data
+}
+
 const getClassGroupDetails = async () => {
   const { data } = await classGroupResource.getOne(classGroupID.value)
 
@@ -150,6 +195,7 @@ const getMarks = async () => {
 
 getClassGroupStudents()
 getClassGroupDetails()
+getClassgroupTeachers()
 getMarks()
 </script>
 

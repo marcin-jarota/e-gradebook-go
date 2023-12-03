@@ -7,7 +7,7 @@ type TranslateOptions = {
 
 const TranslatePlugin: Plugin = {
   install: (app: App, options: TranslateOptions) => {
-    app.config.globalProperties.$translate = (key: string): string | undefined => {
+    const translate = (key: string): string | undefined => {
       //@ts-ignore
       const value = key.split('.').reduce((o, i) => {
         if (o) return o[i]
@@ -15,6 +15,8 @@ const TranslatePlugin: Plugin = {
 
       return typeof value === 'string' ? value : `missing value for key: ${key}`
     }
+    app.config.globalProperties.$translate = translate
+    app.provide('translate', translate)
   }
 }
 

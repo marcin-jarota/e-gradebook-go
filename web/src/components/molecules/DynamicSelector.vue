@@ -6,7 +6,7 @@
       <InputText :label="title" class="flex-grow-1" :disabled="true" type="text" v-model="selected.name"
         name="subject-value" :placeholder="placeholder" />
 
-      <button type="button" class="btn btn-danger d-inline clear-btn text-left" @click="selected = null">
+      <button type="button" class="btn btn-danger d-inline clear-btn text-left" @click="selectSubject(null)">
         <font-awesome-icon icon="fa-solid fa-xmark" />
       </button>
     </div>
@@ -36,7 +36,7 @@ const selected = ref<T | null>()
 const props = defineProps<{ items: T[]; title: string; placeholder: string }>()
 const listVisible = ref(false)
 
-const selectSubject = (sub: T) => {
+const selectSubject = (sub: T | null) => {
   selected.value = sub
   $emit('on-select', sub)
 }

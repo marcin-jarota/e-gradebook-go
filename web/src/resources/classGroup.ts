@@ -17,6 +17,13 @@ export const classGroupResource = {
       )
     )
   },
+  teachers(classGroupID: number) {
+    return unwrapRequestData(
+      client.get<ApiBaseResponse<ClassGroupStudent[]>>(
+        '/class-groups/' + classGroupID + '/teachers'
+      )
+    )
+  },
   getOne(classGroupID: number) {
     return unwrapRequestData(
       client.get<ApiBaseResponse<ClassGroupOutput>>('/class-groups/' + classGroupID)
@@ -36,6 +43,14 @@ export const classGroupResource = {
       })
     )
   },
+  assignTeacher({ teacherID, classGroupID }: { teacherID: number; classGroupID: number }) {
+    return unwrapRequestData(
+      client.post<ApiBaseResponse<{ success: boolean }>>(`/class-groups/${classGroupID}/teachers`, {
+        teacherID
+      })
+    )
+  },
+
   async create(payload: ClassGroupPayload) {
     return unwrapRequestData(client.post('/class-groups', payload))
   }

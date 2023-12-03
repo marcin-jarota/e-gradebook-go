@@ -34,3 +34,23 @@ func (r *GormTeacherRepository) ExistsByEmail(email string) (bool, error) {
 
 	return true, nil
 }
+
+func (r *GormTeacherRepository) GetAll() ([]domain.Teacher, error) {
+	var teachers []domain.Teacher
+
+	if err := r.db.Joins("User").Find(&teachers).Error; err != nil {
+		return nil, err
+	}
+
+	return teachers, nil
+}
+
+func (r *GormTeacherRepository) GetAllByClassGroup(classGroupID uint) ([]domain.Teacher, error) {
+	var teachers []domain.Teacher
+
+	if err := r.db.Preload("User").Preload("Marks").Where("class_group_id = ?", classGroupID).Find(&teachers).Error; err != nil {
+		return nil, err
+	}
+
+	return teachers, nil
+}

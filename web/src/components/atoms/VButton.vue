@@ -8,11 +8,16 @@
 import { reactive } from 'vue'
 
 defineEmits(['click'])
-const props = defineProps<{ variant: 'primary' | 'danger'; type: 'submit' | 'button' | 'reset' }>()
+const props = defineProps<{
+  variant: 'primary' | 'danger' | 'secondary' | 'light'
+  type: 'submit' | 'button' | 'reset'
+}>()
 
 const classObject = reactive({
   'btn-primary': props.variant === 'primary',
-  'btn-danger': props.variant === 'danger'
+  'btn-danger': props.variant === 'danger',
+  'btn-secondary': props.variant === 'secondary',
+  'btn-light': props.variant === 'light'
 })
 </script>
 
