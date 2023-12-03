@@ -28,7 +28,6 @@
 import { ref } from 'vue'
 import VButton from '@/components/atoms/VButton.vue'
 import { Modal } from 'bootstrap'
-import { type Subject } from '@/types/Subject'
 import { useSnackbar } from '@/composables/useSnackbar'
 import DynamicSelector from '@/components/molecules/DynamicSelector.vue'
 import { studentResource } from '@/resources/student'
@@ -39,10 +38,6 @@ const props = defineProps<{ classGroupId: number }>()
 const $emit = defineEmits(['on-add'])
 
 const errorCode = ref('')
-const subject = ref<Subject | null>(null)
-const markDate = ref('')
-const comment = ref('')
-const markValue = ref<number>()
 
 const studentsToAssigne = ref<{ id: number; name: string }[]>([])
 const selectedStudent = ref<{ id: number; name: string } | null>()
@@ -71,6 +66,7 @@ const getStudents = async () => {
 }
 
 getStudents()
+
 const save = async () => {
   try {
     if (!selectedStudent.value) return
