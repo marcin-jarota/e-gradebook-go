@@ -11,15 +11,19 @@ import (
 
 func AskForCleanDatabase(db *gorm.DB) {
 	if yes() {
-		db.Migrator().DropTable(&domain.SubjectClassGroup{})
-		db.Migrator().DropTable(&domain.SubjectTeacher{})
+
 		db.Migrator().DropTable(&domain.Student{})
 		db.Migrator().DropTable(&domain.Teacher{})
 		db.Migrator().DropTable(&domain.User{})
 		db.Migrator().DropTable(&domain.ClassGroup{})
 		db.Migrator().DropTable(&domain.Mark{})
 		db.Migrator().DropTable(&domain.Subject{})
+    db.Exec("DROP TABLE subject_teachers cascade")
+    db.Exec("DROP TABLE subject_classes cascade")
+    db.Exec("DROP TABLE class_subjects cascade")
+    db.Exec("DROP TABLE class_teachers cascade")
 	}
+
 }
 
 func yes() bool {

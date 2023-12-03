@@ -54,9 +54,9 @@ func main() {
 	}
 
 	db.SeedAdminUser(conn)
+	db.SeedTeacherUser(conn)
 	db.SeedSubject(conn)
 	db.SeedClassGroup(conn)
 	db.SeedStudentUser(conn)
-	db.SeedTeacherUser(conn)
 	db.SeedMarks(conn)
 }

@@ -122,20 +122,30 @@ func SeedTeacherUser(db *gorm.DB) {
 
 func SeedClassGroup(db *gorm.DB) {
 	name := "1 mat-fiz"
+	var classGroup domain.ClassGroup
+	var subject domain.Subject
+	var wfTeacher domain.Teacher
 
-	classGroup := &domain.ClassGroup{
-		Name: name,
-		// Students: []domain.Student{},
+	if err := db.FirstOrCreate(&subject, domain.Subject{Name: "Wychowanie Fizyczne"}).Error; err != nil {
+		log.Panic(err)
 	}
 
-	if err := db.First(&classGroup, "name = ?", name).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			db.Create(&classGroup)
-			log.Println("[SEED]: CLASS GROUP ADDED")
-		} else {
-			panic(err)
-		}
+	if err := db.FirstOrCreate(&classGroup, "name = ?", name).Error; err != nil {
+		log.Panic(err)
 	}
+
+	if err := db.FirstOrCreate(&wfTeacher, domain.Teacher{User: teacher}).Error; err != nil {
+		log.Panic(err)
+	}
+
+	classGroup.Subjects = append(classGroup.Subjects, subject)
+	classGroup.Teachers = append(classGroup.Teachers, wfTeacher)
+
+	if err := db.Save(&classGroup).Error; err != nil {
+		log.Panic(err)
+	}
+
+	log.Println("[SEED]: Class group added: ", name)
 
 }
 
@@ -146,13 +156,18 @@ func SeedSubject(db *gorm.DB) {
 	}
 
 	var myClass domain.ClassGroup
-	err := db.FirstOrCreate(&myClass, domain.ClassGroup{Name: "1 mat-fiz"}).Error
+	var wfTeacher domain.Teacher
 
-	if err == nil {
-		subject.ClassGroups = append(subject.ClassGroups, myClass)
-	} else {
+	if err := db.FirstOrCreate(&myClass, domain.ClassGroup{Name: "1 mat-fiz"}).Error; err != nil {
 		log.Panic(err)
 	}
+
+	if err := db.FirstOrCreate(&wfTeacher, domain.Teacher{User: teacher}).Error; err != nil {
+		log.Panic(err)
+	}
+
+	subject.ClassGroups = append(subject.ClassGroups, myClass)
+	subject.Teachers = append(subject.Teachers, wfTeacher)
 
 	if err := db.First(&subject, "name = ?", name).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -189,5 +204,5 @@ func SeedMarks(db *gorm.DB) {
 	}
 
 	db.Create(&mark)
-	log.Println(fmt.Sprintf("[SEED]: Creating mark %f for subject %s", mark.Value, mark.Subject.Name))
+	log.Printf("[SEED]: Creating mark %f for subject %s", mark.Value, mark.Subject.Name)
 }
