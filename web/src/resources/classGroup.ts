@@ -24,6 +24,13 @@ export const classGroupResource = {
       )
     )
   },
+  subjects(classGroupID: number) {
+    return unwrapRequestData(
+      client.get<ApiBaseResponse<ClassGroupStudent[]>>(
+        '/class-groups/' + classGroupID + '/subjects'
+      )
+    )
+  },
   getOne(classGroupID: number) {
     return unwrapRequestData(
       client.get<ApiBaseResponse<ClassGroupOutput>>('/class-groups/' + classGroupID)
@@ -47,6 +54,14 @@ export const classGroupResource = {
     return unwrapRequestData(
       client.post<ApiBaseResponse<{ success: boolean }>>(`/class-groups/${classGroupID}/teachers`, {
         teacherID
+      })
+    )
+  },
+
+  assignSubject({ subjectID, classGroupID }: { subjectID: number; classGroupID: number }) {
+    return unwrapRequestData(
+      client.post<ApiBaseResponse<{ success: boolean }>>(`/class-groups/${classGroupID}/subjects`, {
+        subjectID
       })
     )
   },

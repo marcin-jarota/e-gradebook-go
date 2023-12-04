@@ -9,7 +9,8 @@ import {
   faUserPlus,
   faChalkboard,
   faUsers,
-  faSchool
+  faSchool,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import type { App } from 'vue'
@@ -26,7 +27,8 @@ export const setupIcons = (app: App<Element>) => {
     faChalkboard,
     faUsers,
     faSchool,
-    faXmark
+    faXmark,
+    faTrash
   )
   app.component('font-awesome-icon', FontAwesomeIcon)
 }

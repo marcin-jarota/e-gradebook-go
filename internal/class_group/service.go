@@ -5,6 +5,7 @@ import (
 	"e-student/internal/app/ports"
 	"errors"
 	"fmt"
+	"log"
 )
 
 type ClassGroupService struct {
@@ -63,7 +64,12 @@ func (s *ClassGroupService) AddClassGroup(input ports.AddClassGroupInput) error 
 }
 
 func (s *ClassGroupService) AddSubject(input ports.AddSubjectToClassGroupPayload) error {
-	return s.repo.AddSubject(input.ClassGroupID, input.SubjectID)
+	if err := s.repo.AddSubject(input.ClassGroupID, input.SubjectID); err != nil {
+		log.Println(err)
+		return errors.New("classGroup.error.assignSubject")
+	}
+
+	return nil
 }
 
 func (s *ClassGroupService) GetTeachers(classGroupID int) ([]ports.ClassGroupTeacher, error) {

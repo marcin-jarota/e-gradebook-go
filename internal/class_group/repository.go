@@ -46,11 +46,11 @@ func (r *GormClassGroupRepository) AddSubject(classGroupID int, subjectID int) e
 	var subject domain.Subject
 	var classGroup domain.ClassGroup
 
-	if err := r.db.First(&subject, "id = ?", subjectID).Error; err != nil {
+	if err := r.db.First(&subject, subjectID).Error; err != nil {
 		return err
 	}
 
-	if err := r.db.Joins("Subjects").First(&classGroup, "id = ?", classGroupID).Error; err != nil {
+	if err := r.db.Preload("Subjects").First(&classGroup, classGroupID).Error; err != nil {
 		return err
 	}
 

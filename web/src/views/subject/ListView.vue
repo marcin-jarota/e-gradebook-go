@@ -2,7 +2,7 @@
   <MainLayout>
     <div class="container">
       <h2 class="pb-2">Lista przedmiotów</h2>
-      <SubjectList :subjects="subjects" @delete-click="openDeleteModal" />
+      <SubjectList :subjects="subjects" @delete-click="openDeleteModal" @refresh-request="getSubjects" />
       <VButton @click="openModal(modal)" variant="primary" type="button">Dodaj przedmiot</VButton>
     </div>
 
@@ -60,6 +60,7 @@ import MainLayout from '@/layouts/MainLayout.vue'
 import SubjectList from '@/components/SubjectList.vue'
 import VButton from '@/components/atoms/VButton.vue'
 import InputText from '@/components/form/InputText.vue'
+import AssignTeacherSubject from '@/components/organisms/AssignTeacherSubject.vue'
 import { useSnackbar } from '@/composables/useSnackbar'
 
 const { successSnackbar } = useSnackbar()

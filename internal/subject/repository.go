@@ -23,7 +23,7 @@ func (r *GormSubjectRepository) AddSubject(subject *domain.Subject) error {
 func (r *GormSubjectRepository) GetAll() ([]*domain.Subject, error) {
 	var subjects []*domain.Subject
 
-	res := r.db.Find(&subjects)
+	res := r.db.Preload("Teachers.User").Find(&subjects)
 	if res.Error != nil {
 		return subjects, res.Error
 	}
@@ -61,4 +61,25 @@ func (r *GormSubjectRepository) Exists(name string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (r *GormSubjectRepository) AddTeacher(teacherID int, subjectID int) error {
+	var teacher domain.Teacher
+	var subject domain.Subject
+
+	if err := r.db.First(&teacher, teacherID).Error; err != nil {
+		return err
+	}
+
+	if err := r.db.First(&subject, subjectID).Error; err != nil {
+		return err
+	}
+
+	for _, t := range subject.Teachers {
+		if int(t.ID) == teacherID {
+			return nil
+		}
+	}
+
+	return r.db.Model(&subject).Association("Teachers").Append(&teacher)
 }

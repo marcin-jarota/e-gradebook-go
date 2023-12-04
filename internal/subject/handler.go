@@ -22,11 +22,12 @@ func NewSubjectHandler(service ports.SubjectService) *SubjectHandler {
 }
 
 func (h *SubjectHandler) BindRouting(app *fiber.App, auth *middleware.AuthMiddleware) {
-	r := app.Group("/subject", auth.IsAuthenticatedByHeader())
+	r := app.Group("/subjects", auth.IsAuthenticatedByHeader())
 
-	r.Get("/all", auth.IsAdmin(), h.GetAll)
-	r.Get("/delete/:id", auth.IsAdmin(), h.DeleteSubject)
-	r.Post("/create", h.AddSubject)
+	r.Get("/", auth.IsAdmin(), h.GetAll)
+	r.Post("/", h.AddSubject)
+	r.Delete("/:id", auth.IsAdmin(), h.DeleteSubject)
+	r.Post("/:subjectID/teachers", auth.IsAdmin(), h.AssignTeacher)
 }
 
 func (h *SubjectHandler) AddSubject(c *fiber.Ctx) error {
@@ -57,6 +58,27 @@ func (h *SubjectHandler) DeleteSubject(c *fiber.Ctx) error {
 	}
 
 	return h.JSON(c, nil)
+}
+
+func (h *SubjectHandler) AssignTeacher(c *fiber.Ctx) error {
+	var p ports.TeacherSubjectID
+	subjectID, err := h.ParseIntParam(c.Params("subjectID", "0"))
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	if err := c.BodyParser(&p); err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	p.SubjectID = subjectID
+
+	if err := h.service.AddTeacher(p); err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, fiber.Map{"ok": true})
 }
 
 func (h *SubjectHandler) GetAll(c *fiber.Ctx) error {

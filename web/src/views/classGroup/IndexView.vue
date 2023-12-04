@@ -70,6 +70,34 @@
           </table>
 
           <AssignTeacher :class-group-id="classGroupID" @save-success="getClassgroupTeachers" />
+          <AssignSubject :class-group-id="classGroupID" />
+
+          <h3 class="py-4">Przedmioty</h3>
+          <table class="table table-hover mt-2">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Imię</th>
+                <th>Nazwisko</th>
+                <th>E-mail</th>
+              </tr>
+            </thead>
+            <tbody v-if="teachers.length">
+              <tr v-for="t in subjects" :key="t.id">
+                <th scope="row">
+                  {{ t.id }}
+                </th>
+                <td>
+                  {{ t.name }}
+                </td>
+              </tr>
+            </tbody>
+            <tbody v-else>
+              <tr>
+                <td colspan="4">Brak nauczycieli przypisanych do klasy</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="col-4">
           <h3 class="pb-4">Oceny w klasie</h3>
@@ -89,11 +117,14 @@ import { useRoute } from 'vue-router'
 import AddMark from '@/components/organisms/AddMark.vue'
 import AssignStudent from '@/components/organisms/AssignStudent.vue'
 import AssignTeacher from '@/components/organisms/AssignTeacher.vue'
+import AssignSubject from '@/components/organisms/AssignSubject.vue'
 import type { TeacherOutput } from '@/types/Teacher'
+import { type Subject } from '@/types/Subject'
 
 const route = useRoute()
 const students = ref<ClassGroupStudent[]>([])
 const teachers = ref<TeacherOutput[]>([])
+const subjects = ref<Subject[]>([])
 const details = ref<ClassGroupOutput>()
 const marks = reactive<{ list: { value: number; id: number }[] }>({ list: [] })
 
@@ -176,6 +207,12 @@ const getClassGroupDetails = async () => {
   details.value = data
 }
 
+const getSubjects = async () => {
+  const { data } = await classGroupResource.subjects(classGroupID.value)
+
+  subjects.value = data
+}
+
 const marksMap = {
   1: 'niedotateczny',
   1.5: 'niedostateczny +',
@@ -197,6 +234,7 @@ getClassGroupStudents()
 getClassGroupDetails()
 getClassgroupTeachers()
 getMarks()
+getSubjects()
 </script>
 
 <style scoped></style>

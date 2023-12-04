@@ -26,7 +26,16 @@ func (s *SubjectService) GetAll() ([]*ports.SubjectOutput, error) {
 	}
 
 	for _, subject := range subjects {
-		response = append(response, &ports.SubjectOutput{ID: subject.ID, Name: subject.Name})
+		var teachers []ports.SubjectTeacher
+
+		for _, t := range subject.Teachers {
+			teachers = append(teachers, ports.SubjectTeacher{
+				ID:      int(t.ID),
+				Name:    t.User.Name,
+				Surname: t.User.Surname,
+			})
+		}
+		response = append(response, &ports.SubjectOutput{ID: subject.ID, Name: subject.Name, Teachers: teachers})
 	}
 
 	return response, nil
@@ -62,6 +71,14 @@ func (s *SubjectService) AddSubject(name string) error {
 
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (s *SubjectService) AddTeacher(payload ports.TeacherSubjectID) error {
+	if err := s.repo.AddTeacher(payload.TeacherID, payload.SubjectID); err != nil {
+		return errors.New("subject.error.assignTeacher")
 	}
 
 	return nil
