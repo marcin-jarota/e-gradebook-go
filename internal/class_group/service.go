@@ -38,6 +38,43 @@ func (s *ClassGroupService) GetAll() ([]ports.ClassGroupOutput, error) {
 	return output, nil
 }
 
+func (s *ClassGroupService) AddTeacherWithSubject(input ports.TeacherSubjectClassgroupID) error {
+	err := s.repo.AddTeacherWithSubject(input.ClassGroupID, input.TeacherID, input.SubjectID)
+
+	if err != nil {
+		log.Println(err)
+		return errors.New("classGroup.error.assignTeacherSubject")
+	}
+	return nil
+}
+
+func (s *ClassGroupService) GetTeachersWithSubject(classGroupID int) ([]ports.TeacherSubject, error) {
+	var output []ports.TeacherSubject
+
+	res, err := s.repo.GetTeachersWithSubject(classGroupID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, entity := range res {
+		output = append(output, ports.TeacherSubject{
+			Teacher: ports.TeacherBaseOutput{
+				ID:      int(entity.Teacher.ID),
+				Name:    entity.Teacher.User.Name,
+				Surname: entity.Teacher.User.Surname,
+				Email:   entity.Teacher.User.Email,
+			},
+			Subject: ports.SubjectBaseOutput{
+				ID:   entity.Subject.ID,
+				Name: entity.Subject.Name,
+			},
+		})
+	}
+
+	return output, nil
+}
+
 func (s *ClassGroupService) GetOneByID(classGroupID int) (ports.ClassGroupOutput, error) {
 	var output ports.ClassGroupOutput
 	classGroup, err := s.repo.GetOneByID(classGroupID)

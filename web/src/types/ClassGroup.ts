@@ -4,6 +4,18 @@ export type ClassGroupOutput = {
   studentsCount: number
 }
 
+export type TeacherSubject = {
+  teacher: {
+    id: number
+    name: string
+    surname: string
+    email: string
+  }
+  subject: {
+    id: number
+    name: string
+  }
+}
 export type ClassGroupStudent = {
   id: number
   name: string

@@ -24,6 +24,11 @@ type (
 		Teachers []SubjectTeacher `json:"teachers"`
 	}
 
+	SubjectBaseOutput struct {
+		ID   uint   `json:"id"`
+		Name string `json:"name"`
+	}
+
 	SubjectAddPayload struct {
 		Name string `json:"name"`
 	}

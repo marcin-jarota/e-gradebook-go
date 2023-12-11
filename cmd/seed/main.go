@@ -53,10 +53,15 @@ func main() {
 		log.Panic("Could migrate Teacher table: ", err)
 	}
 
+	if err := conn.AutoMigrate(&domain.SubjectTeacherClass{}); err != nil {
+		log.Panic(`Could not migrate SubjectTeacherClass: `, err)
+	}
+
 	db.SeedAdminUser(conn)
 	db.SeedTeacherUser(conn)
 	db.SeedSubject(conn)
 	db.SeedClassGroup(conn)
 	db.SeedStudentUser(conn)
 	db.SeedMarks(conn)
+	db.SeedSubjectTeacherClassGroup(conn)
 }

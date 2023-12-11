@@ -31,9 +31,10 @@ func (h *classGroupHandler) BindRouting(app fiber.Router, auth *middleware.AuthM
 	r.Get("/:classGroupID/students", auth.IsAdmin(), h.ListStudents)
 	r.Get("/:classGroupID/marks", auth.UserIs("admin", "teacher"), h.ListMarks)
 	r.Get("/:classGroupID/teachers", auth.IsAdmin(), h.ListTeachers)
+	r.Get("/:classGroupID/teacher-subject", h.ListTeacherSubject)
 	r.Post("/:classGroupID/teachers", auth.IsAdmin(), h.AddTeacherToClassGroup)
 	r.Post("/:classGroupID/students", auth.IsAdmin(), h.AddStudentToClassGroup)
-	r.Post("/:classGroupID/subjects", auth.IsAdmin(), h.AddSubjectToClassGroup)
+	r.Post("/:classGroupID/subjects", auth.IsAdmin(), h.AssignTeacherWithSubject)
 }
 
 func (h *classGroupHandler) Details(c *fiber.Ctx) error {
@@ -76,6 +77,23 @@ func (h *classGroupHandler) ListTeachers(c *fiber.Ctx) error {
 	}
 
 	teachers, err := h.classGroupService.GetTeachers(classGroupID)
+
+	if err != nil {
+
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, teachers)
+}
+
+func (h *classGroupHandler) ListTeacherSubject(c *fiber.Ctx) error {
+	classGroupID, err := h.ParseIntParam(c.Params("classGroupID", "0"))
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	teachers, err := h.classGroupService.GetTeachersWithSubject(classGroupID)
 
 	if err != nil {
 
@@ -144,6 +162,28 @@ func (h *classGroupHandler) AddTeacherToClassGroup(c *fiber.Ctx) error {
 	}
 
 	return h.JSON(c, nil)
+}
+
+func (h *classGroupHandler) AssignTeacherWithSubject(c *fiber.Ctx) error {
+	var p ports.TeacherSubjectClassgroupID
+
+	classGroupID, err := h.ParseIntParam(c.Params("classGroupID", "0"))
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	if err := c.BodyParser(&p); err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	p.ClassGroupID = classGroupID
+
+	if err := h.classGroupService.AddTeacherWithSubject(p); err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, fiber.Map{"ok": true})
 }
 
 func (h *classGroupHandler) AddSubjectToClassGroup(c *fiber.Ctx) error {

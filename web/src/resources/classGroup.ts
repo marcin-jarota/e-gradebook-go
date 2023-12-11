@@ -3,7 +3,8 @@ import type { ApiBaseResponse } from '@/types'
 import {
   type ClassGroupOutput,
   type ClassGroupPayload,
-  type ClassGroupStudent
+  type ClassGroupStudent,
+  type TeacherSubject
 } from '@/types/ClassGroup'
 
 export const classGroupResource = {
@@ -21,6 +22,13 @@ export const classGroupResource = {
     return unwrapRequestData(
       client.get<ApiBaseResponse<ClassGroupStudent[]>>(
         '/class-groups/' + classGroupID + '/teachers'
+      )
+    )
+  },
+  teachersSubjects(classGroupID: number) {
+    return unwrapRequestData(
+      client.get<ApiBaseResponse<TeacherSubject[]>>(
+        '/class-groups/' + classGroupID + '/teacher-subject'
       )
     )
   },
@@ -62,6 +70,22 @@ export const classGroupResource = {
     return unwrapRequestData(
       client.post<ApiBaseResponse<{ success: boolean }>>(`/class-groups/${classGroupID}/subjects`, {
         subjectID
+      })
+    )
+  },
+  assignTeacherSubject({
+    subjectID,
+    teacherID,
+    classGroupID
+  }: {
+    teacherID: number
+    subjectID: number
+    classGroupID: number
+  }) {
+    return unwrapRequestData(
+      client.post<ApiBaseResponse<{ success: boolean }>>(`/class-groups/${classGroupID}/subjects`, {
+        subjectID,
+        teacherID
       })
     )
   },

@@ -3,7 +3,6 @@ package db
 import (
 	"e-student/internal/app/domain"
 	"errors"
-	"fmt"
 	"log"
 
 	"gorm.io/gorm"
@@ -65,7 +64,7 @@ func SeedStudentUser(db *gorm.DB) {
 
 	var group domain.ClassGroup
 
-	err = db.First(&group, "name = ?", "1 mat-fiz").Error
+	err = db.FirstOrCreate(&group, "name = ?", "1 mat-fiz").Error
 
 	if err != nil {
 		panic(err)
@@ -75,7 +74,7 @@ func SeedStudentUser(db *gorm.DB) {
 
 	if err := db.Model(&domain.User{}).First(&student, "email = ?", student.Email).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Println(fmt.Sprintf("[SEED]: Creating student with class group: %s", group.Name))
+			log.Printf("[SEED]: Creating student with class group: %s", group.Name)
 			db.Create(&domain.Student{
 				User:       student,
 				ClassGroup: group,
@@ -98,20 +97,9 @@ func SeedTeacherUser(db *gorm.DB) {
 	if err := db.Model(&domain.User{}).First(&teacher, "email = ?", teacher.Email).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 
-			var subject domain.Subject
 			var newTeacher domain.Teacher
 
 			newTeacher.User = teacher
-
-			err := db.FirstOrCreate(&subject, domain.Subject{Name: "Wychowanie Fizyczne"}).Error
-
-			if err == nil {
-				newTeacher.Subjects = append(newTeacher.Subjects, subject)
-			} else {
-				log.Println(err)
-			}
-
-			log.Println(fmt.Sprintf("[SEED]: Creating teacher user with subject assigned %s", subject.Name))
 
 			db.Create(&newTeacher)
 		} else {
@@ -123,25 +111,8 @@ func SeedTeacherUser(db *gorm.DB) {
 func SeedClassGroup(db *gorm.DB) {
 	name := "1 mat-fiz"
 	var classGroup domain.ClassGroup
-	var subject domain.Subject
-	var wfTeacher domain.Teacher
-
-	if err := db.FirstOrCreate(&subject, domain.Subject{Name: "Wychowanie Fizyczne"}).Error; err != nil {
-		log.Panic(err)
-	}
 
 	if err := db.FirstOrCreate(&classGroup, "name = ?", name).Error; err != nil {
-		log.Panic(err)
-	}
-
-	if err := db.FirstOrCreate(&wfTeacher, domain.Teacher{User: teacher}).Error; err != nil {
-		log.Panic(err)
-	}
-
-	classGroup.Subjects = append(classGroup.Subjects, subject)
-	classGroup.Teachers = append(classGroup.Teachers, wfTeacher)
-
-	if err := db.Save(&classGroup).Error; err != nil {
 		log.Panic(err)
 	}
 
@@ -155,18 +126,12 @@ func SeedSubject(db *gorm.DB) {
 		Name: name,
 	}
 
-	var myClass domain.ClassGroup
 	var wfTeacher domain.Teacher
-
-	if err := db.FirstOrCreate(&myClass, domain.ClassGroup{Name: "1 mat-fiz"}).Error; err != nil {
-		log.Panic(err)
-	}
 
 	if err := db.FirstOrCreate(&wfTeacher, domain.Teacher{User: teacher}).Error; err != nil {
 		log.Panic(err)
 	}
 
-	subject.ClassGroups = append(subject.ClassGroups, myClass)
 	subject.Teachers = append(subject.Teachers, wfTeacher)
 
 	if err := db.First(&subject, "name = ?", name).Error; err != nil {
@@ -205,4 +170,32 @@ func SeedMarks(db *gorm.DB) {
 
 	db.Create(&mark)
 	log.Printf("[SEED]: Creating mark %f for subject %s", mark.Value, mark.Subject.Name)
+}
+
+func SeedSubjectTeacherClassGroup(db *gorm.DB) {
+	var c domain.ClassGroup
+	var t domain.Teacher
+	var s domain.Subject
+
+	if err := db.Find(&s, "id = ?", 1).Error; err != nil {
+		panic(err)
+	}
+
+	if err := db.Find(&t, "id = ?", 1).Error; err != nil {
+		panic(err)
+	}
+
+	if err := db.Find(&c, "id = ?", 1).Error; err != nil {
+		panic(err)
+	}
+
+	if err := db.Create(&domain.SubjectTeacherClass{
+		Teacher:    t,
+		ClassGroup: c,
+		Subject:    s,
+	}).Error; err != nil {
+		log.Panicln(err)
+	}
+
+	log.Println("[SEDD]: SeedSubjectTeacherClassGroup successfully")
 }

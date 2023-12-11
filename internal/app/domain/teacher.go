@@ -10,5 +10,4 @@ type Teacher struct {
 	UserID   uint
 	Marks    []Mark
 	Subjects []Subject `gorm:"many2many:subject_teachers;"`
-  ClassGroups []ClassGroup `gorm:"many2many:class_teachers;"`
 }

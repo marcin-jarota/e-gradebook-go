@@ -1,7 +1,7 @@
 <template>
   <SelectDialog @save-request="save" :selectable-items="subjectsToAssigne" title="Przypisz przedmiot"
     dropdown-title="Wybierz ucznia" dropdown-placeholder="Informatyka" v-slot="props">
-    <VButton type="button" variant="primary" @click="props.openModal">Przypisz przedmiotj</VButton>
+    <VButton type="button" variant="primary" @click="props.openModal">Przypisz przedmiot</VButton>
   </SelectDialog>
 </template>
 

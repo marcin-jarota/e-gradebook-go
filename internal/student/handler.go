@@ -38,7 +38,7 @@ func (h *StudentHandler) GetAll(c *fiber.Ctx) error {
 }
 
 func (h *StudentHandler) GetMarks(c *fiber.Ctx) error {
-	studentID, err := h.ParseIntParam(c.Params("studentId"))
+	studentID, err := h.ParseIntParam(c.Params("studentID"))
 
 	if err != nil {
 		return h.JSONError(c, err, fiber.StatusBadRequest)

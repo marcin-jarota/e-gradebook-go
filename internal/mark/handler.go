@@ -22,7 +22,7 @@ func NewMarkHandler(markService ports.MarkService) *markHandler {
 func (h *markHandler) BindRouting(app fiber.Router, auth *middleware.AuthMiddleware) {
 	r := app.Group("/marks", auth.IsAuthenticatedByHeader())
 
-	r.Post("/", h.CreateMark)
+	r.Post("/", auth.UserIs("teacher"), h.CreateMark)
 }
 
 func (h *markHandler) CreateMark(c *fiber.Ctx) error {

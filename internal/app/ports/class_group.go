@@ -10,6 +10,11 @@ type (
 		AddSubject(classGroupID int, subjectID int) error
 		AddTeacher(classGroupID int, teacherID int) error
 		GetTeachers(classGroupID int) ([]domain.Teacher, error)
+		GetTeachersWithSubject(classGropID int) ([]struct {
+			Teacher domain.Teacher
+			Subject domain.Subject
+		}, error)
+		AddTeacherWithSubject(classGroupID int, teacherID int, subjectID int) error
 		// AddStudent(studentID uint, classGroupID uint) error
 		// RemoveStudent(studentID uint, classGroupID uint) error
 		// DeleteByID(classGroupID uint) error
@@ -46,6 +51,16 @@ type (
 		Email   string `json:"email"`
 	}
 
+	TeacherSubjectClassgroupID struct {
+		ClassGroupID int `json:"classGroupID"`
+		TeacherID    int `json:"teacherID"`
+		SubjectID    int `json:"subjectID"`
+	}
+
+	TeacherSubject struct {
+		Teacher TeacherBaseOutput `json:"teacher"`
+		Subject SubjectBaseOutput `json:"subject"`
+	}
 	ClassGroupService interface {
 		GetAll() ([]ClassGroupOutput, error)
 		GetOneByID(id int) (ClassGroupOutput, error)
@@ -53,5 +68,7 @@ type (
 		AddSubject(input AddSubjectToClassGroupPayload) error
 		AddTeacher(input TeacherClassGroup) error
 		GetTeachers(classGroupID int) ([]ClassGroupTeacher, error)
+		AddTeacherWithSubject(input TeacherSubjectClassgroupID) error
+		GetTeachersWithSubject(classGroupID int) ([]TeacherSubject, error)
 	}
 )

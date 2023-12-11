@@ -47,6 +47,19 @@ export const routes: Record<
     },
     component: () => import('@/views/student/MarksView.vue')
   },
+  studentSubjects: {
+    path: '/student/subjects',
+    name: 'student.subjects',
+    meta: {
+      requiresAuth: true,
+      mainNav: true,
+      roles: [Role.Student],
+      sidebar: true,
+      title: 'Przedmioty',
+      icon: 'fa-chalkboard'
+    },
+    component: () => import('@/views/student/SubjectsView.vue')
+  },
   subjectList: {
     path: '/subject/list',
     name: 'subject.list',

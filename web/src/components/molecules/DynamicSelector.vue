@@ -59,7 +59,7 @@ const subjectsList = computed(() => {
 }
 
 .dropdown {
-  // bottom: 10px;
+  z-index: 999999;
 }
 
 .subject-btn {}

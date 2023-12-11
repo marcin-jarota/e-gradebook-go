@@ -10,6 +10,7 @@ import translatePlugin from './plugins/translate'
 const app = createApp(App)
 
 app.use(translatePlugin, {
+  auth: { unauthorized: 'Brak uprawnień do zasobu' },
   subject: {
     error: {
       exists: 'Podany przedmiot już istnieje',

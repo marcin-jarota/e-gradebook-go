@@ -42,23 +42,18 @@
           <table class="table table-hover mt-2">
             <thead>
               <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Imię</th>
-                <th>Nazwisko</th>
-                <th>E-mail</th>
+                <th scope="col">Przedmiot</th>
+                <th scope="col">Nauczyciel</th>
               </tr>
             </thead>
-            <tbody v-if="teachers.length">
-              <tr v-for="t in teachers" :key="t.id">
+            <tbody v-if="teacherSubject?.length">
+              <tr v-for="row in teacherSubject" :key="row.teacher.surname">
                 <th scope="row">
-                  {{ t.id }}
+                  {{ row.subject.name }}
                 </th>
                 <td>
-                  {{ t.name }}
-                </td>
-                <td>{{ t.surname }}</td>
-                <td>
-                  <a :href="'mailto:' + t.email">{{ t.email }}</a>
+                  {{ row.teacher.name }}
+                  {{ row.teacher.surname }}
                 </td>
               </tr>
             </tbody>
@@ -69,35 +64,7 @@
             </tbody>
           </table>
 
-          <AssignTeacher :class-group-id="classGroupID" @save-success="getClassgroupTeachers" />
-          <AssignSubject :class-group-id="classGroupID" />
-
-          <h3 class="py-4">Przedmioty</h3>
-          <table class="table table-hover mt-2">
-            <thead>
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Imię</th>
-                <th>Nazwisko</th>
-                <th>E-mail</th>
-              </tr>
-            </thead>
-            <tbody v-if="teachers.length">
-              <tr v-for="t in subjects" :key="t.id">
-                <th scope="row">
-                  {{ t.id }}
-                </th>
-                <td>
-                  {{ t.name }}
-                </td>
-              </tr>
-            </tbody>
-            <tbody v-else>
-              <tr>
-                <td colspan="4">Brak nauczycieli przypisanych do klasy</td>
-              </tr>
-            </tbody>
-          </table>
+          <AssignSubjectTeacherClassGroup :class-group-id="classGroupID" @save-success="getTeacherSubjects" />
         </div>
         <div class="col-4">
           <h3 class="pb-4">Oceny w klasie</h3>
@@ -111,22 +78,20 @@
 <script setup lang="ts">
 import MainLayout from '@/layouts/MainLayout.vue'
 import { classGroupResource } from '@/resources/classGroup'
-import type { ClassGroupOutput, ClassGroupStudent } from '@/types/ClassGroup'
+import type { ClassGroupOutput, ClassGroupStudent, TeacherSubject } from '@/types/ClassGroup'
 import { computed, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AddMark from '@/components/organisms/AddMark.vue'
 import AssignStudent from '@/components/organisms/AssignStudent.vue'
-import AssignTeacher from '@/components/organisms/AssignTeacher.vue'
-import AssignSubject from '@/components/organisms/AssignSubject.vue'
+import AssignSubjectTeacherClassGroup from '@/components/organisms/AssignSubjectTeacherClassGroup.vue'
 import type { TeacherOutput } from '@/types/Teacher'
-import { type Subject } from '@/types/Subject'
 
 const route = useRoute()
 const students = ref<ClassGroupStudent[]>([])
 const teachers = ref<TeacherOutput[]>([])
-const subjects = ref<Subject[]>([])
 const details = ref<ClassGroupOutput>()
 const marks = reactive<{ list: { value: number; id: number }[] }>({ list: [] })
+const teacherSubject = ref<TeacherSubject[]>([])
 
 const options = computed(() => {
   const val = marks.list.reduce(
@@ -207,11 +172,12 @@ const getClassGroupDetails = async () => {
   details.value = data
 }
 
-const getSubjects = async () => {
-  const { data } = await classGroupResource.subjects(classGroupID.value)
+const getTeacherSubjects = async () => {
+  const { data } = await classGroupResource.teachersSubjects(classGroupID.value)
 
-  subjects.value = data
+  teacherSubject.value = data || []
 }
+getTeacherSubjects()
 
 const marksMap = {
   1: 'niedotateczny',
@@ -234,7 +200,6 @@ getClassGroupStudents()
 getClassGroupDetails()
 getClassgroupTeachers()
 getMarks()
-getSubjects()
 </script>
 
 <style scoped></style>
