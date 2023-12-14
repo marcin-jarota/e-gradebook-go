@@ -60,6 +60,20 @@ export const routes: Record<
     },
     component: () => import('@/views/student/SubjectsView.vue')
   },
+  studentLessons: {
+    path: '/student/lessons',
+    name: 'student.lessons',
+    meta: {
+      requiresAuth: true,
+      mainNav: true,
+      roles: [Role.Student],
+      sidebar: true,
+      title: 'Plan zajęć',
+      icon: 'fa-calendar'
+    },
+    component: () => import('@/views/student/LessonsView.vue')
+  },
+
   subjectList: {
     path: '/subject/list',
     name: 'subject.list',
