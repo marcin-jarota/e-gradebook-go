@@ -27,3 +27,12 @@ export type ClassGroupStudent = {
 export type ClassGroupPayload = {
   name: string
 }
+
+export type Lesson = {
+  id: number
+  subject: string
+  teacher: string
+  start: string
+  end: string
+  dayOfWeek: number
+}

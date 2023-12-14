@@ -118,6 +118,17 @@ export const routes: Record<
     },
     component: () => import('@/views/classGroup/IndexView.vue')
   },
+  classGroupLessons: {
+    path: '/class-group/:id/lessons',
+    name: 'class-group-lessons',
+    meta: {
+      title: 'Plan zajęć',
+      roles: [Role.Admin, Role.Teacher],
+      requiresAuth: true
+    },
+    component: () => import('@/views/classGroup/LessonsView.vue')
+  },
+
   accessDenied: {
     path: '/denied',
     name: 'denied',

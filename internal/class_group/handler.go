@@ -13,13 +13,15 @@ type classGroupHandler struct {
 	classGroupService ports.ClassGroupService
 	studentsService   ports.StudentService
 	markService       ports.MarkService
+	lessonService     ports.LessonService
 }
 
-func NewClassGroupHandler(classGroupService ports.ClassGroupService, studentsService ports.StudentService, markService ports.MarkService) *classGroupHandler {
+func NewClassGroupHandler(classGroupService ports.ClassGroupService, studentsService ports.StudentService, markService ports.MarkService, lessonService ports.LessonService) *classGroupHandler {
 	return &classGroupHandler{
 		classGroupService: classGroupService,
 		studentsService:   studentsService,
 		markService:       markService,
+		lessonService:     lessonService,
 	}
 }
 
@@ -32,6 +34,7 @@ func (h *classGroupHandler) BindRouting(app fiber.Router, auth *middleware.AuthM
 	r.Get("/:classGroupID/marks", auth.UserIs("admin", "teacher"), h.ListMarks)
 	r.Get("/:classGroupID/teachers", auth.IsAdmin(), h.ListTeachers)
 	r.Get("/:classGroupID/teacher-subject", h.ListTeacherSubject)
+	r.Get("/:classGroupID/lessons", h.ListLessons)
 	r.Post("/:classGroupID/teachers", auth.IsAdmin(), h.AddTeacherToClassGroup)
 	r.Post("/:classGroupID/students", auth.IsAdmin(), h.AddStudentToClassGroup)
 	r.Post("/:classGroupID/subjects", auth.IsAdmin(), h.AssignTeacherWithSubject)
@@ -51,6 +54,22 @@ func (h *classGroupHandler) Details(c *fiber.Ctx) error {
 	}
 
 	return h.JSON(c, res)
+}
+
+func (h *classGroupHandler) ListLessons(c *fiber.Ctx) error {
+	classGroupID, err := h.ParseIntParam(c.Params("classGroupID", "0"))
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	lessons, err := h.lessonService.GetByClassGroup(classGroupID)
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, lessons)
 }
 
 func (h *classGroupHandler) ListMarks(c *fiber.Ctx) error {

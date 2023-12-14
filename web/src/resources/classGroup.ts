@@ -4,6 +4,7 @@ import {
   type ClassGroupOutput,
   type ClassGroupPayload,
   type ClassGroupStudent,
+  type Lesson,
   type TeacherSubject
 } from '@/types/ClassGroup'
 
@@ -25,6 +26,12 @@ export const classGroupResource = {
       )
     )
   },
+  lessons(classGroupID: number) {
+    return unwrapRequestData(
+      client.get<ApiBaseResponse<Lesson[]>>('/class-groups/' + classGroupID + '/lessons')
+    )
+  },
+
   teachersSubjects(classGroupID: number) {
     return unwrapRequestData(
       client.get<ApiBaseResponse<TeacherSubject[]>>(
