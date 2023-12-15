@@ -39,6 +39,14 @@ export const userResource = {
       )
     )
   },
+  async teacherDataByUserID(userID: number) {
+    return unwrapRequestData(
+      client.get<ApiBaseResponse<{ studentID: number; classGroupID: number }>>(
+        `/user/${userID}/teacher-data`
+      )
+    )
+  },
+
   logout() {
     return unwrapRequestData(client.get('/logout'))
   }

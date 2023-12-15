@@ -41,6 +41,23 @@ func (s *StudentService) GetAll() ([]*ports.StudentOutput, error) {
 	return studentsResponse, nil
 }
 
+func (s *StudentService) GetOneByID(studnetID int) (*ports.StudentOutput, error) {
+
+	student, err := s.studentRepo.GetOneByID(studnetID)
+	if err != nil {
+		return nil, errors.New("student.byId.internalError")
+	}
+
+	return &ports.StudentOutput{
+		ID:       student.ID,
+		UserID:   int(student.UserID),
+		Name:     student.User.Name,
+		Surname:  student.User.Surname,
+		FullName: student.User.GetFullName(),
+		Email:    student.User.Email,
+	}, nil
+}
+
 func (s *StudentService) SetClassGroup(payload ports.SetClassGroupPayload) error {
 	return s.studentRepo.SetClassGroup(uint(payload.StudentID), uint(payload.ClassGroupID))
 }

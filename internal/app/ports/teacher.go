@@ -6,6 +6,7 @@ type (
 	TeacherRepository interface {
 		GetAll() ([]domain.Teacher, error)
 		AddTeacher(teacher domain.Teacher) error
+		GetTeacherByUserID(id int) (domain.Teacher, error)
 		ExistsByEmail(email string) (bool, error)
 		// GetAllByClassGroup(classGroupID uint) ([]domain.Teacher, error)
 	}
@@ -20,6 +21,7 @@ type (
 	TeacherService interface {
 		GetAll() ([]TeacherBaseOutput, error)
 		AddTeacher(user UserCreatePayload) error
+		GetTeacherByUserID(id int) (*TeacherBaseOutput, error)
 		// GetAllByClassGroup(classGroupID uint)
 	}
 )

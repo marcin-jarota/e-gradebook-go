@@ -18,6 +18,8 @@ func AskForCleanDatabase(db *gorm.DB) {
 		db.Migrator().DropTable(&domain.ClassGroup{})
 		db.Migrator().DropTable(&domain.Mark{})
 		db.Migrator().DropTable(&domain.Subject{})
+		db.Migrator().DropTable(&domain.Lesson{})
+		db.Migrator().DropTable(&domain.Notification{})
 		db.Exec("DROP TABLE subject_teachers cascade")
 		db.Exec("DROP TABLE subject_teacher_classes cascade")
 	}

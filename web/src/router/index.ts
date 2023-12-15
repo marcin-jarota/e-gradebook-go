@@ -115,7 +115,7 @@ export const routes: Record<
     name: 'class-group-list',
     meta: {
       requiresAuth: true,
-      roles: [Role.Admin],
+      roles: [Role.Admin, Role.Teacher],
       sidebar: true,
       title: 'Klasy',
       icon: 'fa-school'

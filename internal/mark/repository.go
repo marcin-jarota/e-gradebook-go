@@ -17,8 +17,8 @@ func NewGormMarkRepository(db *gorm.DB) *gormMarkRepository {
 	}
 }
 
-func (r *gormMarkRepository) AddMark(mark *domain.Mark) error {
-	return r.db.Create(mark).Error
+func (r *gormMarkRepository) AddMark(mark domain.Mark) error {
+	return r.db.Create(&mark).Error
 }
 
 func (r *gormMarkRepository) GetByStudent(studentID int) ([]domain.Mark, error) {

@@ -7,6 +7,7 @@ type (
 		AddSubject(subject *domain.Subject) error
 		GetAll() ([]*domain.Subject, error)
 		GetOneByName(name string) (*domain.Subject, error)
+		GetOneByID(id int) (domain.Subject, error)
 		AddTeacher(teacherID int, subjectID int) error
 		Exists(name string) (bool, error)
 		DeleteByID(id uint) error
@@ -41,6 +42,7 @@ type (
 	SubjectService interface {
 		AddSubject(name string) error
 		AddTeacher(payload TeacherSubjectID) error
+		GetOneByID(id int) (*SubjectBaseOutput, error)
 		GetAll() ([]*SubjectOutput, error)
 		Delete(id uint) error
 	}

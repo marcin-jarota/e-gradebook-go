@@ -41,6 +41,8 @@ func (h *UserHandler) BindRouting(app *fiber.App, auth *middleware.AuthMiddlewar
 	r.Get("/destroy-session/:id", auth.IsAdmin(), h.DestroyUserSession)
 	r.Post("/create/:role", auth.IsAdmin(), h.PostAddUser)
 	r.Get("/:id/student-data", auth.UserIs("student"), h.GetStudentByUserID)
+	r.Get("/:id/teacher-data", auth.UserIs("teacher"), h.GetTeacherByUserID)
+
 	app.Post("/setup-password", h.SetupPassword)
 }
 
@@ -189,4 +191,20 @@ func (h *UserHandler) GetStudentByUserID(c *fiber.Ctx) error {
 	}
 
 	return h.JSON(c, student)
+}
+
+func (h *UserHandler) GetTeacherByUserID(c *fiber.Ctx) error {
+	id, err := h.ParseIntParam(c.Params("id", "0"))
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	teacher, err := h.teacherService.GetTeacherByUserID(id)
+
+	if err != nil {
+		h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, teacher)
 }

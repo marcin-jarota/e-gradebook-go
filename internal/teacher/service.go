@@ -32,6 +32,17 @@ func (s *TeacherService) GetAll() ([]ports.TeacherBaseOutput, error) {
 	return output, nil
 }
 
+func (s *TeacherService) GetTeacherByUserID(id int) (*ports.TeacherBaseOutput, error) {
+
+	t, err := s.repo.GetTeacherByUserID(id)
+
+	if err != nil {
+		return nil, errors.New("teacher.getbyuserID.internal")
+	}
+
+	return &ports.TeacherBaseOutput{ID: int(t.ID), Name: t.User.Name, Surname: t.User.Surname}, nil
+}
+
 func (s *TeacherService) AddTeacher(user ports.UserCreatePayload) error {
 
 	exists, err := s.repo.ExistsByEmail(user.Email)

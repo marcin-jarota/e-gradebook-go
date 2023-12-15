@@ -20,6 +20,18 @@ func (r *GormSubjectRepository) AddSubject(subject *domain.Subject) error {
 	return r.db.Create(subject).Error
 }
 
+func (r *GormSubjectRepository) GetOneByID(id int) (domain.Subject, error) {
+	var subject domain.Subject
+
+	err := r.db.Find(&subject, "id = ?", id).Error
+
+	if err != nil {
+		return subject, err
+	}
+
+	return subject, nil
+}
+
 func (r *GormSubjectRepository) GetAll() ([]*domain.Subject, error) {
 	var subjects []*domain.Subject
 

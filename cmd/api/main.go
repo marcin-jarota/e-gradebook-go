@@ -6,11 +6,13 @@ import (
 	"e-student/internal/adapters/storage"
 	"e-student/internal/adapters/transport"
 	core "e-student/internal/app"
+	"e-student/internal/app/ports"
 	"e-student/internal/auth"
 	classgroup "e-student/internal/class_group"
 	"e-student/internal/lesson"
 	"e-student/internal/mark"
 	"e-student/internal/middleware"
+	"e-student/internal/notification"
 	"e-student/internal/student"
 	"e-student/internal/subject"
 	"e-student/internal/teacher"
@@ -36,6 +38,7 @@ func main() {
 	markRepo := mark.NewGormMarkRepository(conn)
 	teacherRepo := teacher.NewTeacherRepository(conn)
 	lessonRepo := lesson.NewLessonRepository(conn)
+	notificationRepo := notification.NewGormNotificationRepository(conn)
 
 	// services
 	authService := auth.NewAuthService(userRepo, storage, cfg)
@@ -46,6 +49,12 @@ func main() {
 	userService := user.NewUserService(userRepo, storage)
 	classgroupService := classgroup.NewClassGroupService(classgroupRepo)
 	lessonService := lesson.NewLessonService(lessonRepo)
+	notificationService := notification.NewNotificationService(
+		map[string]ports.NotificationStrategy{
+			"in-app": notification.NewInAppNotification(notificationRepo),
+		},
+		notificationRepo,
+	)
 
 	// middlewares
 	authMiddleware := middleware.NewAuthMiddleware(authService)
@@ -56,7 +65,7 @@ func main() {
 	subjecthandler := subject.NewSubjectHandler(subjectService)
 	userHandler := user.NewUserHandler(userService, studentService, teacherService, authService, cfg)
 	classgroupHandler := classgroup.NewClassGroupHandler(classgroupService, studentService, markService, lessonService)
-	markHandler := mark.NewMarkHandler(markService)
+	markHandler := mark.NewMarkHandler(markService, studentService, subjectService, notificationService)
 	teacherHandler := teacher.NewTeacherHandler(teacherService)
 	lessonHandler := lesson.NewLessonHandler(lessonService)
 

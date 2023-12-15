@@ -4,7 +4,7 @@ import "e-student/internal/app/domain"
 
 type (
 	MarkRepository interface {
-		AddMark(mark *domain.Mark) error
+		AddMark(mark domain.Mark) error
 		GetByStudent(studentID int) ([]domain.Mark, error)
 		GetByClassGroup(classGroupID int) ([]domain.Mark, error)
 	}

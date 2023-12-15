@@ -53,6 +53,7 @@ import { useCurrentUser } from '@/composables/useCurrentUser'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { subjectResource } from '@/resources/subject'
 import DynamicSelector from '@/components/molecules/DynamicSelector.vue'
+import { userResource } from '@/resources/user'
 const { user } = useCurrentUser()
 const { successSnackbar } = useSnackbar()
 const props = defineProps<{ studentID: number }>()
@@ -115,13 +116,14 @@ function formatDateToMMDDYYYY(date: Date) {
 const save = async () => {
   try {
     if (subject.value?.id === undefined || markValue.value === undefined) return
+    const { data: teacher } = await userResource.teacherDataByUserID(user.id)
     await markResource.addMark({
       subjectID: subject.value?.id,
       comment: comment.value,
       date: markDate.value && formatDateToMMDDYYYY(new Date(markDate.value)),
       value: markValue.value,
       studentID: props.studentID,
-      teacherID: user.id
+      teacherID: teacher.id
     })
     successSnackbar('Ocena dodana', 3000)
     closeModal(modal.value)

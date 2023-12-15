@@ -24,7 +24,7 @@ func NewSubjectHandler(service ports.SubjectService) *SubjectHandler {
 func (h *SubjectHandler) BindRouting(app *fiber.App, auth *middleware.AuthMiddleware) {
 	r := app.Group("/subjects", auth.IsAuthenticatedByHeader())
 
-	r.Get("/", auth.IsAdmin(), h.GetAll)
+	r.Get("/", auth.UserIs("admin", "teacher"), h.GetAll)
 	r.Post("/", h.AddSubject)
 	r.Delete("/:id", auth.IsAdmin(), h.DeleteSubject)
 	r.Post("/:subjectID/teachers", auth.IsAdmin(), h.AssignTeacher)

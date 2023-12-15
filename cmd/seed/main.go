@@ -60,6 +60,11 @@ func main() {
 	if err := conn.AutoMigrate(&domain.Lesson{}); err != nil {
 		log.Panic("Could not migrate Lesson", err)
 	}
+
+	if err := conn.AutoMigrate(&domain.Notification{}); err != nil {
+		log.Panic("Could not migrate Lesson", err)
+	}
+
 	db.SeedAdminUser(conn)
 	db.SeedTeacherUser(conn)
 	db.SeedSubject(conn)

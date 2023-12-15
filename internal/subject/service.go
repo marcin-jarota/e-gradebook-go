@@ -41,6 +41,15 @@ func (s *SubjectService) GetAll() ([]*ports.SubjectOutput, error) {
 	return response, nil
 }
 
+func (s *SubjectService) GetOneByID(id int) (*ports.SubjectBaseOutput, error) {
+	subject, err := s.repo.GetOneByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ports.SubjectBaseOutput{ID: subject.ID, Name: subject.Name}, nil
+}
+
 func (s *SubjectService) Delete(id uint) error {
 	err := s.repo.DeleteByID(id)
 

@@ -35,6 +35,15 @@ func (r *GormTeacherRepository) ExistsByEmail(email string) (bool, error) {
 	return true, nil
 }
 
+func (r *GormTeacherRepository) GetTeacherByUserID(id int) (domain.Teacher, error) {
+	var teacher domain.Teacher
+
+	if err := r.db.Joins("User").First(&teacher, "user_id = ?", id).Error; err != nil {
+		return teacher, err
+	}
+
+	return teacher, nil
+}
 func (r *GormTeacherRepository) GetAll() ([]domain.Teacher, error) {
 	var teachers []domain.Teacher
 

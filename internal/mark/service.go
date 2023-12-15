@@ -60,7 +60,7 @@ func (s *markService) CreateMark(p ports.MarkCreatePayload) error {
 		date = parsed
 	}
 
-	return s.markRepository.AddMark(&domain.Mark{
+	return s.markRepository.AddMark(domain.Mark{
 		TeacherID: uint(p.TeacherID),
 		StudentID: uint(p.StudentID),
 		SubjectID: uint(p.SubjectID),

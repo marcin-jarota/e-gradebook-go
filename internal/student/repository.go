@@ -32,6 +32,16 @@ func (r *GormStudentRepository) GetAll() ([]domain.Student, error) {
 	return students, nil
 }
 
+func (r *GormStudentRepository) GetOneByID(studentID int) (domain.Student, error) {
+	var student domain.Student
+
+	if err := r.db.Preload("User").First(&student, "id = ?", studentID).Error; err != nil {
+		return student, err
+	}
+
+	return student, nil
+}
+
 func (r *GormStudentRepository) GetAllByClassGroup(classGroupID uint) ([]domain.Student, error) {
 	var students []domain.Student
 
