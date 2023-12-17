@@ -9,13 +9,15 @@ type (
 	}
 
 	Notification struct {
-		UserID  int    `json:"userID"`
-		Message string `json:"message"`
-		Read    bool   `json:"read"`
+		UserID    int    `json:"userID,omitempty"`
+		Message   string `json:"message"`
+		Read      bool   `json:"read"`
+		CreatedAt string `json:"createdAt,omitempty"`
 	}
 
 	NotificationService interface {
 		SendNotification(notificationType string, notification Notification) error
+		GetNotificationsForUser(userID int) ([]Notification, error)
 	}
 
 	NotificationStrategy interface {

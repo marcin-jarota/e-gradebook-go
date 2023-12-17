@@ -33,7 +33,7 @@ const daysOfWeek = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek']
 const activeLesson = ref<number | null>(null)
 
 const filteredLessons = (dayOfWeek: number) => {
-  return props.lessons.filter((lesson: Lesson) => lesson.dayOfWeek === dayOfWeek + 1)
+  return (props.lessons || []).filter((lesson: Lesson) => lesson.dayOfWeek === dayOfWeek + 1)
 }
 const getLessonStyle = (lesson: Lesson) => {
   const startHour = parseInt(lesson.start.split(':')[0])

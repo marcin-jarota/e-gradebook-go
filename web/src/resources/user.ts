@@ -39,6 +39,13 @@ export const userResource = {
       )
     )
   },
+  async getNotifications(userID: number) {
+    return unwrapRequestData(
+      client.get<
+        ApiBaseResponse<{ id: number; createdAt: string; message: string; read: boolean }[]>
+      >(`/notifications/${userID}`)
+    )
+  },
   async teacherDataByUserID(userID: number) {
     return unwrapRequestData(
       client.get<ApiBaseResponse<{ studentID: number; classGroupID: number }>>(

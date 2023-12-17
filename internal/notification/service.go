@@ -4,6 +4,7 @@ import (
 	"e-student/internal/app/ports"
 	"errors"
 	"fmt"
+	"time"
 )
 
 type NotificationService struct {
@@ -25,4 +26,23 @@ func (s *NotificationService) SendNotification(notificationType string, notifica
 	}
 
 	return stratery.SendNotification(notification)
+}
+
+func (s *NotificationService) GetNotificationsForUser(userID int) ([]ports.Notification, error) {
+	var output []ports.Notification
+	list, err := s.repo.GetNotificationsForUser(userID)
+
+	if err != nil {
+		return output, errors.New("notificaiton.errorFetch.internal")
+	}
+
+	for _, n := range list {
+		output = append(output, ports.Notification{
+			Read:      n.Read,
+			Message:   n.Message,
+			CreatedAt: n.CreatedAt.Format(time.RFC3339),
+		})
+	}
+
+	return output, nil
 }
