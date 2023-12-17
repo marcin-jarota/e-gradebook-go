@@ -60,13 +60,8 @@ func SeedAdminUser(db *gorm.DB) {
 }
 
 func SeedSchoolYear(db *gorm.DB) {
-	start := "2023-09-01"
-	end := "2024-06-25"
-	startDate, _ := time.Parse("2006-01-02", start)
-	endDate, _ := time.Parse("2006-01-02", end)
-
-	if err := db.Create(&domain.SchoolYear{Name: "2023/2024", Start: startDate, End: endDate, IsCurrent: true}).Error; err != nil {
-		panic(err)
+	if err := db.Exec(`SELECT open_new_school_year('2023/2024', '2023-09-01', '2024-06-30')`).Error; err != nil {
+		log.Fatal(err)
 	}
 
 	log.Println("[SEED]: Creating domain.SchoolYear added: ", "2023/2024")
