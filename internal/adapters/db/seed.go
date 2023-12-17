@@ -3,7 +3,11 @@ package db
 import (
 	"e-student/internal/app/domain"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -55,6 +59,19 @@ func SeedAdminUser(db *gorm.DB) {
 	}
 }
 
+func SeedSchoolYear(db *gorm.DB) {
+	start := "2023-09-01"
+	end := "2024-06-25"
+	startDate, _ := time.Parse("2006-01-02", start)
+	endDate, _ := time.Parse("2006-01-02", end)
+
+	if err := db.Create(&domain.SchoolYear{Name: "2023/2024", Start: startDate, End: endDate, IsCurrent: true}).Error; err != nil {
+		panic(err)
+	}
+
+	log.Println("[SEED]: Creating domain.SchoolYear added: ", "2023/2024")
+}
+
 func SeedStudentUser(db *gorm.DB) {
 	hash, err := student.GeneratePassword(student.Password)
 
@@ -64,7 +81,7 @@ func SeedStudentUser(db *gorm.DB) {
 
 	var group domain.ClassGroup
 
-	err = db.FirstOrCreate(&group, "name = ?", "1 mat-fiz").Error
+	err = db.FirstOrCreate(&group, domain.ClassGroup{Name: "1 mat-fiz"}).Error
 
 	if err != nil {
 		panic(err)
@@ -112,7 +129,7 @@ func SeedClassGroup(db *gorm.DB) {
 	name := "1 mat-fiz"
 	var classGroup domain.ClassGroup
 
-	if err := db.FirstOrCreate(&classGroup, "name = ?", name).Error; err != nil {
+	if err := db.FirstOrCreate(&classGroup, domain.ClassGroup{Name: name, EducationYear: 1}).Error; err != nil {
 		log.Panic(err)
 	}
 
@@ -137,11 +154,35 @@ func SeedSubject(db *gorm.DB) {
 	if err := db.First(&subject, "name = ?", name).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			db.Create(&subject)
-			log.Println("[SEED]: Creating subject")
+			log.Println("[SEED]: Creating domain.Subject: ", name)
 		} else {
 			panic(err)
 		}
 	}
+}
+
+func SeedLessons(db *gorm.DB) {
+	name := "1 mat-fiz"
+	var classGroup domain.ClassGroup
+
+	if err := db.FirstOrCreate(&classGroup, domain.ClassGroup{Name: name, EducationYear: 1}).Error; err != nil {
+		log.Fatal(err)
+	}
+
+	lesson := domain.Lesson{
+		TeacherID:    1,
+		SubjectID:    1,
+		ClassGroupID: classGroup.ID,
+		Start:        time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 8, 0, 0, 0, time.UTC),
+		End:          time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 8, 45, 0, 0, time.UTC),
+		DayOfWeek:    1,
+	}
+
+	if err := db.Create(&lesson).Error; err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("[SEED]: Created domain.Lesson: ", lesson)
 }
 
 func SeedMarks(db *gorm.DB) {
@@ -168,7 +209,10 @@ func SeedMarks(db *gorm.DB) {
 		Student: s,
 	}
 
-	db.Create(&mark)
+	if err := db.Create(&mark).Error; err != nil {
+		log.Panic(err)
+	}
+
 	log.Printf("[SEED]: Creating mark %f for subject %s", mark.Value, mark.Subject.Name)
 }
 
@@ -197,5 +241,40 @@ func SeedSubjectTeacherClassGroup(db *gorm.DB) {
 		log.Panicln(err)
 	}
 
-	log.Println("[SEDD]: SeedSubjectTeacherClassGroup successfully")
+	log.Println("[SEED]: SeedSubjectTeacherClassGroup successfully")
+}
+
+func LoadSQLFile(fileName string, db *gorm.DB) {
+	query, err := loadSQL(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := db.Exec(query).Error; err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("[SEED]: Loaded %s", fileName)
+}
+
+func loadSQL(fileName string) (string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	filePath := fmt.Sprintf("%s/db/%s", cwd, fileName)
+
+	sqlFile, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	sqlBytes, err := ioutil.ReadAll(sqlFile)
+	if err != nil {
+		return "", err
+	}
+	defer sqlFile.Close()
+
+	return string(sqlBytes), nil
 }

@@ -62,14 +62,23 @@ func main() {
 	}
 
 	if err := conn.AutoMigrate(&domain.Notification{}); err != nil {
-		log.Panic("Could not migrate Lesson", err)
+		log.Panic("Could not migrate Notificationj", err)
 	}
+
+	if err := conn.AutoMigrate(&domain.SchoolYear{}); err != nil {
+		log.Panic("Could not migrate SchoolYear", err)
+	}
+
+	db.LoadSQLFile("open_school_year.sql", conn)
+	db.LoadSQLFile("trigger_set_school_year.sql", conn)
 
 	db.SeedAdminUser(conn)
 	db.SeedTeacherUser(conn)
+	db.SeedSchoolYear(conn)
 	db.SeedSubject(conn)
 	db.SeedClassGroup(conn)
 	db.SeedStudentUser(conn)
 	db.SeedMarks(conn)
 	db.SeedSubjectTeacherClassGroup(conn)
+	db.SeedLessons(conn)
 }

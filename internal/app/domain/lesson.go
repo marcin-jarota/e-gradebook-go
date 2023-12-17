@@ -17,6 +17,8 @@ type Lesson struct {
 	Start        time.Time
 	End          time.Time
 	DayOfWeek    int
+	SchoolYear   SchoolYear
+	SchoolYearID *uint
 }
 
 func (l *Lesson) ValidateDayOfWeek(dayOfWeek int) bool {
