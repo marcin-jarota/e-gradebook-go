@@ -22,7 +22,7 @@ func NewNotificationService(strategies map[string]ports.NotificationStrategy, re
 func (s *NotificationService) SendNotification(notificationType string, notification ports.Notification) error {
 	stratery, ok := s.strategies[notificationType]
 	if !ok {
-		return errors.New(fmt.Sprintf("Missing implementation for required type: %s", notificationType))
+		return fmt.Errorf("Missing implementation for required type: %s", notificationType)
 	}
 
 	return stratery.SendNotification(notification)
