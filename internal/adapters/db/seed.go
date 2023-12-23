@@ -160,7 +160,7 @@ func SeedLessons(db *gorm.DB) {
 	name := "1 mat-fiz"
 	var classGroup domain.ClassGroup
 
-	if err := db.FirstOrCreate(&classGroup, domain.ClassGroup{Name: name, EducationYear: 1}).Error; err != nil {
+	if err := db.FirstOrCreate(&classGroup, domain.ClassGroup{Name: name}).Error; err != nil {
 		log.Fatal(err)
 	}
 

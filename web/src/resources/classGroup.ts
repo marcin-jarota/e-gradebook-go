@@ -51,6 +51,11 @@ export const classGroupResource = {
       client.get<ApiBaseResponse<ClassGroupOutput>>('/class-groups/' + classGroupID)
     )
   },
+  delete(classGroupID: number) {
+    return unwrapRequestData(
+      client.delete<ApiBaseResponse<{ ok: true }>>('/class-groups/' + classGroupID)
+    )
+  },
   getMarks(classGroupID: number) {
     return unwrapRequestData(
       client.get<ApiBaseResponse<{ value: number; id: number }[]>>(

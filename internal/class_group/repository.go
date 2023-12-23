@@ -98,11 +98,55 @@ func (r *GormClassGroupRepository) GetTeachersWithSubject(classGroupID int) ([]s
 func (r *GormClassGroupRepository) GetOneByID(classGroupID int) (domain.ClassGroup, error) {
 	var classGroup domain.ClassGroup
 
-	if err := r.db.Find(&classGroup, "id = ?", classGroupID).Error; err != nil {
+	if err := r.db.Preload("SchoolYears").Find(&classGroup, "id = ?", classGroupID).Error; err != nil {
 		return classGroup, err
 	}
 
 	return classGroup, nil
+}
+
+func (r *GormClassGroupRepository) Delete(id int) error {
+	var classGroup domain.ClassGroup
+	tx := r.db.Begin()
+
+	if err := tx.Preload("Students").Find(&classGroup, "id = ?", id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if len(classGroup.Students) != 0 {
+		for _, s := range classGroup.Students {
+			s.ClassGroupID = nil
+			err := tx.Save(&s).Error
+
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+		}
+	}
+
+	if err := tx.Delete(&domain.SubjectTeacherClass{}, "class_group_id = ?", id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Delete(&domain.Lesson{}, "class_group_id = ?", id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Model(&classGroup).Association("SchoolYears").Clear(); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Delete(&classGroup).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 func (r *GormClassGroupRepository) AddSubject(classGroupID int, subjectID int) error {

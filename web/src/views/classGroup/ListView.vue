@@ -32,19 +32,29 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Czy jesteś pewien?</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="deleteModal" aria-label="Close"></button>
+            <h5 class="modal-title">
+              Czy jesteś pewien?
+              <font-awesome-icon icon="fa-solid fa-triangle-exclamation" class="text-warning" />
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div v-if="errorCode" class="alert alert-danger">
               {{ $translate(errorCode) }}
             </div>
             <div v-else>
-              <span> Osoby przypisane do klasy zostaną z niej wypisane</span>
+              <span>Usunięcie klasy spowoduje:</span>
+              <ul class="mt-3">
+                <li>
+                  Wypisanie uczniów z klasy <span class="text-muted">(z zachowaniem ich ocen)</span>
+                </li>
+                <li>Usunięcie lekcji przypisanych do klasy</li>
+                <li>Usunięcie nauczycieli i przedmiotów z klasy</li>
+              </ul>
             </div>
           </div>
           <div class="modal-footer">
-            <!-- <VButton @click="deleteSubject" variant="danger" type="button">Usuń</VButton> -->
+            <VButton @click="deleteClass" variant="danger" type="button">Usuń</VButton>
           </div>
         </div>
       </div>
@@ -62,11 +72,11 @@ import { useSnackbar } from '@/composables/useSnackbar'
 import type { ClassGroupOutput } from '@/types/ClassGroup'
 import ClassGroupTable from '@/components/organisms/ClassGroupTable.vue'
 
-const { successSnackbar } = useSnackbar()
+const { successSnackbar, errorSnackbar } = useSnackbar()
 const classGroups = ref<ClassGroupOutput[]>([])
 const classGroupName = ref('')
 const errorCode = ref('')
-const subjectID = ref<number | null>(null)
+const classGroup = ref<number | null>(null)
 
 const modal = ref<HTMLDivElement | null>(null)
 const deleteModal = ref<HTMLDivElement | null>(null)
@@ -89,12 +99,29 @@ const closeModal = (e: HTMLDivElement | null) => {
 
 const openDeleteModal = (id: number) => {
   openModal(deleteModal.value)
-  subjectID.value = id
+  classGroup.value = id
 }
 
 const closeDeleteModal = () => {
   closeModal(deleteModal.value)
-  subjectID.value = null
+  classGroup.value = null
+}
+
+const deleteClass = async () => {
+  try {
+    if (classGroup.value === null) return
+    await classGroupResource.delete(classGroup.value)
+    closeDeleteModal()
+    successSnackbar('Klasa usunięta')
+  } catch (err) {
+    errorSnackbar('Nie udało usunąć się klasy')
+  }
+
+  try {
+    await getClassGroups()
+  } catch (err) {
+    errorSnackbar('Problem z odsiweżeniem listy')
+  }
 }
 
 const saveClassGroup = async (e: Event) => {

@@ -32,10 +32,17 @@ func (s *ClassGroupService) GetAll() ([]ports.ClassGroupOutput, error) {
 			ID:            int(c.ID),
 			Name:          c.Name,
 			StudentsCount: len(c.Students),
+			EducationYear: c.EducationYear,
 		})
 	}
 
 	return output, nil
+}
+
+func (s *ClassGroupService) Delete(id int) error {
+	err := s.repo.Delete(id)
+	log.Println(err)
+	return err
 }
 
 func (s *ClassGroupService) AddTeacherWithSubject(input ports.TeacherSubjectClassgroupID) error {
@@ -83,10 +90,21 @@ func (s *ClassGroupService) GetOneByID(classGroupID int) (ports.ClassGroupOutput
 		return output, errors.New("classGroup.error.fetchOne")
 	}
 
+	var schoolYears []ports.SchoolYearBasic
+
+	for _, schoolYear := range classGroup.SchoolYears {
+		schoolYears = append(schoolYears, ports.SchoolYearBasic{
+			ID:   int(schoolYear.ID),
+			Name: schoolYear.Name,
+		})
+	}
+
 	output = ports.ClassGroupOutput{
 		ID:            int(classGroup.ID),
 		Name:          classGroup.Name,
 		StudentsCount: len(classGroup.Students),
+		EducationYear: classGroup.EducationYear,
+		SchoolYears:   schoolYears,
 	}
 
 	return output, nil

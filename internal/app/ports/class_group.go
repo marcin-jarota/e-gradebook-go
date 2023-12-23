@@ -14,16 +14,16 @@ type (
 			Teacher domain.Teacher
 			Subject domain.Subject
 		}, error)
+		Delete(classGroupID int) error
 		AddTeacherWithSubject(classGroupID int, teacherID int, subjectID int) error
-		// AddStudent(studentID uint, classGroupID uint) error
-		// RemoveStudent(studentID uint, classGroupID uint) error
-		// DeleteByID(classGroupID uint) error
 	}
 
 	ClassGroupOutput struct {
-		ID            int    `json:"id"`
-		Name          string `json:"name"`
-		StudentsCount int    `json:"studentsCount"`
+		ID            int               `json:"id"`
+		Name          string            `json:"name"`
+		StudentsCount int               `json:"studentsCount"`
+		EducationYear int               `json:"educationYear,omitempty"`
+		SchoolYears   []SchoolYearBasic `json:"schoolYears,omitempty"`
 	}
 
 	AddClassGroupInput struct {
@@ -70,5 +70,6 @@ type (
 		GetTeachers(classGroupID int) ([]ClassGroupTeacher, error)
 		AddTeacherWithSubject(input TeacherSubjectClassgroupID) error
 		GetTeachersWithSubject(classGroupID int) ([]TeacherSubject, error)
+		Delete(id int) error
 	}
 )

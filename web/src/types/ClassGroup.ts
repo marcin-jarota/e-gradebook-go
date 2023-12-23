@@ -2,6 +2,7 @@ export type ClassGroupOutput = {
   id: number
   name: string
   studentsCount: number
+  educationYear?: number
 }
 
 export type TeacherSubject = {

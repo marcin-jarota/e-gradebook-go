@@ -4,6 +4,7 @@
       <tr>
         <th scope="col">ID</th>
         <th scope="col">Nazwa klasy</th>
+        <th>Rok edukacji</th>
         <th>Liczba uczniów</th>
         <th scope="col">Akcje</th>
       </tr>
@@ -19,8 +20,11 @@
           }}</RouterLink>
         </td>
         <td>{{ classgroup.studentsCount }}</td>
+        <td>{{ classgroup.educationYear }}</td>
         <td>
           <VButton variant="danger" type="button" @click="$emit('deleteClick', classgroup.id)">Usuń</VButton>
+          <RouterLink class="ms-3" :to="{ name: routes.classGroupLessons.name, params: { id: classgroup.id } }">Plan zajęć
+          </RouterLink>
         </td>
       </tr>
     </tbody>

@@ -4,6 +4,7 @@ import (
 	"e-student/internal/adapters/transport"
 	"e-student/internal/app/ports"
 	"e-student/internal/middleware"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -30,6 +31,7 @@ func (h *classGroupHandler) BindRouting(app fiber.Router, auth *middleware.AuthM
 	r.Get("/", h.GetAll)
 	r.Post("/", auth.IsAdmin(), h.Create)
 	r.Get("/:classGroupID", auth.UserIs("admin", "teacher"), h.Details)
+	r.Delete("/:classGroupID", auth.UserIs("admin"), h.Delete)
 	r.Get("/:classGroupID/students", auth.UserIs("admin", "teacher"), h.ListStudents)
 	r.Get("/:classGroupID/marks", auth.UserIs("admin", "teacher"), h.ListMarks)
 	r.Get("/:classGroupID/teachers", auth.UserIs("admin", "teacher"), h.ListTeachers)
@@ -54,6 +56,23 @@ func (h *classGroupHandler) Details(c *fiber.Ctx) error {
 	}
 
 	return h.JSON(c, res)
+}
+
+func (h *classGroupHandler) Delete(c *fiber.Ctx) error {
+	classGroupID, err := h.ParseIntParam(c.Params("classGroupID", "0"))
+
+	if err != nil {
+		return h.JSONError(c, err, fiber.StatusBadRequest)
+	}
+
+	err = h.classGroupService.Delete(classGroupID)
+
+	if err != nil {
+		log.Println((err))
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, fiber.Map{"ok": true})
 }
 
 func (h *classGroupHandler) ListLessons(c *fiber.Ctx) error {
