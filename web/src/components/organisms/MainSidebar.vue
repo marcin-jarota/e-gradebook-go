@@ -130,6 +130,7 @@ const unreadNotifications = computed(() => notifications.value.filter((n) => !n.
   position: sticky;
   top: 0;
   left: 0;
+  z-index: 1000;
 
   &__user-initials {
     display: flex;
