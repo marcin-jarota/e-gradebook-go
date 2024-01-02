@@ -118,7 +118,7 @@ export const routes: Record<
       roles: [Role.Admin, Role.Teacher],
       sidebar: true,
       title: 'Klasy',
-      icon: 'fa-school'
+      icon: 'fa-chalkboard-user'
     },
     component: () => import('@/views/classGroup/ListView.vue')
   },
