@@ -13,6 +13,7 @@ import (
 	"e-student/internal/mark"
 	"e-student/internal/middleware"
 	"e-student/internal/notification"
+	schoolyear "e-student/internal/school_year"
 	"e-student/internal/student"
 	"e-student/internal/subject"
 	"e-student/internal/teacher"
@@ -39,6 +40,7 @@ func main() {
 	teacherRepo := teacher.NewTeacherRepository(conn)
 	lessonRepo := lesson.NewLessonRepository(conn)
 	notificationRepo := notification.NewGormNotificationRepository(conn)
+	schoolYearRepo := schoolyear.NewGormSchoolYearRepository(conn)
 
 	// services
 	authService := auth.NewAuthService(userRepo, storage, cfg)
@@ -55,6 +57,7 @@ func main() {
 		},
 		notificationRepo,
 	)
+	schoolYearService := schoolyear.NewSchoolYearService(schoolYearRepo)
 
 	// middlewares
 	authMiddleware := middleware.NewAuthMiddleware(authService)
@@ -69,6 +72,7 @@ func main() {
 	teacherHandler := teacher.NewTeacherHandler(teacherService)
 	lessonHandler := lesson.NewLessonHandler(lessonService)
 	notificationHandler := notification.NewNotificationHandler(notificationService)
+	schoolYearHandler := schoolyear.NewSchoolYearHandler(schoolYearService)
 
 	// bind routing
 	studentHandler.BindRouting(server.App, authMiddleware)
@@ -80,6 +84,7 @@ func main() {
 	teacherHandler.BindRouting(server.App, authMiddleware)
 	lessonHandler.BindRouting(server.App, authMiddleware)
 	notificationHandler.BindRouting(server.App, authMiddleware)
+	schoolYearHandler.BindRouting(server.App, authMiddleware)
 
 	server.Listen()
 }

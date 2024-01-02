@@ -71,6 +71,7 @@ func main() {
 
 	db.LoadSQLFile("open_school_year.sql", conn)
 	db.LoadSQLFile("trigger_set_school_year.sql", conn)
+	db.LoadSQLFile("add_classgroup_to_current_schoolyear.sql", conn)
 
 	db.SeedAdminUser(conn)
 	db.SeedTeacherUser(conn)

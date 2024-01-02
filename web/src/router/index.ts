@@ -142,6 +142,18 @@ export const routes: Record<
     },
     component: () => import('@/views/classGroup/LessonsView.vue')
   },
+  schoolYears: {
+    path: '/school-years',
+    name: 'school-years',
+    meta: {
+      title: 'Rok szkolny',
+      roles: [Role.Admin, Role.Teacher],
+      requiresAuth: true,
+      sidebar: true,
+      icon: 'fa-award'
+    },
+    component: () => import('@/views/schoolYear/ListView.vue')
+  },
 
   accessDenied: {
     path: '/denied',

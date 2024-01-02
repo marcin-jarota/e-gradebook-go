@@ -13,7 +13,8 @@ import {
   faTrash,
   faCalendar,
   faBell,
-  faTriangleExclamation
+  faTriangleExclamation,
+  faAward
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import type { App } from 'vue'
@@ -34,7 +35,8 @@ export const setupIcons = (app: App<Element>) => {
     faTrash,
     faCalendar,
     faBell,
-    faTriangleExclamation
+    faTriangleExclamation,
+    faAward
   )
   app.component('font-awesome-icon', FontAwesomeIcon)
 }
