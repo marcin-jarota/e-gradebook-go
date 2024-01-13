@@ -1,0 +1,537 @@
+@startuml
+
+namespace ports.classgroup {
+
+    class ClassGroupOutput {
+        +ID: int
+        +Name: string
+        +StudentsCount: int
+        +EducationYear: int
+        +SchoolYears: []SchoolYearBasic
+    }
+
+    class AddClassGroupInput {
+        +Name: string
+    }
+
+    class AddSubjectToClassGroupPayload {
+        +SubjectID: int
+        +ClassGroupID: int
+    }
+
+    class TeacherClassGroup {
+        +TeacherID: int
+        +ClassGroupID: int
+    }
+
+    class ClassGroupTeacher {
+        +ID: int
+        +Name: string
+        +Surname: string
+        +Email: string
+    }
+
+    class TeacherSubjectClassgroupID {
+        +ClassGroupID: int
+        +TeacherID: int
+        +SubjectID: int
+    }
+
+    class TeacherSubject {
+        +Teacher: TeacherBaseOutput
+        +Subject: SubjectBaseOutput
+    }
+
+    interface ClassGroupRepository {
+        +GetAll() : []domain.ClassGroup, error
+        +GetOneByID(id: int) : domain.ClassGroup, error
+        +AddClassGroup(classGroup: *domain.ClassGroup) : error
+        +AddSubject(classGroupID: int, subjectID: int) : error
+        +AddTeacher(classGroupID: int, teacherID: int) : error
+        +GetTeachers(classGroupID: int) : []domain.Teacher, error
+        +GetTeachersWithSubject(classGroupID: int) : []struct {Teacher Subject}, error
+        +Delete(classGroupID: int) : error
+        +AddTeacherWithSubject(classGroupID: int, teacherID: int, subjectID: int) : error
+    }
+
+    interface ClassGroupService {
+        -repo: ClassGroupRepository
+        +GetAll() : []ClassGroupOutput, error
+        +GetOneByID(id: int) : ClassGroupOutput, error
+        +AddClassGroup(input: AddClassGroupInput) : error
+        +AddSubject(input: AddSubjectToClassGroupPayload) : error
+        +AddTeacher(input: TeacherClassGroup) : error
+        +GetTeachers(classGroupID: int) : []ClassGroupTeacher, error
+        +AddTeacherWithSubject(input: TeacherSubjectClassgroupID) : error
+        +GetTeachersWithSubject(classGroupID: int) : []TeacherSubject, error
+        +Delete(id: int) : error
+    }
+
+    ClassGroupService ..> ClassGroupRepository : uses
+    ClassGroupService ..> ClassGroupOutput : returns
+    ClassGroupService ..> AddClassGroupInput : uses
+    ClassGroupService ..> TeacherClassGroup : uses
+    ClassGroupService ..> ClassGroupTeacher : returns
+    ClassGroupService ..> TeacherSubjectClassgroupID : uses
+    ClassGroupService ..> TeacherSubject : returns
+    ClassGroupService ..> AddSubjectToClassGroupPayload : uses
+
+}
+
+namespace ports.lesson {
+
+    class CreateLessonPayload {
+        +TeacherID: int
+        +SubjectID: int
+        +ClassGroupID: int
+        +StartTime: string
+        +EndTime: string
+        +DayOfWeek: int
+    }
+
+    class ClassGroupLesson {
+        +ID: int
+        +Subject: string
+        +Teacher: string
+        +Start: string
+        +End: string
+        +DayOfWeek: int
+    }
+
+    interface LessonRepository {
+        +Create(lesson: *domain.Lesson) : error
+        +GetByClassGroup(classGroupID: int) : []*domain.Lesson, error
+    }
+
+    interface LessonService {
+        -repo: LessonRepository
+        +Create(payload: *CreateLessonPayload) : error
+        +GetByClassGroup(classGroupID: int) : []*ClassGroupLesson, error
+    }
+
+    LessonService ..> LessonRepository : uses
+    LessonService ..> ClassGroupLesson : returns
+    LessonService ..> CreateLessonPayload : uses
+
+}
+
+namespace ports.mark {
+
+    class MarkOutputSubject {
+        +ID: int
+        +Name: string
+    }
+
+    class MarkOutputTeacher {
+        +ID: int
+        +Name: string
+        +Surname: string
+    }
+
+    class MarkOutput {
+        +Comment: string
+        +Value: float32
+        +Subject: MarkOutputSubject
+        +Teacher: MarkOutputTeacher
+    }
+
+    class SimpleMark {
+        +ID: int
+        +Value: float32
+    }
+
+    class MarkCreatePayload {
+        +SubjectID: int
+        +Value: float32
+        +StudentID: int
+        +TeacherID: int
+        +Comment: string
+        +Date: string
+    }
+
+    interface MarkRepository {
+        +AddMark(mark: domain.Mark) : error
+        +GetByStudent(studentID: int) : []domain.Mark, error
+        +GetByClassGroup(classGroupID: int) : []domain.Mark, error
+    }
+
+    interface MarkService {
+        -repo: MarkRepository
+        +CalculateAverage(marks: []domain.Mark) : float32
+        +GetByStudent(studentID: int) : []MarkOutput, error
+        +GetByClassGroup(classGroupID: int) : []SimpleMark, error
+        +CreateMark(payload: MarkCreatePayload) : error
+    }
+
+    MarkService ..> MarkRepository : uses
+    MarkService ..> MarkOutput : returns
+    MarkService ..> SimpleMark : returns
+    MarkService ..> MarkCreatePayload : uses
+
+}
+
+namespace ports.notification {
+    class Notification {
+        +UserID: int
+        +Message: string
+        +Read: bool
+        +CreatedAt: string
+    }
+
+    interface NotificationRepository {
+        +CreateNotification(notification: domain.Notification) : error
+        +GetNotificationsForUser(userID: int) : []domain.Notification, error
+    }
+
+    interface NotificationService {
+        -repo: NotificationRepository
+        -strategies: []NotificationStrategy
+        +SendNotification(notificationType: string, notification: Notification) : error
+        +GetNotificationsForUser(userID: int) : []Notification, error
+    }
+
+    interface NotificationStrategy {
+        +SendNotification(n: Notification) : error
+    }
+
+    NotificationService ..> NotificationRepository : uses
+    NotificationService ..> NotificationStrategy : uses
+    NotificationStrategy ..> Notification : operates on
+
+}
+
+namespace ports.teacher {
+
+    class TeacherBaseOutput {
+        +ID: int
+        +Name: string
+        +Surname: string
+        +Email: string
+    }
+
+    interface TeacherRepository {
+        +GetAll() : []domain.Teacher, error
+        +AddTeacher(teacher: domain.Teacher) : error
+        +GetTeacherByUserID(id: int) : domain.Teacher, error
+        +ExistsByEmail(email: string) : bool, error
+        +GetAllByClassGroup(classGroupID: uint) : []domain.Teacher, error
+    }
+
+    interface TeacherService {
+        -repo: TeacherRepository
+        +GetAll() : []TeacherBaseOutput, error
+        +AddTeacher(user: UserCreatePayload) : error
+        +GetTeacherByUserID(id: int) : TeacherBaseOutput, error
+        +GetAllByClassGroup(classGroupID: uint) : (commented)
+    }
+
+    TeacherService ..> TeacherBaseOutput : uses
+    TeacherService ..> TeacherRepository : uses
+}
+
+namespace ports.subject {
+    class SubjectTeacher {
+        +ID: int
+        +Name: string
+        +Surname: string
+    }
+
+    class SubjectOutput {
+        +ID: uint
+        +Name: string
+        +Teachers: []SubjectTeacher
+    }
+
+    class SubjectBaseOutput {
+        +ID: uint
+        +Name: string
+    }
+
+    class TeacherSubjectID {
+        +TeacherID: int
+        +SubjectID: int
+    }
+
+    interface SubjectRepository {
+        +AddSubject(subject: *domain.Subject) : error
+        +GetAll() : []*domain.Subject, error
+        +GetOneByName(name: string) : *domain.Subject, error
+        +GetOneByID(id: int) : domain.Subject, error
+        +AddTeacher(teacherID: int, subjectID: int) : error
+        +Exists(name: string) : bool, error
+        +DeleteByID(id: uint) : error
+    }
+
+    interface SubjectService {
+        -repo: SubjectRepository
+        +AddSubject(name: string) : error
+        +AddTeacher(payload: TeacherSubjectID) : error
+        +GetOneByID(id: int) : *SubjectBaseOutput, error
+        +GetAll() : []*SubjectOutput, error
+        +Delete(id: uint) : error
+    }
+
+    SubjectOutput --o SubjectTeacher : contains
+    SubjectService ..> TeacherSubjectID : uses
+    SubjectService ..> SubjectBaseOutput : uses
+    SubjectService ..> SubjectRepository : uses
+    SubjectService ..> SubjectOutput : returns
+}
+
+namespace ports.student {
+
+    class StudentOutput {
+        +ID: uint
+        +UserID: int
+        +Name: string
+        +Surname: string
+        +FullName: string
+        +Email: string
+        +Marks: []domain.Mark
+    }
+
+    class StudentMarkOutput {
+        +ID: uint
+        +Value: float32
+        +Subject: domain.Subject
+    }
+
+    class StudentByClassGroup {
+        +ID: int
+        +Name: string
+        +Surname: string
+        +Email: string
+        +AvgMark: float32
+    }
+
+    class SetClassGroupPayload {
+        +StudentID: int
+        +ClassGroupID: int
+    }
+
+    class StudentByUserID {
+        +StudentID: int
+        +ClassGroupID: int
+    }
+
+    interface StudentRepository {
+        +GetAll() : []domain.Student, error
+        +GetOneByID(studentID: int) : domain.Student, error
+        +GetAllByClassGroup(classGroupID: uint) : []domain.Student, error
+        +AddStudent(student: *domain.Student) : error
+        +ExistsByEmail(email: string) : bool, error
+        +SetClassGroup(studentID: uint, classGroupID: uint) : error
+        +RemoveClassGroup(studentID: uint) : error
+        +GetByUserID(userID: int) : domain.Student, error
+    }
+
+    interface StudentService {
+        -repo: StudentRepository
+        +GetAll() : []*StudentOutput, error
+        +GetAllByClassGroup(classGroupID: int) : []StudentByClassGroup, error
+        +GetOneByID(studentID: int) : *StudentOutput, error
+        '+GetMarks(studentID: int) : []*StudentMarkOutput, error' (commented)
+        +AddStudent(user: UserCreatePayload) : error
+        +SetClassGroup(payload: SetClassGroupPayload) : error
+        +GetByUserID(userID: int) : StudentByUserID, error
+    }
+
+    StudentService ..> StudentRepository : uses
+    StudentOutput "1" -- "*" StudentMarkOutput : contains
+    StudentOutput "1" -- "0..1" StudentByClassGroup : maps to
+
+}
+
+namespace ports.schoolyear {
+
+    class SchoolYearBasic {
+        +ID: int
+        +Name: string
+    }
+
+    class SchoolYearDetailed {
+        +SchoolYearBasic
+        +ClassGroupsCount: int
+        +Start: time.Time
+        +End: time.Time
+        +IsCurrent: bool
+    }
+
+    interface SchoolYearRepository {
+        +GetAll() : []domain.SchoolYear, error
+    }
+
+    interface SchoolYearService {
+        -repo: SchoolYearRepository
+        +GetAll() : []*SchoolYearDetailed, error
+    }
+
+    SchoolYearService ..> SchoolYearRepository : uses
+    SchoolYearService ..> SchoolYearDetailed : returns
+    SchoolYearService ..> SchoolYearBasic : uses
+}
+
+namespace ports.user {
+    class UserCreatePayload {
+        +Name: string
+        +Surname: string
+        +Email: string
+    }
+
+    class UserOutput {
+        +ID: uint
+        +Name: string
+        +Surname: string
+        +Email: string
+        +Role: domain.UserRole
+        +IsActive: bool
+        +SessionActive: bool
+    }
+
+    interface UserRepository {
+        +GetAll() : []*domain.User, error
+        +GetOne(id: int) : *domain.User, error
+        +AddUser(user: *domain.User) : error
+        +GetOneByEmail(email: string) : *domain.User, error
+        +ExistsByEmail(email: string) : bool, error
+        +Activate(userID: uint) : error
+        +Deactivate(userID: uint) : error
+        +SetPassword(email: string, password: string) : error
+        '// IsActive(user: *domain.User) : bool' (commented)
+    }
+
+    interface UserService {
+        -repo: UserRepositor
+        +GetAll() : []*UserOutput, error
+        +AddAdmin(user: UserCreatePayload) : error
+        +Activate(userID: uint) : error
+        +Deactivate(userID: uint) : error
+        +DestroySession(userID: uint) : error
+        +SetupPassword(email: string, password: string, passwordConfirm: string) : error
+    }
+
+    UserService ..> UserRepository : uses
+    UserService ..> UserCreatePayload : uses
+    UserService ..> UserOutput : returns
+
+}
+
+class ClassGroup {
+    -gorm.Model
+    +Name: string
+    +EducationYear: int
+    +SchoolYears: []SchoolYear
+    +Students: []Student
+}
+
+class SchoolYear {
+    -gorm.Model
+    +Name: string
+    +IsCurrent: bool
+    +Start: time.Time
+    +End: time.Time
+    +ClassGroups: []ClassGroup
+}
+
+class Student {
+    -gorm.Model
+    +UserID: uint
+    +User: User
+    +Marks: []Mark
+    +ClassGroupID: *uint
+    +ClassGroup: ClassGroup
+}
+
+class Mark {
+    -gorm.Model
+    +Value: float32
+    +Subject: Subject
+    +StudentID: uint
+    +Comment: string
+    +Date: *time.Time
+    +SubjectID: uint
+    +Student: Student
+    +Teacher: Teacher
+    +TeacherID: uint
+    +SchoolYear: SchoolYear
+    +SchoolYearID: *uint
+}
+
+class Subject {
+    -gorm.Model
+    +Name: string
+    +Marks: []Mark
+    +Teachers: []Teacher
+}
+
+class Teacher {
+    -gorm.Model
+    +User: User
+    +UserID: uint
+    +Marks: []Mark
+    +Subjects: []Subject
+}
+
+class User {
+    -gorm.Model
+    +Name: string
+    +Surname: string
+    +Email: string
+    +Role: UserRole
+    +Password: string
+    +Active: bool
+    +GetFullName() : string
+    +GeneratePassword(plainText: string) : string, error
+    +PasswordMatches(plainText: string) : error
+    +IsAdmin() : bool
+    +IsStudent() : bool
+    +Is(roles: ...UserRole) : bool
+}
+
+enum UserRole {
+    AdminRole
+    StudentRole
+    TeacherRole
+}
+
+class Lesson {
+    -gorm.Model
+    +Subject: Subject
+    +SubjectID: uint
+    +Teacher: Teacher
+    +TeacherID: uint
+    +ClassGroup: ClassGroup
+    +ClassGroupID: uint
+    +Start: time.Time
+    +End: time.Time
+    +DayOfWeek: int
+    +SchoolYear: SchoolYear
+    +SchoolYearID: *uint
+    +ValidateDayOfWeek(dayOfWeek: int) : bool
+}
+
+class Notification {
+    -gorm.Model
+    +UserID: uint
+    +User: User
+    +Message: string
+    +Read: bool
+}
+
+ClassGroup "1" -- "*" Student
+SchoolYear "1" -- "*" ClassGroup
+SchoolYear "1" -- "*" Mark
+SchoolYear "1" -- "*" Lesson
+Student "1" -- "1" User
+Student "1" -- "*" Mark
+Subject "1" -- "*" Mark
+Teacher "1" -- "1" User
+Teacher "1" -- "*" Mark
+Teacher "1" -- "*" Subject
+User "1" -- "*" Notification
+User --|> UserRole
+Lesson "1" -- "1" Subject
+Lesson "1" -- "1" Teacher
+Lesson "1" -- "1" ClassGroup
+
+@enduml
