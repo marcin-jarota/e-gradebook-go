@@ -23,7 +23,7 @@ func (r *GormLessonRepository) Create(lesson *domain.Lesson) error {
 func (r *GormLessonRepository) GetByClassGroup(classGroupID int) ([]*domain.Lesson, error) {
 	var lessons []*domain.Lesson
 
-	if err := r.db.Preload("Teacher.User").Preload("Subject").Find(&lessons).Where("class_group_id = ?", classGroupID).Error; err != nil {
+	if err := r.db.Preload("Teacher.User").Preload("Subject").Find(&lessons, "class_group_id = ?", classGroupID).Error; err != nil {
 		return nil, err
 	}
 
