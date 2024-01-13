@@ -20,7 +20,7 @@
                 <option value="2">Wtorek</option>
                 <option value="3">Środa</option>
                 <option value="4">Cwartek</option>
-                <option value="4">Piątek</option>
+                <option value="5">Piątek</option>
               </select>
             </div>
 
