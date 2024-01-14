@@ -1,0 +1,36 @@
+namespace ports.lesson {
+
+    class CreateLessonPayload {
+        +TeacherID: int
+        +SubjectID: int
+        +ClassGroupID: int
+        +StartTime: string
+        +EndTime: string
+        +DayOfWeek: int
+    }
+
+    class ClassGroupLesson {
+        +ID: int
+        +Subject: string
+        +Teacher: string
+        +Start: string
+        +End: string
+        +DayOfWeek: int
+    }
+
+    interface LessonRepository {
+        +Create(lesson: *domain.Lesson) : error
+        +GetByClassGroup(classGroupID: int) : []*domain.Lesson, error
+    }
+
+    interface LessonService {
+        -repo: LessonRepository
+        +Create(payload: *CreateLessonPayload) : error
+        +GetByClassGroup(classGroupID: int) : []*ClassGroupLesson, error
+    }
+
+    LessonService ..> LessonRepository : uses
+    LessonService ..> ClassGroupLesson : returns
+    LessonService ..> CreateLessonPayload : uses
+
+}

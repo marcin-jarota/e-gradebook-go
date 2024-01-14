@@ -1,0 +1,25 @@
+@startuml
+left to right direction
+actor "Administrator" as Admin
+
+package "Zarządzania Klasami" {
+    usecase "Tworzenie Klasy" as UC1
+    usecase "Przypisanie Nauczycieli do Klasy" as UC2
+    usecase "Przypisanie Przedmiotów do Klasy z Przypisanym Nauczycielem" as UC3
+    usecase "Przeglądanie Klas" as UC4
+    usecase "Przeglądanie Uczniów w Klas" as UC5
+    usecase "Aktualizacja Informacji o Klasie" as UC6
+    usecase "Stworzenie Lekcji dla Klasy" as UC7
+    usecase "Usuwanie Klasy" as UC8
+}
+
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+Admin --> UC6
+Admin --> UC7
+Admin --> UC8
+
+@enduml

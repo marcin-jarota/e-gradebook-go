@@ -1,0 +1,44 @@
+namespace ports.user {
+    class UserCreatePayload {
+        +Name: string
+        +Surname: string
+        +Email: string
+    }
+
+    class UserOutput {
+        +ID: uint
+        +Name: string
+        +Surname: string
+        +Email: string
+        +Role: domain.UserRole
+        +IsActive: bool
+        +SessionActive: bool
+    }
+
+    interface UserRepository {
+        +GetAll() : []*domain.User, error
+        +GetOne(id: int) : *domain.User, error
+        +AddUser(user: *domain.User) : error
+        +GetOneByEmail(email: string) : *domain.User, error
+        +ExistsByEmail(email: string) : bool, error
+        +Activate(userID: uint) : error
+        +Deactivate(userID: uint) : error
+        +SetPassword(email: string, password: string) : error
+        '// IsActive(user: *domain.User) : bool' (commented)
+    }
+
+    interface UserService {
+        -repo: UserRepositor
+        +GetAll() : []*UserOutput, error
+        +AddAdmin(user: UserCreatePayload) : error
+        +Activate(userID: uint) : error
+        +Deactivate(userID: uint) : error
+        +DestroySession(userID: uint) : error
+        +SetupPassword(email: string, password: string, passwordConfirm: string) : error
+    }
+
+    UserService ..> UserRepository : uses
+    UserService ..> UserCreatePayload : uses
+    UserService ..> UserOutput : returns
+
+}

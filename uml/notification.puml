@@ -1,0 +1,32 @@
+@startuml
+namespace ports.notification {
+    class Notification {
+        +UserID: int
+        +Message: string
+        +Read: bool
+        +CreatedAt: string
+    }
+
+    interface NotificationRepository {
+        +CreateNotification(notification: domain.Notification) : error
+        +GetNotificationsForUser(userID: int) : []domain.Notification, error
+    }
+
+    interface NotificationService {
+        -repo: NotificationRepository
+        -strategies: []NotificationStrategy
+        +SendNotification(notificationType: string, notification: Notification) : error
+        +GetNotificationsForUser(userID: int) : []Notification, error
+    }
+
+    interface NotificationStrategy {
+        +SendNotification(n: Notification) : error
+    }
+
+    NotificationService ..> NotificationRepository : uses
+    NotificationService ..> NotificationStrategy : uses
+    NotificationStrategy ..> Notification : operates on
+
+}
+
+@enduml

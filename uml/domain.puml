@@ -1,0 +1,118 @@
+
+class ClassGroup {
+    -gorm.Model
+    +Name: string
+    +EducationYear: int
+    +SchoolYears: []SchoolYear
+    +Students: []Student
+}
+
+class SchoolYear {
+    -gorm.Model
+    +Name: string
+    +IsCurrent: bool
+    +Start: time.Time
+    +End: time.Time
+    +ClassGroups: []ClassGroup
+}
+
+class Student {
+    -gorm.Model
+    +UserID: uint
+    +User: User
+    +Marks: []Mark
+    +ClassGroupID: *uint
+    +ClassGroup: ClassGroup
+}
+
+class Mark {
+    -gorm.Model
+    +Value: float32
+    +Subject: Subject
+    +StudentID: uint
+    +Comment: string
+    +Date: *time.Time
+    +SubjectID: uint
+    +Student: Student
+    +Teacher: Teacher
+    +TeacherID: uint
+    +SchoolYear: SchoolYear
+    +SchoolYearID: *uint
+}
+
+class Subject {
+    -gorm.Model
+    +Name: string
+    +Marks: []Mark
+    +Teachers: []Teacher
+}
+
+class Teacher {
+    -gorm.Model
+    +User: User
+    +UserID: uint
+    +Marks: []Mark
+    +Subjects: []Subject
+}
+
+class User {
+    -gorm.Model
+    +Name: string
+    +Surname: string
+    +Email: string
+    +Role: UserRole
+    +Password: string
+    +Active: bool
+    +GetFullName() : string
+    +GeneratePassword(plainText: string) : string, error
+    +PasswordMatches(plainText: string) : error
+    +IsAdmin() : bool
+    +IsStudent() : bool
+    +Is(roles: ...UserRole) : bool
+}
+
+enum UserRole {
+    AdminRole
+    StudentRole
+    TeacherRole
+}
+
+class Lesson {
+    -gorm.Model
+    +Subject: Subject
+    +SubjectID: uint
+    +Teacher: Teacher
+    +TeacherID: uint
+    +ClassGroup: ClassGroup
+    +ClassGroupID: uint
+    +Start: time.Time
+    +End: time.Time
+    +DayOfWeek: int
+    +SchoolYear: SchoolYear
+    +SchoolYearID: *uint
+    +ValidateDayOfWeek(dayOfWeek: int) : bool
+}
+
+class Notification {
+    -gorm.Model
+    +UserID: uint
+    +User: User
+    +Message: string
+    +Read: bool
+}
+
+ClassGroup "1" -- "*" Student
+SchoolYear "1" -- "*" ClassGroup
+SchoolYear "1" -- "*" Mark
+SchoolYear "1" -- "*" Lesson
+Student "1" -- "1" User
+Student "1" -- "*" Mark
+Subject "1" -- "*" Mark
+Teacher "1" -- "1" User
+Teacher "1" -- "*" Mark
+Teacher "1" -- "*" Subject
+User "1" -- "*" Notification
+User --|> UserRole
+Lesson "1" -- "1" Subject
+Lesson "1" -- "1" Teacher
+Lesson "1" -- "1" ClassGroup

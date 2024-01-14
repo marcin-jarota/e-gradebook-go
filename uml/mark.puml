@@ -1,0 +1,54 @@
+namespace ports.mark {
+
+    class MarkOutputSubject {
+        +ID: int
+        +Name: string
+    }
+
+    class MarkOutputTeacher {
+        +ID: int
+        +Name: string
+        +Surname: string
+    }
+
+    class MarkOutput {
+        +Comment: string
+        +Value: float32
+        +Subject: MarkOutputSubject
+        +Teacher: MarkOutputTeacher
+    }
+
+    class SimpleMark {
+        +ID: int
+        +Value: float32
+    }
+
+    class MarkCreatePayload {
+        +SubjectID: int
+        +Value: float32
+        +StudentID: int
+        +TeacherID: int
+        +Comment: string
+        +Date: string
+    }
+
+    interface MarkRepository {
+        +AddMark(mark: domain.Mark) : error
+        +GetByStudent(studentID: int) : []domain.Mark, error
+        +GetByClassGroup(classGroupID: int) : []domain.Mark, error
+    }
+
+    interface MarkService {
+        -repo: MarkRepository
+        +CalculateAverage(marks: []domain.Mark) : float32
+        +GetByStudent(studentID: int) : []MarkOutput, error
+        +GetByClassGroup(classGroupID: int) : []SimpleMark, error
+        +CreateMark(payload: MarkCreatePayload) : error
+    }
+
+    MarkService ..> MarkRepository : uses
+    MarkService ..> MarkOutput : returns
+    MarkService ..> SimpleMark : returns
+    MarkService ..> MarkCreatePayload : uses
+
+}

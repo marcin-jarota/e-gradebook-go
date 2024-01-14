@@ -1,0 +1,15 @@
+@startuml
+left to right direction
+actor "Nauczyciel" as Teacher
+
+package "Zarządzania Ocenami uczniów" {
+    usecase "Dodanie oceny dla ucznia" as UC4
+    usecase "Dodanie oceny z przedmiotu który uczę" as UC5
+    usecase "Przeglądanie ocen" as UC6
+}
+
+Teacher --> UC4
+Teacher --> UC5
+Teacher --> UC6
+
+@enduml

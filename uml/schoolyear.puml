@@ -1,0 +1,28 @@
+namespace ports.schoolyear {
+
+    class SchoolYearBasic {
+        +ID: int
+        +Name: string
+    }
+
+    class SchoolYearDetailed {
+        +SchoolYearBasic
+        +ClassGroupsCount: int
+        +Start: time.Time
+        +End: time.Time
+        +IsCurrent: bool
+    }
+
+    interface SchoolYearRepository {
+        +GetAll() : []domain.SchoolYear, error
+    }
+
+    interface SchoolYearService {
+        -repo: SchoolYearRepository
+        +GetAll() : []*SchoolYearDetailed, error
+    }
+
+    SchoolYearService ..> SchoolYearRepository : uses
+    SchoolYearService ..> SchoolYearDetailed : returns
+    SchoolYearService ..> SchoolYearBasic : uses
+}

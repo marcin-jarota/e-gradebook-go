@@ -1,0 +1,19 @@
+@startuml
+left to right direction
+actor "Uczeń" as Student
+
+package "Wyświetlanie danych" {
+    usecase "Wyświetlenie planu zajęć" as UC1
+    usecase "Wyświetlenie listy przedmiotów" as UC2
+    usecase "Wyświetlenie listy nauczycieli uczących przedmioty" as UC3
+    usecase "Wyświetlenie Kontaktu do nauczyciela uczącego (email)" as UC4
+    usecase "Lista ocen wraz ze średnią per przedmiot" as UC6
+}
+
+Student --> UC1
+Student --> UC2
+Student --> UC3
+Student --> UC4
+Student --> UC6
+
+@enduml

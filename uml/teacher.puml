@@ -1,0 +1,28 @@
+namespace ports.teacher {
+
+    class TeacherBaseOutput {
+        +ID: int
+        +Name: string
+        +Surname: string
+        +Email: string
+    }
+
+    interface TeacherRepository {
+        +GetAll() : []domain.Teacher, error
+        +AddTeacher(teacher: domain.Teacher) : error
+        +GetTeacherByUserID(id: int) : domain.Teacher, error
+        +ExistsByEmail(email: string) : bool, error
+        +GetAllByClassGroup(classGroupID: uint) : []domain.Teacher, error
+    }
+
+    interface TeacherService {
+        -repo: TeacherRepository
+        +GetAll() : []TeacherBaseOutput, error
+        +AddTeacher(user: UserCreatePayload) : error
+        +GetTeacherByUserID(id: int) : TeacherBaseOutput, error
+        +GetAllByClassGroup(classGroupID: uint) : (commented)
+    }
+
+    TeacherService ..> TeacherBaseOutput : uses
+    TeacherService ..> TeacherRepository : uses
+}

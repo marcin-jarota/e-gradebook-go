@@ -1,0 +1,79 @@
+@startuml
+namespace ports.classgroup {
+
+    class ClassGroupOutput {
+        +ID: int
+        +Name: string
+        +StudentsCount: int
+        +EducationYear: int
+        +SchoolYears: []SchoolYearBasic
+    }
+
+    class AddClassGroupInput {
+        +Name: string
+    }
+
+    class AddSubjectToClassGroupPayload {
+        +SubjectID: int
+        +ClassGroupID: int
+    }
+
+    class TeacherClassGroup {
+        +TeacherID: int
+        +ClassGroupID: int
+    }
+
+    class ClassGroupTeacher {
+        +ID: int
+        +Name: string
+        +Surname: string
+        +Email: string
+    }
+
+    class TeacherSubjectClassgroupID {
+        +ClassGroupID: int
+        +TeacherID: int
+        +SubjectID: int
+    }
+
+    class TeacherSubject {
+        +Teacher: TeacherBaseOutput
+        +Subject: SubjectBaseOutput
+    }
+
+    interface ClassGroupRepository {
+        +GetAll() : []domain.ClassGroup, error
+        +GetOneByID(id: int) : domain.ClassGroup, error
+        +AddClassGroup(classGroup: *domain.ClassGroup) : error
+        +AddSubject(classGroupID: int, subjectID: int) : error
+        +AddTeacher(classGroupID: int, teacherID: int) : error
+        +GetTeachers(classGroupID: int) : []domain.Teacher, error
+        +GetTeachersWithSubject(classGroupID: int) : []struct {Teacher Subject}, error
+        +Delete(classGroupID: int) : error
+        +AddTeacherWithSubject(classGroupID: int, teacherID: int, subjectID: int) : error
+    }
+
+    interface ClassGroupService {
+        -repo: ClassGroupRepository
+        +GetAll() : []ClassGroupOutput, error
+        +GetOneByID(id: int) : ClassGroupOutput, error
+        +AddClassGroup(input: AddClassGroupInput) : error
+        +AddSubject(input: AddSubjectToClassGroupPayload) : error
+        +AddTeacher(input: TeacherClassGroup) : error
+        +GetTeachers(classGroupID: int) : []ClassGroupTeacher, error
+        +AddTeacherWithSubject(input: TeacherSubjectClassgroupID) : error
+        +GetTeachersWithSubject(classGroupID: int) : []TeacherSubject, error
+        +Delete(id: int) : error
+    }
+
+    ClassGroupService ..> ClassGroupRepository : uses
+    ClassGroupService ..> ClassGroupOutput : returns
+    ClassGroupService ..> AddClassGroupInput : uses
+    ClassGroupService ..> TeacherClassGroup : uses
+    ClassGroupService ..> ClassGroupTeacher : returns
+    ClassGroupService ..> TeacherSubjectClassgroupID : uses
+    ClassGroupService ..> TeacherSubject : returns
+    ClassGroupService ..> AddSubjectToClassGroupPayload : uses
+
+}
+@enduml

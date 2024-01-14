@@ -1,0 +1,63 @@
+namespace ports.student {
+
+    class StudentOutput {
+        +ID: uint
+        +UserID: int
+        +Name: string
+        +Surname: string
+        +FullName: string
+        +Email: string
+        +Marks: []domain.Mark
+    }
+
+    class StudentMarkOutput {
+        +ID: uint
+        +Value: float32
+        +Subject: domain.Subject
+    }
+
+    class StudentByClassGroup {
+        +ID: int
+        +Name: string
+        +Surname: string
+        +Email: string
+        +AvgMark: float32
+    }
+
+    class SetClassGroupPayload {
+        +StudentID: int
+        +ClassGroupID: int
+    }
+
+    class StudentByUserID {
+        +StudentID: int
+        +ClassGroupID: int
+    }
+
+    interface StudentRepository {
+        +GetAll() : []domain.Student, error
+        +GetOneByID(studentID: int) : domain.Student, error
+        +GetAllByClassGroup(classGroupID: uint) : []domain.Student, error
+        +AddStudent(student: *domain.Student) : error
+        +ExistsByEmail(email: string) : bool, error
+        +SetClassGroup(studentID: uint, classGroupID: uint) : error
+        +RemoveClassGroup(studentID: uint) : error
+        +GetByUserID(userID: int) : domain.Student, error
+    }
+
+    interface StudentService {
+        -repo: StudentRepository
+        +GetAll() : []*StudentOutput, error
+        +GetAllByClassGroup(classGroupID: int) : []StudentByClassGroup, error
+        +GetOneByID(studentID: int) : *StudentOutput, error
+        '+GetMarks(studentID: int) : []*StudentMarkOutput, error' (commented)
+        +AddStudent(user: UserCreatePayload) : error
+        +SetClassGroup(payload: SetClassGroupPayload) : error
+        +GetByUserID(userID: int) : StudentByUserID, error
+    }
+
+    StudentService ..> StudentRepository : uses
+    StudentOutput "1" -- "*" StudentMarkOutput : contains
+    StudentOutput "1" -- "0..1" StudentByClassGroup : maps to
+
+}

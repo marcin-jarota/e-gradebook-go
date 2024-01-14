@@ -1,0 +1,17 @@
+@startuml
+left to right direction
+actor "Nauczyciel" as Teacher
+
+package "Zarządzania Klasami" {
+    usecase "Przeglądanie klas" as UC4
+    usecase "Przeglądanie listy ucnziów w klasie" as UC5
+    usecase "Przeglądanie planu lekcji dla klasy" as UC6
+    usecase "Przeglądanie statystyk klas" as UC7
+}
+
+Teacher --> UC4
+Teacher --> UC5
+Teacher --> UC6
+Teacher --> UC7
+
+@enduml

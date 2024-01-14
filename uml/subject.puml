@@ -1,0 +1,48 @@
+namespace ports.subject {
+    class SubjectTeacher {
+        +ID: int
+        +Name: string
+        +Surname: string
+    }
+
+    class SubjectOutput {
+        +ID: uint
+        +Name: string
+        +Teachers: []SubjectTeacher
+    }
+
+    class SubjectBaseOutput {
+        +ID: uint
+        +Name: string
+    }
+
+    class TeacherSubjectID {
+        +TeacherID: int
+        +SubjectID: int
+    }
+
+    interface SubjectRepository {
+        +AddSubject(subject: *domain.Subject) : error
+        +GetAll() : []*domain.Subject, error
+        +GetOneByName(name: string) : *domain.Subject, error
+        +GetOneByID(id: int) : domain.Subject, error
+        +AddTeacher(teacherID: int, subjectID: int) : error
+        +Exists(name: string) : bool, error
+        +DeleteByID(id: uint) : error
+    }
+
+    interface SubjectService {
+        -repo: SubjectRepository
+        +AddSubject(name: string) : error
+        +AddTeacher(payload: TeacherSubjectID) : error
+        +GetOneByID(id: int) : *SubjectBaseOutput, error
+        +GetAll() : []*SubjectOutput, error
+        +Delete(id: uint) : error
+    }
+
+    SubjectOutput --o SubjectTeacher : contains
+    SubjectService ..> TeacherSubjectID : uses
+    SubjectService ..> SubjectBaseOutput : uses
+    SubjectService ..> SubjectRepository : uses
+    SubjectService ..> SubjectOutput : returns
+}
