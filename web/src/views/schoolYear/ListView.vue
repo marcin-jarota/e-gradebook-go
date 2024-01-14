@@ -29,7 +29,7 @@
         </tbody>
       </table>
 
-      <VButton variant="primary" type="button">Otwórz nowy rok szkolny</VButton>
+      <OpenSchoolYear @on-add="fetchYears" />
     </div>
   </MainLayout>
 </template>
@@ -37,6 +37,7 @@
 <script setup lang="ts">
 import MainLayout from '@/layouts/MainLayout.vue'
 import VButton from '@/components/atoms/VButton.vue'
+import OpenSchoolYear from '@/components/organisms/OpenSchoolYear.vue'
 import { schoolYearResource } from '@/resources/schoolYear'
 import type { SchoolYearDetailed } from '@/types/SchoolYear'
 import { ref } from 'vue'

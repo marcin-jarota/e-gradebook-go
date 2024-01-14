@@ -2,6 +2,8 @@ package schoolyear
 
 import (
 	"e-student/internal/app/ports"
+	"errors"
+	"time"
 )
 
 type SchoolYearService struct {
@@ -35,4 +37,25 @@ func (r *SchoolYearService) GetAll() ([]*ports.SchoolYearDetailed, error) {
 	}
 
 	return schoolYears, nil
+}
+
+func (r *SchoolYearService) AddSchoolYear(schoolYear ports.SchoolYearPayload) error {
+	start, err := time.Parse("01-02-2006", schoolYear.Start)
+
+	if err != nil {
+		return errors.New("schoolYear.error.invalidStartDate")
+	}
+
+	end, err := time.Parse("01-02-2006", schoolYear.End)
+
+	if err != nil {
+		return errors.New("schoolYear.error.invalidEndDate")
+	}
+
+	if schoolYear.Name == "" {
+		return errors.New("schoolYear.error.missingName")
+	}
+
+	return r.repo.AddSchoolYear(schoolYear.Name, start, end)
+
 }

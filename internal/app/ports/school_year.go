@@ -19,11 +19,19 @@ type (
 		IsCurrent        bool      `json:"isCurrent"`
 	}
 
+	SchoolYearPayload struct {
+		Name  string `json:"name"`
+		Start string `json:"start"`
+		End   string `json:"end"`
+	}
+
 	SchoolYearRepository interface {
 		GetAll() ([]domain.SchoolYear, error)
+		AddSchoolYear(name string, start time.Time, end time.Time) error
 	}
 
 	SchoolYearService interface {
 		GetAll() ([]*SchoolYearDetailed, error)
+		AddSchoolYear(schoolYear SchoolYearPayload) error
 	}
 )

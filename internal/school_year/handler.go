@@ -22,7 +22,8 @@ func NewSchoolYearHandler(service ports.SchoolYearService) *SchoolYearHandler {
 func (h *SchoolYearHandler) BindRouting(app fiber.Router, auth *middleware.AuthMiddleware) {
 	r := app.Group("/school-year", auth.IsAuthenticatedByHeader())
 
-	r.Get("/", auth.UserIs("admin", "teacher"), h.GetAll)
+	r.Get("/", auth.UserIs("admin"), h.GetAll)
+	r.Post("/", auth.UserIs("admin"), h.OpenSchoolYear)
 }
 
 func (h *SchoolYearHandler) GetAll(c *fiber.Ctx) error {
@@ -33,4 +34,18 @@ func (h *SchoolYearHandler) GetAll(c *fiber.Ctx) error {
 	}
 
 	return h.JSON(c, schoolYears)
+}
+
+func (h *SchoolYearHandler) OpenSchoolYear(c *fiber.Ctx) error {
+	var p ports.SchoolYearPayload
+
+	if err := c.BodyParser(&p); err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	if err := h.service.AddSchoolYear(p); err != nil {
+		return h.JSONError(c, err, fiber.StatusInternalServerError)
+	}
+
+	return h.JSON(c, fiber.Map{"ok": true})
 }

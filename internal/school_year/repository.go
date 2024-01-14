@@ -2,6 +2,7 @@ package schoolyear
 
 import (
 	"e-student/internal/app/domain"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -23,4 +24,8 @@ func (r *GormSchoolYearRepostiory) GetAll() ([]domain.SchoolYear, error) {
 	}
 
 	return schoolYears, nil
+}
+
+func (r *GormSchoolYearRepostiory) AddSchoolYear(name string, start time.Time, end time.Time) error {
+	return r.db.Exec("SELECT open_new_school_year(?, ?, ?)", name, start, end).Error
 }
