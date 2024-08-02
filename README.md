@@ -4,6 +4,7 @@ This project is a comprehensive School Management System implemented using Go fo
 
 ## Project Structure
 
+```bash
 ├── cmd # Command-line interfaces
 │ ├── api # Main API application
 │ └── seed # Database seeding utility
@@ -24,6 +25,7 @@ This project is a comprehensive School Management System implemented using Go fo
 │ └── user # User management
 ├── uml # UML diagrams
 └── web # Frontend Vue.js application
+```
 
 ## Key Features
 
@@ -58,4 +60,4 @@ This project follows Clean Architecture and Domain-Driven Design principles:
 - The `internal/app/ports` directory defines the interfaces for the application.
 - Each feature (e.g., `class_group`, `lesson`, `mark`) is organized into its own package with handlers, repositories, and services.
 
-![architecture diagram](https://github.com/marcin-jarota/e-gradebook-go/tree/main/uml/architecture.png?raw=true)
+![architecture diagram](https://github.com/marcin-jarota/e-gradebook-go/tree/main/uml/architecture.png)
