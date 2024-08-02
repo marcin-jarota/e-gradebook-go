@@ -40,9 +40,9 @@ This project is a comprehensive School Management System implemented using Go fo
 
 - Backend: Go
 - Frontend: Vue.js
-- Database: PostgreSQL (inferred from SQL files)
-- Cache: Redis (inferred from `redis_storage.go`)
-- API: RESTful (inferred from project structure)
+- Database: PostgreSQL
+- Session storage: Redis
+- API: RESTful
 
 ## Getting Started
 
